@@ -3,207 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jake Herridge - Generators</title>
+    <title>Jake Herridge | Strategic Operations Leader</title>
     <style>
-        /* Modern CSS Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0a192f; /* Dark techy background */
-            color: #ccd6f6; /* Light text for contrast */
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.7;
+            padding: 2rem;
         }
 
-        header {
-            background: linear-gradient(135deg, #00cfc8, #00a8cc); /* Teal to blue gradient */
-            color: white;
-            padding: 40px 20px;
-            width: 100%;
-            text-align: center;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+        .container {
+            max-width: 800px;
+            margin: 4rem auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            animation: fadeIn 0.6s ease-in;
         }
 
         h1 {
+            color: #2d3436;
+            margin-bottom: 2rem;
             font-size: 2.5rem;
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(0, 207, 200, 0.7); /* Glowing effect */
+            border-bottom: 3px solid #0984e3;
+            padding-bottom: 0.5rem;
         }
 
-        .generator-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            max-width: 1000px;
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: #555;
         }
 
-        .generator {
-            background: #112240; /* Dark techy background */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .contact-cta {
             text-align: center;
-            flex: 1 1 30%;
-            max-width: 300px;
-            border: 1px solid #1f4068; /* Subtle border */
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
 
-        .generator h2 {
-            font-size: 1.25rem;
-            margin-bottom: 20px;
-            color: #64ffda; /* Teal accent color */
-            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5); /* Glowing effect */
+        a {
+            color: #0984e3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
 
-        button {
-            background: linear-gradient(135deg, #00cfc8, #00a8cc); /* Teal to blue gradient */
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 207, 200, 0.5); /* Glowing effect */
-            font-family: 'Courier New', Courier, monospace; /* Nerdy monospace font */
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        a:hover {
+            color: #074b83;
         }
 
-        button:hover {
-            background: linear-gradient(135deg, #00a8cc, #00cfc8); /* Reverse gradient on hover */
-            box-shadow: 0 0 20px rgba(0, 207, 200, 0.8); /* Brighter glow on hover */
-            transform: translateY(-2px); /* Slight lift */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .output {
-            margin-top: 20px;
-            font-size: 1rem;
-            color: #ccd6f6; /* Light text */
-            font-style: italic;
-            padding: 15px;
-            background: #1f4068; /* Darker background for output */
-            border-radius: 5px;
-            border: 1px solid #00cfc8; /* Teal border */
-            box-shadow: inset 0 0 10px rgba(0, 207, 200, 0.3); /* Inner glow */
-        }
-
-        .output-author {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #64ffda; /* Teal accent color */
-            font-style: normal;
+        @media (max-width: 768px) {
+            .container {
+                margin: 2rem auto;
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            body {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="container">
         <h1>Jake Herridge</h1>
-    </header>
-    <main>
-        <div class="generator-container">
-            <!-- Philosophy Quote Generator -->
-            <section class="generator">
-                <h2>Philosophy Quote Generator</h2>
-                <button id="generate-philosophy">Generate Philosophy Quote</button>
-                <div id="philosophy-output" class="output"></div>
-            </section>
+        
+        <p>I'm a strategic operations leader who believes data should empower people, not overwhelm them. Over the past 5+ years, I've specialized in turning tangled processes into streamlined systems—but what truly excites me is leading teams to own those solutions. Whether it's redesigning performance reviews to cut administrative time in half and add five times the value or building customer scoring models that boost retention, I focus on aligning daily work with the bigger picture. Tools like Power BI and Power Automate are my allies, but my superpower is translating raw insights into actionable strategies that teams actually want to execute.</p>
 
-            <!-- Psychology Quote Generator -->
-            <section class="generator">
-                <h2>Psychology Quote Generator</h2>
-                <button id="generate-psychology">Generate Psychology Quote</button>
-                <div id="psychology-output" class="output"></div>
-            </section>
+        <p>As a leader, I operate like a strategic compass: I get into the trenches with my team to understand their pain points, then connect those dots to organizational goals. For example, by creating transparent dashboards that show how individual tasks ladder up to CEO-level priorities, I've helped teams shift from 'Why are we doing this?' to 'Here's how we'll win.' I thrive on fostering trust through clarity—no jargon, no hidden agendas—just a relentless focus on solving the right problems, in the right order, together.</p>
 
-            <!-- Hybrid Quote Generator -->
-            <section class="generator">
-                <h2>Hybrid Quote Generator</h2>
-                <button id="generate-hybrid">Generate Hybrid Quote</button>
-                <div id="hybrid-output" class="output"></div>
-                <div id="hybrid-author" class="output-author"></div>
-            </section>
+        <p>My approach? Listen first, automate second, and always keep the human impact in focus. I've earned praise from CEOs for my ability to bridge the gap between high-level vision and on-the-ground execution—turning what was ambiguity into a playbook that teams rally behind. For me, transparency isn't just a buzzword; it's the fuel that keeps everyone rowing in the same direction, even when tackling the most daunting of challenges.</p>
+
+        <div class="contact-cta">
+            <p>If your organization needs a leader who can turn operational chaos into momentum—where data drives decisions, teams feel heard, and 'how we've always done it' evolves into 'how we'll outpace the competition'—<a href="mailto:your.email@example.com">let's connect</a>.<br><br>What's the #1 friction point keeping your team from aligning with your CEO's vision?</p>
         </div>
-    </main>
-    <script>
-        // Sample Quotes with Authors
-        const psychologyQuotes = [
-            { text: "The mind is everything. What you think, you become.", author: "Buddha", theme: "self-awareness" },
-            { text: "Happiness depends upon ourselves.", author: "Aristotle", theme: "happiness" },
-            { text: "The greatest weapon against stress is our ability to choose one thought over another.", author: "William James", theme: "stress" },
-            { text: "Knowing your own darkness is the best method for dealing with the darknesses of other people.", author: "Carl Jung", theme: "self-awareness" },
-            { text: "The good life is a process, not a state of being.", author: "Carl Rogers", theme: "happiness" }
-        ];
-
-        const philosophyQuotes = [
-            { text: "The unexamined life is not worth living.", author: "Socrates", theme: "self-awareness" },
-            { text: "Happiness is not an ideal of reason but of imagination.", author: "Immanuel Kant", theme: "happiness" },
-            { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle", theme: "habits" },
-            { text: "The only thing I know is that I know nothing.", author: "Socrates", theme: "self-awareness" },
-            { text: "The life of man is solitary, poor, nasty, brutish, and short.", author: "Thomas Hobbes", theme: "human-nature" }
-        ];
-
-        // Function to generate a random philosophy quote
-        document.getElementById('generate-philosophy').addEventListener('click', function() {
-            const randomIndex = Math.floor(Math.random() * philosophyQuotes.length);
-            const randomQuote = philosophyQuotes[randomIndex];
-            document.getElementById('philosophy-output').textContent = `${randomQuote.text} — ${randomQuote.author}`;
-        });
-
-        // Function to generate a random psychology quote
-        document.getElementById('generate-psychology').addEventListener('click', function() {
-            const randomIndex = Math.floor(Math.random() * psychologyQuotes.length);
-            const randomQuote = psychologyQuotes[randomIndex];
-            document.getElementById('psychology-output').textContent = `${randomQuote.text} — ${randomQuote.author}`;
-        });
-
-        // Function to generate a hybrid quote
-        document.getElementById('generate-hybrid').addEventListener('click', function() {
-            // Randomly select a theme
-            const themes = ["self-awareness", "happiness", "stress", "habits", "human-nature"];
-            const randomTheme = themes[Math.floor(Math.random() * themes.length)];
-
-            // Filter quotes by the selected theme
-            const psychQuotesByTheme = psychologyQuotes.filter(q => q.theme === randomTheme);
-            const philQuotesByTheme = philosophyQuotes.filter(q => q.theme === randomTheme);
-
-            // Randomly select one psychology and one philosophy quote
-            const randomPsychQuote = psychQuotesByTheme[Math.floor(Math.random() * psychQuotesByTheme.length)];
-            const randomPhilQuote = philQuotesByTheme[Math.floor(Math.random() * philQuotesByTheme.length)];
-
-            // Combine the quotes and authors
-            if (randomPsychQuote && randomPhilQuote) {
-                const hybridQuote = `${randomPsychQuote.text} — ${randomPhilQuote.text}`;
-                const hybridAuthor = `— ${combineNames(randomPsychQuote.author, randomPhilQuote.author)}`;
-
-                document.getElementById('hybrid-output').textContent = hybridQuote;
-                document.getElementById('hybrid-author').textContent = hybridAuthor;
-            } else {
-                document.getElementById('hybrid-output').textContent = "No quotes found for this theme. Try again!";
-                document.getElementById('hybrid-author').textContent = "";
-            }
-        });
-
-        // Function to combine names creatively
-        function combineNames(psychologist, philosopher) {
-            const psychFirst = psychologist.split(" ")[0];
-            const philLast = philosopher.split(" ")[1];
-            return `${psychFirst} ${philLast}`; // Example: "Carl Kant"
-        }
-    </script>
+    </div>
 </body>
 </html>
