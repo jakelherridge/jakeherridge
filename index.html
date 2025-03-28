@@ -3,149 +3,155 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kitchen Happy | The Cookbook That Plans Dinner For You</title>
+  <title>Kitchen Happy – The Cookbook That Solves Dinner</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
       background-color: #fffaf6;
       color: #333;
-      scroll-behavior: smooth;
+      line-height: 1.6;
     }
     header {
-      background-color: #ffe8d6;
-      padding: 3rem 2rem;
+      background: linear-gradient(135deg, #ffe8d6 0%, #fff1ec 100%);
       text-align: center;
-      animation: fadeIn 1.2s ease-in;
+      padding: 4rem 2rem 3rem;
     }
     header h1 {
-      font-size: 2.5rem;
+      font-size: 3rem;
       margin-bottom: 0.5rem;
     }
     header p {
       font-size: 1.25rem;
-      margin-top: 0;
+      margin-bottom: 2rem;
     }
-    .cta-button {
+    .hero-button {
       background-color: #ff7f50;
       color: white;
       padding: 1rem 2rem;
+      font-size: 1.1rem;
       border: none;
-      border-radius: 12px;
-      font-size: 1rem;
+      border-radius: 1rem;
       cursor: pointer;
-      margin-top: 1.5rem;
-      transition: transform 0.2s ease, background-color 0.3s ease;
+      transition: all 0.3s ease;
     }
-    .cta-button:hover {
+    .hero-button:hover {
       background-color: #ff5722;
       transform: scale(1.05);
     }
-    .section {
-      padding: 3rem 2rem;
-      max-width: 900px;
+    section {
+      padding: 4rem 2rem;
+      max-width: 1000px;
       margin: auto;
-      animation: fadeInUp 1.2s ease both;
+      animation: fadeIn 1s ease-in;
     }
-    .section h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .features {
+    .highlight-boxes {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
+      margin-top: 2rem;
     }
-    .feature-box {
+    .highlight {
       background-color: #fff;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .feature-box:hover {
+    .highlight:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
     }
-    .preview-image {
-      width: 100%;
+    .highlight h3 {
+      margin-top: 0;
+      color: #ff7f50;
+    }
+    .qr-demo {
+      text-align: center;
+      padding: 4rem 2rem;
+      background-color: #fef3eb;
+    }
+    .qr-demo img {
+      width: 200px;
       border-radius: 1rem;
       margin-top: 1rem;
-      animation: fadeIn 1.2s ease-in;
+    }
+    .author-box {
+      text-align: center;
+      margin-top: 3rem;
+    }
+    .author-box img {
+      border-radius: 50%;
+      width: 120px;
+      margin-bottom: 1rem;
     }
     footer {
       text-align: center;
-      background-color: #f3f3f3;
-      padding: 2rem;
-      margin-top: 3rem;
+      padding: 3rem 1rem;
       font-size: 0.9rem;
-    }
-    @media (max-width: 768px) {
-      header h1 {
-        font-size: 2rem;
-      }
-      header p {
-        font-size: 1rem;
-      }
-      .features {
-        grid-template-columns: 1fr;
-      }
-      .section {
-        padding: 2rem 1rem;
-      }
+      color: #777;
     }
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Kitchen Happy</h1>
-    <p>The Cookbook That Basically Cooks Itself</p>
-    <button class="cta-button">Preorder Now</button>
+    <p>The cookbook that solves dinner, reduces stress, and delivers groceries in a click.</p>
+    <button class="hero-button">See How It Works</button>
   </header>
 
-  <section class="section">
-    <h2>What You'll Get</h2>
-    <div class="features">
-      <div class="feature-box">
+  <section>
+    <h2>Why This Book Matters</h2>
+    <div class="highlight-boxes">
+      <div class="highlight">
         <h3>20 Weeks of Meal Plans</h3>
-        <p>Each week includes 4 dinners, 1 make-ahead breakfast, and 1 lunch/snack idea. Less planning, more peace.</p>
+        <p>Each week includes 4 dinners, 1 make-ahead breakfast, and 1 snack/lunch idea—so families are never left scrambling at 5PM again.</p>
       </div>
-      <div class="feature-box">
-        <h3>Walmart QR Code Integration</h3>
-        <p>Scan and your cart is filled. Groceries delivered in hours. Magic.</p>
+      <div class="highlight">
+        <h3>One Cart. One Click.</h3>
+        <p>Every recipe is linked to a Walmart cart via QR code. Users can scan, shop, and get groceries delivered in under 8 hours.</p>
       </div>
-      <div class="feature-box">
-        <h3>Video Walkthroughs</h3>
-        <p>Scan to watch step-by-step reels for every recipe. Like TikTok, but actually helpful.</p>
+      <div class="highlight">
+        <h3>Grocery Synergy</h3>
+        <p>Minimal ingredient overlap means families save money, reduce food waste, and reuse ingredients in smart ways throughout the week.</p>
       </div>
-      <div class="feature-box">
-        <h3>Minimal Ingredients, Big Results</h3>
-        <p>Every week uses a tight ingredient list to reduce waste and save you money.</p>
+      <div class="highlight">
+        <h3>Video Support for Every Recipe</h3>
+        <p>Every recipe includes a QR code that leads to a walkthrough video. Approachable, visual, and built for busy brains.</p>
+      </div>
+      <div class="highlight">
+        <h3>Built for Real Life</h3>
+        <p>Created by a mom of four under five, this book understands the chaos and brings simplicity, structure, and joy back into the kitchen.</p>
+      </div>
+      <div class="highlight">
+        <h3>Recurring Grocery Revenue</h3>
+        <p>This isn’t just a cookbook—it’s a recurring cart generator. With over 100 QR codes driving Walmart cart engagement, the revenue potential is built-in.</p>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <h2>Meet the Author</h2>
-    <p>Hi, I'm [Your Name] — a mom of four under five, recipe creator, and real-life dinner survivor. You've seen me on Netflix's Easy-Bake Battle and Food Network. I made this book because I needed it... and I know you do too.</p>
+  <section class="qr-demo">
+    <h2>See the Magic</h2>
+    <p>Scan a QR code in the book, and your entire shopping cart is filled. Easy.</p>
+    <img src="qr-demo.png" alt="QR demo" />
   </section>
 
-  <section class="section">
-    <h2>Peek Inside</h2>
-    <img src="preview-mealplan.jpg" alt="Preview of cookbook meal plan layout" class="preview-image" />
+  <section class="author-box">
+    <img src="author-headshot.jpg" alt="Author Headshot">
+    <h3>Meet the Author</h3>
+    <p>[Your Name] is a food creator, mom of four under five, and seen on Netflix’s Easy-Bake Battle and Food Network. She built the cookbook she wished existed. And now it’s here.</p>
   </section>
 
   <footer>
-    <p>© 2025 Kitchen Happy. All rights reserved.</p>
+    <p>© 2025 Kitchen Happy. Designed to make dinner easier. Every single night.</p>
   </footer>
 </body>
 </html>
