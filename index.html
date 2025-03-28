@@ -1,102 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jake Herridge | Strategic Operations Leader</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.7;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 4rem auto;
-            background: white;
-            padding: 3rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            animation: fadeIn 0.6s ease-in;
-        }
-
-        h1 {
-            color: #2d3436;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-            font-weight: 700;
-            border-bottom: 3px solid #0984e3;
-            padding-bottom: 0.5rem;
-        }
-
-        p {
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-            color: #555;
-        }
-
-        .contact-cta {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        a {
-            color: #0984e3;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        a:hover {
-            color: #074b83;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 2rem auto;
-                padding: 2rem;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            body {
-                padding: 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kitchen Happy | The Cookbook That Plans Dinner For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #fffaf6;
+      color: #333;
+      scroll-behavior: smooth;
+    }
+    header {
+      background-color: #ffe8d6;
+      padding: 3rem 2rem;
+      text-align: center;
+      animation: fadeIn 1.2s ease-in;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      font-size: 1.25rem;
+      margin-top: 0;
+    }
+    .cta-button {
+      background-color: #ff7f50;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: #ff5722;
+      transform: scale(1.05);
+    }
+    .section {
+      padding: 3rem 2rem;
+      max-width: 900px;
+      margin: auto;
+      animation: fadeInUp 1.2s ease both;
+    }
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .feature-box {
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    }
+    .preview-image {
+      width: 100%;
+      border-radius: 1rem;
+      margin-top: 1rem;
+      animation: fadeIn 1.2s ease-in;
+    }
+    footer {
+      text-align: center;
+      background-color: #f3f3f3;
+      padding: 2rem;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .features {
+        grid-template-columns: 1fr;
+      }
+      .section {
+        padding: 2rem 1rem;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Jake Herridge</h1>
-        
-        <p>I'm a strategic operations leader who believes data should empower people, not overwhelm them. Over the past 5+ years, I've specialized in turning tangled processes into streamlined systems—but what truly excites me is leading teams to own those solutions. Whether it's redesigning performance reviews to cut administrative time in half and add five times the value or building customer scoring models that boost retention, I focus on aligning daily work with the bigger picture. Tools like Power BI and Power Automate are my allies, but my superpower is translating raw insights into actionable strategies that teams actually want to execute.</p>
+  <header>
+    <h1>Kitchen Happy</h1>
+    <p>The Cookbook That Basically Cooks Itself</p>
+    <button class="cta-button">Preorder Now</button>
+  </header>
 
-        <p>As a leader, I operate like a strategic compass: I get into the trenches with my team to understand their pain points, then connect those dots to organizational goals. For example, by creating transparent dashboards that show how individual tasks ladder up to CEO-level priorities, I've helped teams shift from 'Why are we doing this?' to 'Here's how we'll win.' I thrive on fostering trust through clarity—no jargon, no hidden agendas—just a relentless focus on solving the right problems, in the right order, together.</p>
-
-        <p>My approach? Listen first, automate second, and always keep the human impact in focus. I've earned praise from CEOs for my ability to bridge the gap between high-level vision and on-the-ground execution—turning what was ambiguity into a playbook that teams rally behind. For me, transparency isn't just a buzzword; it's the fuel that keeps everyone rowing in the same direction, even when tackling the most daunting of challenges.</p>
-
-        <div class="contact-cta">
-            <p>If your organization needs a leader who can turn operational chaos into momentum—where data drives decisions, teams feel heard, and 'how we've always done it' evolves into 'how we'll outpace the competition'—<a href="https://www.linkedin.com/in/jake-herridge-2722b139/" target="_blank" rel="noopener">let's connect</a>.<br><br>What's the #1 friction point keeping your team from aligning with your CEO's vision?</p>
-        </div>
+  <section class="section">
+    <h2>What You'll Get</h2>
+    <div class="features">
+      <div class="feature-box">
+        <h3>20 Weeks of Meal Plans</h3>
+        <p>Each week includes 4 dinners, 1 make-ahead breakfast, and 1 lunch/snack idea. Less planning, more peace.</p>
+      </div>
+      <div class="feature-box">
+        <h3>Walmart QR Code Integration</h3>
+        <p>Scan and your cart is filled. Groceries delivered in hours. Magic.</p>
+      </div>
+      <div class="feature-box">
+        <h3>Video Walkthroughs</h3>
+        <p>Scan to watch step-by-step reels for every recipe. Like TikTok, but actually helpful.</p>
+      </div>
+      <div class="feature-box">
+        <h3>Minimal Ingredients, Big Results</h3>
+        <p>Every week uses a tight ingredient list to reduce waste and save you money.</p>
+      </div>
     </div>
+  </section>
+
+  <section class="section">
+    <h2>Meet the Author</h2>
+    <p>Hi, I'm [Your Name] — a mom of four under five, recipe creator, and real-life dinner survivor. You've seen me on Netflix's Easy-Bake Battle and Food Network. I made this book because I needed it... and I know you do too.</p>
+  </section>
+
+  <section class="section">
+    <h2>Peek Inside</h2>
+    <img src="preview-mealplan.jpg" alt="Preview of cookbook meal plan layout" class="preview-image" />
+  </section>
+
+  <footer>
+    <p>© 2025 Kitchen Happy. All rights reserved.</p>
+  </footer>
 </body>
 </html>
