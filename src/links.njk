@@ -1,0 +1,18 @@
+
+---
+layout: layouts/base.njk
+title: Cool Links
+permalink: "/links/index.html"
+---
+<section class="max-w-4xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-4">Cool Links</h1>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for link in links %}
+      <a href="{{ link.url }}" target="_blank" rel="noopener" class="panel p-4 rounded-lg hover:scale-105 transition block">
+        <img src="{{ link.image }}" class="rounded mb-2 w-full h-32 object-cover" alt="{{ link.title }}">
+        <h3 class="font-semibold">{{ link.title }}</h3>
+        <p class="text-sm text-[color:var(--muted)]">{{ link.description }}</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>

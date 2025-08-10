@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Cool Tool",
+    "description": "Super helpful resource.",
+    "url": "#",
+    "image": "https://via.placeholder.com/600x400?text=Tool"
+  },
+  {
+    "title": "Favorite Pan",
+    "description": "Kitchen gear I love.",
+    "url": "#",
+    "image": "https://via.placeholder.com/600x400?text=Pan"
+  },
+  {
+    "title": "Backyard Gadget",
+    "description": "Makes life easier.",
+    "url": "#",
+    "image": "https://via.placeholder.com/600x400?text=Gadget"
+  }
+]

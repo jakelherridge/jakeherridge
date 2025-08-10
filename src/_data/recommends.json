@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Book Title",
+    "description": "A brief description.",
+    "url": "#",
+    "image": "https://via.placeholder.com/600x400?text=Book"
+  },
+  {
+    "title": "Backpack",
+    "description": "A brief description.",
+    "url": "#",
+    "image": "https://via.placeholder.com/600x400?text=Backpack"
+  },
+  {
+    "title": "Item Name",
+    "description": "A brief description.",
+    "url": "#",
+    "image": "https://via.placeholder.com/600x400?text=Item"
+  }
+]

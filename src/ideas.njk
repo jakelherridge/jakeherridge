@@ -1,0 +1,81 @@
+
+---
+layout: layouts/base.njk
+title: Ideas
+permalink: "/ideas/index.html"
+pagination:
+  data: collections.livePosts
+  size: 8
+  alias: posts
+---
+<section class="max-w-4xl mx-auto p-6">
+  <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <h1 class="text-2xl font-bold">Ideas</h1>
+    <input id="search" type="search" placeholder="Search posts..." class="p-2 rounded text-black w-full md:w-64">
+  </div>
+
+  <div class="mt-4 flex gap-2 flex-wrap">
+    <button class="tag px-3 py-1 rounded panel" data-tag="all">All</button>
+    {% for tag in collections.tagList %}
+      <button class="tag px-3 py-1 rounded panel" data-tag="{{ tag }}">{{ tag }}</button>
+    {% endfor %}
+  </div>
+
+  <div id="posts" class="mt-6 grid grid-cols-1 gap-4">
+    {% for post in posts | reverse %}
+      <a href="{{ post.url }}" class="post panel p-4 rounded-lg block hover:scale-[1.01] transition" data-tags="{{ post.data.tags | join(',') | lower }}">
+        {% if post.data.featuredImage %}
+          <img class="rounded mb-3 w-full h-48 object-cover" src="{{ post.data.featuredImage }}" alt="">
+        {% endif %}
+        <div class="flex items-center gap-2 text-xs text-[color:var(--muted)]">
+          <time datetime="{{ post.date | date('yyyy-MM-dd') }}">{{ post.date | date("MMM d, yyyy") }}</time>
+          {% for t in post.data.tags %}
+            <span class="bg-[color:var(--accent)]/30 px-2 py-0.5 rounded">{{ t }}</span>
+          {% endfor %}
+        </div>
+        <h2 class="font-semibold text-lg mt-1">{{ post.data.title }}</h2>
+        <p class="text-sm text-[color:var(--muted)]">{{ post.data.excerpt }}</p>
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination nav -->
+  <div class="flex justify-between items-center mt-8">
+    {% if pagination.href.previous %}
+      <a class="underline" href="{{ pagination.href.previous }}">&larr; Newer</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+    <span class="text-sm text-[color:var(--muted)]">Page {{ pagination.pageNumber + 1 }} of {{ pagination.pages | length }}</span>
+    {% if pagination.href.next %}
+      <a class="underline" href="{{ pagination.href.next }}">Older &rarr;</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  const input = document.getElementById('search');
+  const postsEls = Array.from(document.querySelectorAll('.post'));
+  const tagButtons = Array.from(document.querySelectorAll('.tag'));
+  let activeTag = 'all';
+
+  function filter() {
+    const q = (input.value || '').toLowerCase();
+    postsEls.forEach(p => {
+      const text = p.innerText.toLowerCase();
+      const tags = p.dataset.tags || '';
+      const tagOk = (activeTag === 'all') || tags.split(',').includes(activeTag.toLowerCase());
+      const textOk = !q || text.includes(q);
+      p.style.display = (tagOk && textOk) ? '' : 'none';
+    });
+  }
+  input.addEventListener('input', filter);
+  tagButtons.forEach(btn => btn.addEventListener('click', () => {
+    activeTag = btn.dataset.tag;
+    tagButtons.forEach(b => b.classList.remove('ring-2'));
+    btn.classList.add('ring-2','ring-[color:var(--accent)]');
+    filter();
+  }));
+</script>

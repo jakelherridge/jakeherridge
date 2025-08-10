@@ -1,0 +1,56 @@
+
+---
+layout: layouts/base.njk
+title: Jake Herridge
+permalink: "/index.html"
+---
+<section class="max-w-4xl mx-auto p-6 flex flex-col md:flex-row items-center gap-6">
+  <img src="/img/headshot.jpg" alt="Jake Herridge" class="rounded-full w-24 h-24 border-4 border-[color:var(--accent)] object-cover" />
+  <div>
+    <h2 class="text-2xl font-bold">Hi, I’m Jake</h2>
+    <p class="text-[color:var(--muted)] mt-2">I’m exploring ideas that matter—in philosophy, economics, well-being, and more.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="max-w-4xl mx-auto p-6 text-center">
+    <h3 class="uppercase tracking-wider text-sm text-[color:var(--accent)]">Thought of the Day</h3>
+    <p class="text-xl mt-2 italic">“{{ quote.text }}” <span class="not-italic text-[color:var(--muted)]">— {{ quote.author }}</span></p>
+  </div>
+</section>
+
+<section class="max-w-4xl mx-auto p-6">
+  <h3 class="text-xl font-bold mb-4">Jake Recommends</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for item in recommends %}
+      <a href="{{ item.url }}" class="panel p-4 rounded-lg hover:scale-105 transition block" target="_blank" rel="noopener">
+        <img src="{{ item.image }}" alt="{{ item.title }}" class="rounded mb-2 w-full h-40 object-cover">
+        <h4 class="font-semibold">{{ item.title }}</h4>
+        <p class="text-sm text-[color:var(--muted)]">{{ item.description }}</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="max-w-4xl mx-auto p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-xl font-bold">Latest Ideas</h3>
+    <a href="/ideas/" class="text-sm underline">View all</a>
+  </div>
+  <div class="space-y-4">
+    {% for post in collections.livePosts | reverse | slice(0,4) %}
+      <a href="{{ post.url }}" class="flex gap-4 panel p-4 rounded-lg hover:scale-[1.01] transition block">
+        {% if post.data.featuredImage %}
+          <img src="{{ post.data.featuredImage }}" alt="" class="rounded w-24 h-24 object-cover">
+        {% endif %}
+        <div>
+          {% if post.data.tags %}
+            <span class="bg-[color:var(--accent)]/30 text-xs px-2 py-1 rounded">{{ post.data.tags[0] }}</span>
+          {% endif %}
+          <h4 class="font-semibold mt-1">{{ post.data.title }}</h4>
+          <p class="text-sm text-[color:var(--muted)]">{{ post.data.excerpt }}</p>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
