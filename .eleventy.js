@@ -24,6 +24,23 @@ eleventyConfig.addCollection("livePosts", function(collectionApi) {
   }).sort((a,b)=>a.date-b.date);
 });
 
+// ----- Date filter (works in Nunjucks & Liquid) -----
+function dateFilter(value, format = "") {
+  const d = new Date(value);
+  const pad = (n) => String(n).padStart(2, "0");
+
+  if (format === "yyyy-MM-dd") return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  if (format === "MMM d, yyyy")
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  if (format === "yyyy") return String(d.getFullYear());
+  return d.toISOString();
+}
+
+eleventyConfig.addFilter("date", dateFilter);          // universal
+eleventyConfig.addNunjucksFilter("date", dateFilter);  // explicit for Nunjucks
+eleventyConfig.addLiquidFilter("date", dateFilter);    // explicit for Liquid (harmless)
+
+
 return {
 
     dir: { input: "src", output: "_site", includes: "_includes", data: "_data" },

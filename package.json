@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "npx @11ty/eleventy --serve --quiet",
-    "build": "npx @11ty/eleventy"
+    "build": "npx @11ty/eleventy",
+    "start": "eleventy --serve"
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.0"
   }
+
 }

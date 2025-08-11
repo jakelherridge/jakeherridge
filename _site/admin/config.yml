@@ -1,0 +1,55 @@
+
+
+publish_mode: editorial_workflow
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "src/img"
+public_folder: "/img"
+
+collections:
+  - name: "posts"
+    label: "Posts"
+    folder: "src/posts"
+    create: true
+    slug: "{{slug}}"
+    
+fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - {label: "Draft", name: "draft", widget: "boolean", default: false, hint: "If true, this post will not appear on the site."}
+      - {label: "Excerpt", name: "excerpt", widget: "text"}
+      - {label: "Featured Image", name: "featuredImage", widget: "image", required: false}
+      - {label: "OG Image", name: "ogImage", widget: "image", required: false, hint: "Used for social sharing previews."}
+      - {label: "Tags", name: "tags", widget: "list", default: ["General"]}
+      - {label: "Body", name: "body", widget: "markdown"}
+
+  - name: "recommends"
+    label: "Jake Recommends"
+    file: "src/_data/recommends.json"
+    fields:
+      - {label: "Items", name: "", widget: "list", fields: [
+          {label: "Title", name: "title", widget: "string"},
+          {label: "Description", name: "description", widget: "string"},
+          {label: "URL", name: "url", widget: "string"},
+          {label: "Image", name: "image", widget: "image"}
+        ]}
+
+  - name: "links"
+    label: "Cool Links"
+    file: "src/_data/links.json"
+    fields:
+      - {label: "Links", name: "", widget: "list", fields: [
+          {label: "Title", name: "title", widget: "string"},
+          {label: "Description", name: "description", widget: "string"},
+          {label: "URL", name: "url", widget: "string"},
+          {label: "Image", name: "image", widget: "image"}
+        ]}
+
+  - name: "quote"
+    label: "Thought of the Day"
+    file: "src/_data/quote.json"
+    fields:
+      - {label: "Text", name: "text", widget: "string"}
+      - {label: "Author", name: "author", widget: "string"}
