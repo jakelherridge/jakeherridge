@@ -1,4 +1,3 @@
-
 ---
 layout: layouts/base.njk
 title: Ideas
@@ -8,6 +7,7 @@ pagination:
   size: 8
   alias: posts
 ---
+
 <section class="max-w-4xl mx-auto p-6">
   <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
     <h1 class="text-2xl font-bold">Ideas</h1>
@@ -16,27 +16,33 @@ pagination:
 
   <div class="mt-4 flex gap-2 flex-wrap">
     <button class="tag px-3 py-1 rounded panel" data-tag="all">All</button>
-    {% for tag in collections.tagList %}
+    {% for tag in (collections.tagList or []) %}
       <button class="tag px-3 py-1 rounded panel" data-tag="{{ tag }}">{{ tag }}</button>
     {% endfor %}
   </div>
 
   <div id="posts" class="mt-6 grid grid-cols-1 gap-4">
-    {% for post in posts | reverse %}
-      <a href="{{ post.url }}" class="post panel p-4 rounded-lg block hover:scale-[1.01] transition" data-tags="{{ post.data.tags | join(',') | lower }}">
-        {% if post.data.featuredImage %}
-          <img class="rounded mb-3 w-full h-48 object-cover" src="{{ post.data.featuredImage }}" alt="">
-        {% endif %}
-        <div class="flex items-center gap-2 text-xs text-[color:var(--muted)]">
-          <time datetime="{{ post.date | date('yyyy-MM-dd') }}">{{ post.date | date("MMM d, yyyy") }}</time>
-          {% for t in post.data.tags %}
-            <span class="bg-[color:var(--accent)]/30 px-2 py-0.5 rounded">{{ t }}</span>
-          {% endfor %}
-        </div>
-        <h2 class="font-semibold text-lg mt-1">{{ post.data.title }}</h2>
-        <p class="text-sm text-[color:var(--muted)]">{{ post.data.excerpt }}</p>
-      </a>
-    {% endfor %}
+    {% if (posts or []).length == 0 %}
+      <p class="text-[color:var(--muted)]">No posts yet. Check back soon.</p>
+    {% else %}
+      {% for post in posts | reverse %}
+        <a href="{{ post.url }}"
+           class="post panel p-4 rounded-lg block hover:scale-[1.01] transition"
+           data-tags="{{ (post.data.tags or []) | join(',') | lower }}">
+          {% if post.data.featuredImage %}
+            <img class="rounded mb-3 w-full h-48 object-cover" src="{{ post.data.featuredImage }}" alt="">
+          {% endif %}
+          <div class="flex items-center gap-2 text-xs text-[color:var(--muted)]">
+            <time datetime="{{ post.date | date('yyyy-MM-dd') }}">{{ post.date | date('MMM d, yyyy') }}</time>
+            {% for t in (post.data.tags or []) %}
+              <span class="bg-[color:var(--accent)]/30 px-2 py-0.5 rounded">{{ t }}</span>
+            {% endfor %}
+          </div>
+          <h2 class="font-semibold text-lg mt-1">{{ post.data.title }}</h2>
+          <p class="text-sm text-[color:var(--muted)]">{{ post.data.excerpt }}</p>
+        </a>
+      {% endfor %}
+    {% endif %}
   </div>
 
   <!-- Pagination nav -->
@@ -46,7 +52,9 @@ pagination:
     {% else %}
       <span></span>
     {% endif %}
-    <span class="text-sm text-[color:var(--muted)]">Page {{ pagination.pageNumber + 1 }} of {{ pagination.pages | length }}</span>
+    <span class="text-sm text-[color:var(--muted)]">
+      Page {{ (pagination.pageNumber or 0) + 1 }} of {{ (pagination.pages or []).length }}
+    </span>
     {% if pagination.href.next %}
       <a class="underline" href="{{ pagination.href.next }}">Older &rarr;</a>
     {% else %}
@@ -65,16 +73,17 @@ pagination:
     const q = (input.value || '').toLowerCase();
     postsEls.forEach(p => {
       const text = p.innerText.toLowerCase();
-      const tags = p.dataset.tags || '';
+      const tags = (p.dataset.tags || '');
       const tagOk = (activeTag === 'all') || tags.split(',').includes(activeTag.toLowerCase());
       const textOk = !q || text.includes(q);
       p.style.display = (tagOk && textOk) ? '' : 'none';
     });
   }
-  input.addEventListener('input', filter);
+
+  input?.addEventListener('input', filter);
   tagButtons.forEach(btn => btn.addEventListener('click', () => {
     activeTag = btn.dataset.tag;
-    tagButtons.forEach(b => b.classList.remove('ring-2'));
+    tagButtons.forEach(b => b.classList.remove('ring-2','ring-[color:var(--accent)]'));
     btn.classList.add('ring-2','ring-[color:var(--accent)]');
     filter();
   }));
