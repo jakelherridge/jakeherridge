@@ -4,27 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
-
-    <!-- Netlify Identity widget (needed for Git Gateway auth) -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
-    <!-- Decap CMS (successor to Netlify CMS) -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-
-    <script>
-      // If you land on /admin with an invite/confirmation/recovery token,
-      // auto-open the Identity modal so you can finish signup/reset.
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', (user) => {
-          if (!user) {
-            const h = window.location.hash || '';
-            if (h.includes('invite_token') || h.includes('confirmation_token') || h.includes('recovery_token')) {
-              window.netlifyIdentity.open();
-            }
-          }
-        });
-      }
-    </script>
   </body>
 </html>
