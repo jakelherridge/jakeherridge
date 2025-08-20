@@ -8,5 +8,5 @@
     "mailchimpAction": "YOUR_MAILCHIMP_FORM_ACTION_URL",
     "beehiivPublicationId": "YOUR_BEEHIIV_PUB_ID"
   },
-  "socialImage": "/img/social-default.png"
+  "socialImage": "https://via.placeholder.com/1200x630?text=Jake+Herridge"
 }
