@@ -3,7 +3,42 @@
   command = "npm run build"
   publish = "_site"
 
+# Force HTTPS
+[[redirects]]
+  from = "http://jakeherridge.com/*"
+  to = "https://jakeherridge.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.jakeherridge.com/*"
+  to = "https://jakeherridge.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.jakeherridge.com/*"
+  to = "https://jakeherridge.com/:splat"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/admin"
   to = "/admin/"
   status = 301
+
+# Handle SPA routing (if you add client-side routing later)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://identity.netlify.com https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://identity.netlify.com;"
