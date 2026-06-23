@@ -1,0 +1,89 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const linkedin = "https://www.linkedin.com/in/jake-herridge-2722b139";
+const github = "https://github.com/jakelherridge";
+---
+
+<BaseLayout
+  title="About"
+  description="Jake Herridge is an operations leader and AI builder. Ten years scaling an engineering staffing firm, now writing and shipping what he learns with AI."
+>
+  <section class="mx-auto max-w-2xl px-5 py-16">
+    <h1 class="font-serif text-4xl tracking-tight md:text-5xl">Hi, I'm Jake.</h1>
+
+    <div class="paper-body mt-8">
+      <p>
+        I spent the last ten years at an engineering staffing firm called LER TechForce, most of it
+        as the director of operations. Director of operations by title, chief of staff in scope. I
+        reported to the CEO, sat on the leadership team, and owned how the company actually ran.
+      </p>
+      <p>
+        When I started, we were a $22 million company with 180 engineers in the field. When I left,
+        we were at $75 million and more than 550, and our internal headcount had not grown. I built
+        the analytics, the forecasting, and the governance that let us scale like that without the
+        back office scaling with it. The work I am proudest of is the work nobody noticed, because it
+        just ran.
+      </p>
+      <p>
+        A few years in, I became the person who brought AI into the business. Not as a slide deck, as
+        tools people used on a Tuesday. I designed an internal AI hub that put every tool we built
+        behind one door. I built an automated performance-review system that covers more than 500
+        people and saves over 2,000 hours a cycle. I built margin calculators, document formatters,
+        and an agent that reads a resume and goes and finds the roles that fit it. Most of it I built
+        by directing Claude Code, with no developer in the loop.
+      </p>
+      <p>
+        Here is the thing I keep coming back to. The big idea is almost always buried in the day to
+        day, in the boring parts everyone has stopped looking at. The part of the job I love is
+        finding it and building it. AI is the best lever I have ever had for that. It takes the boring
+        work off people so they can do the work that is actually human.
+      </p>
+      <p>
+        Outside of work I build. I made PocketWild, an iOS field journal, end to end as a non-coder,
+        by directing the AI and drawing the pixel art myself. I help my wife run her cooking brand. I
+        have started a stack of white papers. I have also failed at plenty: a 3D image app, a
+        color-palette tool, a wage-and-classification generator, a few others. I am fine with that.
+        Every one taught me something I used in the next thing.
+      </p>
+      <p>
+        I am an electrical engineer with an MBA, both from Harding. I live in Bentonville, Arkansas,
+        with my wife and our four kids. This is home. The rest is just me trying to build useful
+        things, and learn out loud while I do it.
+      </p>
+    </div>
+
+    <dl
+      class="mt-12 grid grid-cols-1 gap-x-8 gap-y-5 border-t border-faint pt-8 text-sm sm:grid-cols-2"
+    >
+      <div>
+        <dt class="text-muted">Education</dt>
+        <dd class="mt-1">B.S. Electrical Engineering and MBA, Harding University</dd>
+      </div>
+      <div>
+        <dt class="text-muted">Certifications</dt>
+        <dd class="mt-1">Anthropic AI Fluency, Teaching AI Fluency, Agent Skills, Subagents</dd>
+      </div>
+      <div>
+        <dt class="text-muted">Based in</dt>
+        <dd class="mt-1">Bentonville, Arkansas</dd>
+      </div>
+      <div>
+        <dt class="text-muted">Find me</dt>
+        <dd class="mt-1">
+          <a href={linkedin} rel="me noopener" class="text-accent underline underline-offset-4 hover:text-accent-strong">LinkedIn</a>,
+          <a href={github} rel="me noopener" class="text-accent underline underline-offset-4 hover:text-accent-strong">GitHub</a>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="mt-12">
+      <a
+        href="/contact/"
+        class="inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+      >
+        Get in touch
+      </a>
+    </div>
+  </section>
+</BaseLayout>
