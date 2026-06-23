@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { builds, internalWork } from "../../data/person";
+---
+
+<BaseLayout
+  title="Builds"
+  description="Things Jake Herridge has shipped: the PocketWild iOS app, the APD storytelling system, Kitchen Happy, and the internal AI tools he built at LER TechForce."
+>
+  <section class="mx-auto max-w-3xl px-5 py-16">
+    <header class="border-b border-faint pb-8">
+      <h1 class="font-serif text-4xl tracking-tight md:text-5xl">Builds</h1>
+      <p class="mt-4 text-lg text-muted">
+        Things I have shipped. Some solo, some for the people I worked with. A few are public, a few
+        I can only describe.
+      </p>
+    </header>
+
+    <div>
+      {
+        builds.map((b, i) => (
+          <article class:list={["py-10", i > 0 && "border-t border-faint"]}>
+            <p class="text-xs text-muted">{b.category}</p>
+            <h2 class="mt-1 font-serif text-2xl tracking-tight md:text-3xl">{b.name}</h2>
+            <p class="mt-1 font-serif text-lg italic text-muted">{b.tagline}</p>
+            <p class="mt-4 leading-relaxed">{b.body}</p>
+            <a
+              href={b.href}
+              rel="noopener"
+              class="mt-4 inline-flex items-center gap-1 text-sm text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
+            >
+              {b.linkLabel} &rarr;
+            </a>
+          </article>
+        ))
+      }
+    </div>
+
+    <section class="mt-16 border-t border-faint pt-12">
+      <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Built inside the business</h2>
+      <p class="mt-3 text-muted">
+        These ran inside LER TechForce, so I can describe the results but not show the screens.
+        Public or synthetic only, the same rule I hold my writing to.
+      </p>
+      <dl class="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
+        {
+          internalWork.map((w) => (
+            <div>
+              <dt class="font-serif text-lg">{w.name}</dt>
+              <dd class="mt-1 text-muted">{w.body}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </section>
+</BaseLayout>

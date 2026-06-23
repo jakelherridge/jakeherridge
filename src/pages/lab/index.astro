@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { lab } from "../../data/person";
+---
+
+<BaseLayout
+  title="The Lab"
+  description="Experiments by Jake Herridge, shipped and shelved, each with the lesson it taught. The flops are not failures, they are tuition."
+>
+  <section class="mx-auto max-w-3xl px-5 py-16">
+    <header class="border-b border-faint pb-8">
+      <h1 class="font-serif text-4xl tracking-tight md:text-5xl">The Lab</h1>
+      <p class="mt-4 text-lg text-muted">
+        Everything I build is a bet, and not all of them land. Here are a few that shipped and a few
+        that did not, with what each one taught me. The flops are not failures. They are tuition.
+      </p>
+    </header>
+
+    <ul class="mt-2 divide-y divide-faint">
+      {
+        lab.map((e) => (
+          <li class="py-7">
+            <span
+              class:list={[
+                "text-xs font-medium capitalize",
+                e.outcome === "shipped" ? "text-accent" : "text-muted",
+              ]}
+            >
+              {e.outcome}
+            </span>
+            <h2 class="mt-1 font-serif text-xl tracking-tight md:text-2xl">{e.title}</h2>
+            <p class="mt-2 text-muted">{e.lesson}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
