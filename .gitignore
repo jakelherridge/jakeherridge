@@ -1,0 +1,20 @@
+# build output
+dist/
+
+# astro generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# legacy Eleventy output
+_site/
+
+# logs and env
+*.log
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
