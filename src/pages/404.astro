@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Not found" description="That page does not exist.">
+  <section class="mx-auto max-w-2xl px-5 py-28 text-center">
+    <p class="font-mono text-sm text-accent">404</p>
+    <h1 class="mt-3 font-serif text-4xl tracking-tight md:text-5xl">This page wandered off.</h1>
+    <p class="mx-auto mt-4 max-w-md text-lg text-muted">
+      The link is broken or the page moved. Let me get you back to solid ground.
+    </p>
+    <a
+      href="/"
+      class="mt-8 inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+    >
+      Back home
+    </a>
+  </section>
+</BaseLayout>
