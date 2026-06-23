@@ -205,3 +205,34 @@ body {
 .paper-body th {
   font-weight: 600;
 }
+
+/* ---------- Print (paper PDFs) ---------- */
+@media print {
+  header,
+  footer,
+  .skip-link {
+    display: none !important;
+  }
+  article {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .paper-body a {
+    color: #000;
+    text-decoration: underline;
+  }
+  .paper-body figure,
+  .paper-body img,
+  .paper-body svg,
+  .paper-body table {
+    page-break-inside: avoid;
+  }
+  .paper-body h2,
+  .paper-body h3 {
+    page-break-after: avoid;
+  }
+}

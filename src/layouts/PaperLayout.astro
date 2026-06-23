@@ -47,7 +47,7 @@ const fmt = (d: Date) =>
         <time datetime={date.toISOString()}>{fmt(date)}</time>
         {updated && <span>Updated {fmt(updated)}</span>}
       </div>
-      <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+      <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm print:hidden">
         <a
           href={`/papers/${slug}.pdf`}
           class="text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
