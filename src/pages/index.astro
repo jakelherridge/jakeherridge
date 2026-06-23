@@ -1,17 +1,123 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const stats = [
+  { figure: "3.4×", label: "revenue, $22M to $75M" },
+  { figure: "3×", label: "engineers, 180 to 550+" },
+  { figure: "flat", label: "internal headcount, same span" },
+];
+
+const pillars = [
+  {
+    href: "/papers/",
+    title: "White papers",
+    body: "Practitioner pieces on bringing AI into real business work.",
+  },
+  {
+    href: "/work/",
+    title: "Builds",
+    body: "Apps and tools I have shipped, from a wildlife field journal to internal AI systems.",
+  },
+  {
+    href: "/lab/",
+    title: "The Lab",
+    body: "Experiments in progress and in pieces. The wins, the flops, and the lessons.",
+  },
+];
 ---
 
 <BaseLayout
   title="Jake Herridge"
-  description="Operations executive who ships AI. White papers, builds, and a lab of experiments."
+  description="Operations leader who ships AI. White papers on bringing AI into real business work, the apps and tools I have built, and a lab of experiments."
 >
-  <section class="mx-auto max-w-5xl px-5 py-24">
-    <h1 class="max-w-3xl font-serif text-4xl leading-[1.05] tracking-tight md:text-6xl">
-      Building things, and learning out loud, with AI.
-    </h1>
-    <p class="mt-6 max-w-2xl text-lg text-muted">
-      The full home page lands in U6. This page confirms the design system renders.
-    </p>
+  <!-- Hero -->
+  <section class="mx-auto max-w-5xl px-5 pt-14 pb-20 md:pt-24">
+    <div class="grid items-center gap-10 md:grid-cols-[1.5fr_1fr]">
+      <div>
+        <h1 class="font-serif text-4xl leading-[1.04] tracking-tight md:text-6xl">
+          I build AI that earns its keep.
+        </h1>
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">
+          Operations leader by trade. I find the big idea buried in the day to day, then build it
+          with AI.
+        </p>
+        <a
+          href="/contact/"
+          class="mt-8 inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+        >
+          Get in touch
+        </a>
+      </div>
+      {/* Portrait placeholder. TODO: swap for Jake's two photos (professional + candid). */}
+      <div class="hidden md:block">
+        <div
+          class="flex aspect-[4/5] items-center justify-center rounded border border-faint bg-accent-soft"
+        >
+          <span class="font-serif text-6xl text-accent/30">JH</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Proof -->
+  <section class="border-y border-faint bg-surface">
+    <div class="mx-auto max-w-5xl px-5 py-12">
+      <p class="text-sm text-muted">
+        Ten years at LER TechForce, an engineering staffing firm. The numbers:
+      </p>
+      <dl class="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3">
+        {
+          stats.map((s) => (
+            <div>
+              <dt class="font-mono text-4xl tracking-tight text-ink md:text-5xl">{s.figure}</dt>
+              <dd class="mt-2 text-sm text-muted">{s.label}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- Explore -->
+  <section class="mx-auto max-w-5xl px-5 py-16">
+    <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Have a look around</h2>
+    <ul class="mt-6 divide-y divide-faint border-t border-faint">
+      {
+        pillars.map((p) => (
+          <li>
+            <a href={p.href} class="group flex items-baseline justify-between gap-6 py-6">
+              <div>
+                <h3 class="font-serif text-xl tracking-tight transition-colors group-hover:text-accent md:text-2xl">
+                  {p.title}
+                </h3>
+                <p class="mt-1 text-muted">{p.body}</p>
+              </div>
+              <span
+                aria-hidden="true"
+                class="shrink-0 text-accent transition-transform group-hover:translate-x-1"
+              >
+                &rarr;
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Closing -->
+  <section class="mx-auto max-w-5xl px-5 pb-24">
+    <div class="rounded border border-faint bg-surface px-6 py-12 text-center sm:py-14">
+      <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Working on something hard?</h2>
+      <p class="mx-auto mt-3 max-w-xl text-muted">
+        I am always glad to talk shop, compare notes, or hear about a problem worth solving.
+      </p>
+      <a
+        href="/contact/"
+        class="mt-7 inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+      >
+        Get in touch
+      </a>
+    </div>
   </section>
 </BaseLayout>
