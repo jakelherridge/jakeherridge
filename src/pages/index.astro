@@ -1,5 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import professional from "../assets/jake-professional.jpg";
+import candid from "../assets/jake-candid.jpg";
 
 const stats = [
   { figure: "3.4×", label: "revenue, $22M to $75M" },
@@ -48,13 +51,24 @@ const pillars = [
           Get in touch
         </a>
       </div>
-      {/* Portrait placeholder. TODO: swap for Jake's two photos (professional + candid). */}
-      <div class="hidden md:block">
-        <div
-          class="flex aspect-[4/5] items-center justify-center rounded border border-faint bg-accent-soft"
-        >
-          <span class="font-serif text-6xl text-accent/30">JH</span>
-        </div>
+      {/* Two photos, played against each other: polished and real. */}
+      <div class="relative mx-auto w-full max-w-[280px] md:mx-0 md:max-w-none">
+        <Image
+          src={professional}
+          alt="Jake Herridge"
+          widths={[360, 540, 720]}
+          sizes="(max-width: 768px) 280px, 360px"
+          format="webp"
+          class="w-full rounded-md border border-faint object-cover shadow-sm"
+        />
+        <Image
+          src={candid}
+          alt="Jake Herridge outdoors"
+          widths={[200, 320]}
+          sizes="150px"
+          format="webp"
+          class="absolute -bottom-5 -left-5 w-[42%] rounded-md border-4 border-paper object-cover shadow-md"
+        />
       </div>
     </div>
   </section>
