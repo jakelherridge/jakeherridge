@@ -1,0 +1,22 @@
+---
+import { person } from "../data/person";
+---
+
+<button
+  type="button"
+  class="email-button text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
+  data-user={person.emailUser}
+  data-domain={person.emailDomain}
+>
+  Email
+</button>
+
+<script>
+  for (const node of document.querySelectorAll(".email-button")) {
+    const btn = node as HTMLButtonElement;
+    btn.addEventListener("click", () => {
+      const addr = btn.dataset.user + "@" + btn.dataset.domain;
+      window.location.href = "mailto:" + addr;
+    });
+  }
+</script>
