@@ -1,0 +1,35 @@
+---
+interface Props {
+  text: string;
+  label?: string;
+}
+const { text, label = "Copy prompt" } = Astro.props;
+---
+
+<button
+  type="button"
+  class="copy-button inline-flex items-center rounded border border-faint bg-surface px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:border-accent hover:text-accent"
+  data-clipboard={text}
+  data-label={label}
+>
+  {label}
+</button>
+
+<script>
+  for (const node of document.querySelectorAll(".copy-button")) {
+    const btn = node as HTMLButtonElement;
+    btn.addEventListener("click", async () => {
+      const text = btn.dataset.clipboard ?? "";
+      const label = btn.dataset.label ?? "Copy";
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied";
+      } catch {
+        btn.textContent = "Select the prompt above to copy";
+      }
+      window.setTimeout(() => {
+        btn.textContent = label;
+      }, 2000);
+    });
+  }
+</script>

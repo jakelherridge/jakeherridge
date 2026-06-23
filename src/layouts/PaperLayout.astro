@@ -47,12 +47,20 @@ const fmt = (d: Date) =>
         <time datetime={date.toISOString()}>{fmt(date)}</time>
         {updated && <span>Updated {fmt(updated)}</span>}
       </div>
-      <a
-        href={`/papers/${slug}.pdf`}
-        class="mt-6 inline-flex items-center gap-2 text-sm text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
-      >
-        Download PDF
-      </a>
+      <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <a
+          href={`/papers/${slug}.pdf`}
+          class="text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
+        >
+          Download PDF
+        </a>
+        <a
+          href={`/papers/${slug}.md`}
+          class="text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
+        >
+          View as Markdown
+        </a>
+      </div>
     </header>
     <div class="paper-body mt-10">
       <slot />

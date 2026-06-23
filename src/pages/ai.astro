@@ -1,0 +1,84 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CopyButton from "../components/CopyButton.astro";
+import { getCollection } from "astro:content";
+
+const papers = (await getCollection("papers", (p) => p.data.status === "published")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const endpoints = [
+  { href: "/llms.txt", label: "/llms.txt", note: "A curated index of everything here, for agents." },
+  { href: "/sitemap-index.xml", label: "/sitemap-index.xml", note: "Every page on the site." },
+  ...papers.map((p) => ({
+    href: `/papers/${p.id}.md`,
+    label: `/papers/${p.id}.md`,
+    note: `${p.data.title}, as clean Markdown.`,
+  })),
+];
+
+const prompts = [
+  {
+    text: "Read https://jakeherridge.com/llms.txt and tell me who Jake Herridge is, what he has built, and what he writes about.",
+  },
+  {
+    text: "Read https://jakeherridge.com/papers/from-dashboards-to-decisions.md and explain its main argument in plain terms, then tell me who should read it.",
+  },
+  {
+    text: "Read the white papers indexed at https://jakeherridge.com/llms.txt and tell me the through-line across all of them.",
+  },
+];
+---
+
+<BaseLayout
+  title="For your AI"
+  description="This site is built to be read by machines: an llms.txt index, structured data, and a plain-Markdown twin of every white paper. Point your assistant here."
+>
+  <section class="mx-auto max-w-2xl px-5 py-16">
+    <h1 class="font-serif text-4xl tracking-tight md:text-5xl">Built to be read by machines.</h1>
+
+    <div class="paper-body mt-8">
+      <p>
+        I write about pointing AI at the right things. It would be odd if this site were not built
+        for that too.
+      </p>
+      <p>
+        So it is. Every page is clean, server-rendered HTML with structured data. There is an
+        llms.txt index, and every white paper has a plain-Markdown twin you can hand straight to a
+        model.
+      </p>
+    </div>
+
+    <h2 class="mt-12 font-serif text-2xl tracking-tight">The machine-readable parts</h2>
+    <ul class="mt-5 divide-y divide-faint border-y border-faint">
+      {
+        endpoints.map((e) => (
+          <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
+            <a
+              href={e.href}
+              class="font-mono text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+            >
+              {e.label}
+            </a>
+            <span class="text-sm text-muted">{e.note}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 class="mt-12 font-serif text-2xl tracking-tight">Try it with your own AI</h2>
+    <p class="mt-2 text-muted">Copy a prompt, paste it into your assistant, and let it read.</p>
+    <ul class="mt-6 space-y-4">
+      {
+        prompts.map((p) => (
+          <li class="rounded border border-faint bg-surface p-4">
+            <p class="font-mono text-sm leading-relaxed text-ink">{p.text}</p>
+            <div class="mt-3">
+              <CopyButton text={p.text} />
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
