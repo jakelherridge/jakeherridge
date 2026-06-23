@@ -6,22 +6,27 @@ import "@fontsource-variable/geist-mono";
 import "../styles/global.css";
 
 import Seo from "../components/Seo.astro";
+import JsonLd from "../components/JsonLd.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { siteGraph } from "../lib/schema";
 
 interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  jsonLd?: object[];
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, jsonLd = [] } = Astro.props;
+const graph = [...siteGraph(), ...jsonLd];
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <Seo title={title} description={description} ogImage={ogImage} />
+    <JsonLd graph={graph} />
     <slot name="head" />
   </head>
   <body class="flex min-h-[100dvh] flex-col bg-paper font-sans text-ink">

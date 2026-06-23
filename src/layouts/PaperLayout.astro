@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import { person } from "../data/person";
+import { techArticle, breadcrumb } from "../lib/schema";
 
 interface Props {
   title: string;
@@ -11,6 +13,16 @@ interface Props {
 
 const { title, description, date, updated, slug } = Astro.props;
 
+const url = `${person.url}/papers/${slug}/`;
+const jsonLd = [
+  techArticle({ title, description, date, updated, url, pdfUrl: `${person.url}/papers/${slug}.pdf` }),
+  breadcrumb([
+    { name: "Home", url: `${person.url}/` },
+    { name: "White papers", url: `${person.url}/papers/` },
+    { name: title, url },
+  ]),
+];
+
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-US", {
     year: "numeric",
@@ -20,7 +32,7 @@ const fmt = (d: Date) =>
   });
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <article class="mx-auto max-w-2xl px-5 py-16">
     <header class="border-b border-faint pb-8">
       <p class="font-mono text-xs uppercase tracking-[0.2em] text-accent">White paper</p>
