@@ -6,7 +6,8 @@ const papers = (await getCollection("papers", (p) => p.data.status === "publishe
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
-const fmt = (d: Date) => d.toLocaleDateString("en-US", { year: "numeric", month: "long" });
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "long", timeZone: "UTC" });
 ---
 
 <BaseLayout

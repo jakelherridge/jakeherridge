@@ -1,0 +1,20 @@
+<svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cumulative value over three years. Scarcity leads early then plateaus near 2.9 million dollars. Abundance dips while reskilling, then climbs to about 8.9 million, crossing scarcity around 18 months.">
+  <title>Abundance versus scarcity: three-year cumulative value</title>
+  <text x="90" y="50" font-family="sans-serif" font-size="13" fill="#1d9e75">solid: abundance (reskill, redeploy)</text>
+  <text x="90" y="69" font-family="sans-serif" font-size="13" fill="#d85a30">dashed: scarcity (cut, then rehire)</text>
+  <line x1="80" y1="40" x2="80" y2="330" stroke="#cccccc" stroke-width="1"/>
+  <line x1="80" y1="330" x2="690" y2="330" stroke="#cccccc" stroke-width="1"/>
+  <line x1="80" y1="273" x2="690" y2="273" stroke="#e3e3e3" stroke-width="1" stroke-dasharray="2,3"/>
+  <text x="72" y="277" text-anchor="end" font-family="sans-serif" font-size="11" fill="#999999">$0</text>
+  <text x="72" y="161" text-anchor="end" font-family="sans-serif" font-size="11" fill="#999999">$5M</text>
+  <text x="80" y="350" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#999999">Yr 0</text>
+  <text x="280" y="350" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#999999">Yr 1</text>
+  <text x="480" y="350" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#999999">Yr 2</text>
+  <text x="680" y="350" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#999999">Yr 3</text>
+  <polyline points="80,297 230,249 330,213 380,251 680,206" fill="none" stroke="#d85a30" stroke-width="2.5" stroke-dasharray="7,5" stroke-linejoin="round"/>
+  <polyline points="80,297 230,284 280,270 380,231 480,179 680,66" fill="none" stroke="#1d9e75" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="352" cy="242" r="4" fill="#555555"/>
+  <text x="362" y="238" font-family="sans-serif" font-size="11" fill="#555555">abundance pulls ahead (~18 months)</text>
+  <text x="676" y="200" text-anchor="end" font-family="sans-serif" font-size="11" fill="#d85a30">$2.9M</text>
+  <text x="676" y="60" text-anchor="end" font-family="sans-serif" font-size="11" fill="#1d9e75">$8.9M</text>
+</svg>
