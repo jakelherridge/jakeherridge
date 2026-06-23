@@ -80,3 +80,128 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Paper reading typography ---------- */
+.paper-body {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: var(--color-ink);
+}
+.paper-body > * + * {
+  margin-top: 1.4em;
+}
+.paper-body h2,
+.paper-body h3,
+.paper-body h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 5rem;
+}
+.paper-body h2 {
+  font-size: 1.7rem;
+  margin-top: 2.2em;
+}
+.paper-body h3 {
+  font-size: 1.3rem;
+  margin-top: 1.8em;
+}
+.paper-body h4 {
+  font-size: 1.1rem;
+  margin-top: 1.6em;
+}
+.paper-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+.paper-body a:hover {
+  color: var(--color-accent-strong);
+}
+.paper-body strong {
+  font-weight: 650;
+}
+.paper-body ul,
+.paper-body ol {
+  padding-left: 1.4em;
+}
+.paper-body ul {
+  list-style: disc;
+}
+.paper-body ol {
+  list-style: decimal;
+}
+.paper-body li + li {
+  margin-top: 0.4em;
+}
+.paper-body blockquote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 1.1em;
+  color: var(--color-muted);
+  font-style: italic;
+}
+.paper-body code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--color-accent-soft);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+.paper-body pre {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background-color: var(--color-ink);
+  color: #f3f1ea;
+  padding: 1rem 1.1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.paper-body pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+.paper-body hr {
+  border: 0;
+  border-top: 1px solid var(--color-faint);
+  margin: 2.6em 0;
+}
+.paper-body figure {
+  margin: 2.2em 0;
+}
+.paper-body figure svg,
+.paper-body figure img,
+.paper-body > svg,
+.paper-body > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 2em auto;
+}
+.paper-body figcaption {
+  margin-top: 0.6em;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+.paper-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+.paper-body th,
+.paper-body td {
+  border-bottom: 1px solid var(--color-faint);
+  padding: 0.6em 0.5em;
+  text-align: left;
+  vertical-align: top;
+}
+.paper-body th {
+  font-weight: 600;
+}
