@@ -1,0 +1,35 @@
+---
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/newsreader/opsz-italic.css";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
+import "../styles/global.css";
+
+import Seo from "../components/Seo.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+
+const { title, description, ogImage } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <Seo title={title} description={description} ogImage={ogImage} />
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-[100dvh] flex-col bg-paper font-sans text-ink">
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

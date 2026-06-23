@@ -1,16 +1,17 @@
 ---
-// Placeholder home page. Replaced in U6 with the real hero + sections.
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Jake Herridge</title>
-  </head>
-  <body>
-    <h1>Jake Herridge</h1>
-    <p>Site rebuild in progress.</p>
-  </body>
-</html>
+<BaseLayout
+  title="Jake Herridge"
+  description="Operations executive who ships AI. White papers, builds, and a lab of experiments."
+>
+  <section class="mx-auto max-w-5xl px-5 py-24">
+    <h1 class="max-w-3xl font-serif text-4xl leading-[1.05] tracking-tight md:text-6xl">
+      Building things, and learning out loud, with AI.
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg text-muted">
+      The full home page lands in U6. This page confirms the design system renders.
+    </p>
+  </section>
+</BaseLayout>

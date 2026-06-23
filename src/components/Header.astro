@@ -1,0 +1,42 @@
+---
+const nav = [
+  { href: "/papers/", label: "Papers" },
+  { href: "/work/", label: "Builds" },
+  { href: "/lab/", label: "Lab" },
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(href);
+---
+
+<header class="border-b border-faint">
+  <div
+    class="mx-auto flex max-w-5xl flex-col gap-2 px-5 py-3 sm:h-16 sm:flex-row sm:items-center sm:justify-between sm:py-0"
+  >
+    <a
+      href="/"
+      class="font-serif text-lg font-medium tracking-tight transition-colors hover:text-accent"
+    >
+      Jake Herridge
+    </a>
+    <nav aria-label="Primary" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+      {
+        nav.map((item) => (
+          <a
+            href={item.href}
+            aria-current={isActive(item.href) ? "page" : undefined}
+            class:list={[
+              "transition-colors hover:text-accent",
+              isActive(item.href) ? "text-accent" : "text-muted",
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>

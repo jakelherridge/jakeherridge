@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+/*
+  Design system: editorial reading-room.
+  Serif (Newsreader) carries the writing and display; Geist handles UI;
+  Geist Mono appears sparingly on the machine-readable surfaces.
+  One accent (deep pine), warm paper, warm ink. Single light theme.
+*/
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Newsreader Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-paper: #fbfaf7;
+  --color-surface: #ffffff;
+  --color-ink: #1b1a17;
+  --color-muted: #6c6a63;
+  --color-faint: #e7e3da;
+  --color-accent: #1f6b54;
+  --color-accent-strong: #164f3e;
+  --color-accent-soft: #e9f1ed;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+/* Accent focus ring for keyboard users; quiet for mouse users. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3.5rem;
+  z-index: 100;
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  padding: 0.5rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
