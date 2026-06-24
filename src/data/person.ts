@@ -47,7 +47,7 @@ export const builds: Build[] = [
   {
     name: "APD Storytelling System",
     category: "Open source",
-    tagline: "Raw operational data in, board-ready briefs and decks out.",
+    tagline: "Turns messy operational data into a brief and deck a board will actually read.",
     body: "A Node.js pipeline that turns fulfillment-automation metrics into one-page strategic briefs, a thirteen-slide executive deck, white papers, and a chart library, all from one shared design system. Built as a working demonstration on synthetic data.",
     href: "https://github.com/jakelherridge/apd-storytelling-system",
     linkLabel: "View on GitHub",
@@ -67,7 +67,7 @@ export const builds: Build[] = [
 export const internalWork = [
   {
     name: "The AI Hub",
-    body: "A single sign-on portal that put every internal AI tool we shipped behind one door, with usage tracked from day one. It turned one-off tools into a managed, measurable product line.",
+    body: "A single sign-on portal that put every internal AI tool we shipped behind one door, with usage tracked from day one. Before it, the tools were scattered and half-forgotten. After, we could see what people actually reached for.",
   },
   {
     name: "Automated performance reviews",
@@ -100,19 +100,19 @@ export const lab: LabEntry[] = [
     title: "Internal AI tools at LER TechForce",
     outcome: "shipped",
     lesson:
-      "Adoption is the whole game. A tool people open on a Tuesday beats a brilliant one nobody touches.",
+      "Adoption is the whole game. A tool only counts once people actually open it.",
   },
   {
     title: "A 3D image generator app",
     outcome: "shelved",
     lesson:
-      "I chased the technology before the use. A cool demo, and no one who needed it. Now I start from the person, not the model.",
+      "I chased the technology before the use. Built a cool demo nobody needed. Now I start with the person who has the problem.",
   },
   {
     title: "A color-palette and wardrobe tool",
     outcome: "shelved",
     lesson:
-      "I solved a problem I had, not one a market had. Build for a real, recurring need, or do not build.",
+      "I built it for myself and figured everyone else wanted it too. They did not. Now I make sure the need is real before I start.",
   },
   {
     title: "An occupation-code and wage-level generator",
