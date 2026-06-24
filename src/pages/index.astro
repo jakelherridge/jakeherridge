@@ -4,45 +4,39 @@ import { Image } from "astro:assets";
 import professional from "../assets/jake-professional.jpg";
 import candid from "../assets/jake-candid.jpg";
 
-const stats = [
-  { figure: "3.4×", label: "revenue, $22M to $75M" },
-  { figure: "3×", label: "engineers, 180 to 550+" },
-  { figure: "flat", label: "internal headcount, same span" },
-];
-
 const pillars = [
   {
     href: "/papers/",
     title: "White papers",
-    body: "Where I think through bringing AI into real business work.",
+    body: "Longer thinking, mostly about AI and how real work changes when you bring it in.",
   },
   {
     href: "/work/",
     title: "Builds",
-    body: "Apps and tools I have shipped, from a wildlife field journal to internal AI systems.",
+    body: "Things I have made. A wildlife app, a handful of tools, a few that found an audience.",
   },
   {
     href: "/lab/",
     title: "The Lab",
-    body: "Where I keep the experiments. Some shipped. Most taught me something.",
+    body: "The workshop. Half-built ideas, the ones that shipped, and the flops I learned the most from.",
   },
 ];
 ---
 
 <BaseLayout
   title="Jake Herridge"
-  description="Operations leader who ships AI. White papers on bringing AI into real business work, the apps and tools I have built, and a lab of experiments."
+  description="Jake Herridge is a builder and writer. An iOS app, internal tools, a stack of white papers, and a real excitement about how much one curious person can make right now."
 >
   <!-- Hero -->
   <section class="mx-auto max-w-5xl px-5 pt-14 pb-20 md:pt-24">
     <div class="grid items-center gap-10 md:grid-cols-[1.5fr_1fr]">
       <div>
         <h1 class="font-serif text-4xl leading-[1.04] tracking-tight md:text-6xl">
-          I help people stop doing the boring work.
+          I build things. Lately it feels like anything is buildable.
         </h1>
         <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">
-          I run operations, and I build with AI. Mostly to get the busywork off people, so they can
-          do the work that needs a person.
+          I came up in operations, learning how real work gets done. Now I mostly make things and
+          write about it. Apps, tools, essays, the occasional flop.
         </p>
         <a
           href="/contact/"
@@ -73,22 +67,23 @@ const pillars = [
     </div>
   </section>
 
-  <!-- Proof -->
+  <!-- Why I build -->
   <section class="border-y border-faint bg-surface">
-    <div class="mx-auto max-w-5xl px-5 py-12">
-      <p class="text-sm text-muted">
-        Ten years scaling LER TechForce, an engineering staffing firm:
+    <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+      <p class="font-serif text-2xl leading-snug tracking-tight md:text-3xl">
+        For most of history, building something real took a team, a budget, and a yes from someone
+        above you. Not anymore.
       </p>
-      <dl class="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3">
-        {
-          stats.map((s) => (
-            <div>
-              <dt class="font-mono text-4xl tracking-tight text-ink md:text-5xl">{s.figure}</dt>
-              <dd class="mt-2 text-sm text-muted">{s.label}</dd>
-            </div>
-          ))
-        }
-      </dl>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
+        One curious person with the right tools can make almost anything now. That is the part I
+        cannot get over, and most of what I do is just me chasing it. I built an iOS app without
+        writing the code. I have shipped tools that handed people their afternoons back. I write
+        because I finally have something I want to say.
+      </p>
+      <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
+        The thread through all of it is simple. Get the boring work off people, so they can do the
+        part that needs a human.
+      </p>
     </div>
   </section>
 
@@ -122,9 +117,9 @@ const pillars = [
   <!-- Closing -->
   <section class="mx-auto max-w-5xl px-5 pb-24">
     <div class="rounded border border-faint bg-surface px-6 py-12 text-center sm:py-14">
-      <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Working on something hard?</h2>
+      <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Building something good?</h2>
       <p class="mx-auto mt-3 max-w-xl text-muted">
-        Send it my way. I am always up for a good problem.
+        Tell me about it. I am always up for a good problem, even just to think it through together.
       </p>
       <a
         href="/contact/"

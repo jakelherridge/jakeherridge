@@ -4,7 +4,7 @@
 export const person = {
   name: "Jake Herridge",
   url: "https://jakeherridge.com",
-  jobTitle: "Operations Leader and AI Builder",
+  jobTitle: "Builder and writer",
   location: "Bentonville, Arkansas",
   linkedin: "https://www.linkedin.com/in/jake-herridge-2722b139",
   github: "https://github.com/jakelherridge",
@@ -71,7 +71,7 @@ export const internalWork = [
   },
   {
     name: "Automated performance reviews",
-    body: "An end-to-end system covering more than 500 employees that writes structured results straight into Workday. It saves over 2,000 hours a cycle, about $80,000 a year in labor.",
+    body: "An automated performance-review system that took a dreaded annual scramble and turned it into something that mostly runs itself, writing its results straight into the system of record.",
   },
   {
     name: "Agents on the Anthropic API",
@@ -97,7 +97,7 @@ export const lab: LabEntry[] = [
       "A non-coder can own a real product end to end, if they direct the AI well and keep the taste in their own hands.",
   },
   {
-    title: "Internal AI tools at LER TechForce",
+    title: "Internal AI tools at work",
     outcome: "shipped",
     lesson:
       "Adoption is the whole game. A tool only counts once people actually open it.",

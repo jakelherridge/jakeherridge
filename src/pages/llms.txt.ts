@@ -10,7 +10,7 @@ export const GET: APIRoute = async () => {
   );
 
   let txt = `# Jake Herridge\n\n`;
-  txt += `> Operations leader and AI builder in Bentonville, Arkansas. Spent ten years scaling an engineering staffing firm from $22M to $75M and 180 to 550+ engineers with internal headcount flat, then became its AI champion. Writes practitioner white papers on bringing AI into real business work, and ships products like the PocketWild iOS app. Every paper below has a plain-Markdown version at the same path with a .md extension.\n\n`;
+  txt += `> Builder and writer in Bentonville, Arkansas. Came up in operations, now makes things: the PocketWild iOS app, internal tools, and a stack of practitioner white papers on bringing AI into real business work. Fascinated by how much one curious person can build now. Every paper below has a plain-Markdown version at the same path, with a .md extension.\n\n`;
 
   txt += `## White papers\n`;
   for (const p of papers) {
@@ -23,7 +23,7 @@ export const GET: APIRoute = async () => {
   }
 
   txt += `\n## About\n`;
-  txt += `- [About Jake Herridge](${SITE}/about/): Background, the LER TechForce decade, the AI-champion work, and how he works.\n`;
+  txt += `- [About Jake Herridge](${SITE}/about/): Who he is, what he values, and why he builds.\n`;
   txt += `- [Contact](${SITE}/contact/): How to reach him.\n`;
 
   return new Response(txt, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
