@@ -13,7 +13,6 @@ export interface Specimen {
   year?: string;
   note?: string; // extra metadata shown after the category
   status: SpecimenStatus;
-  tagline: string;
   body: string;
   href?: string;
   linkLabel?: string;
@@ -49,7 +48,6 @@ export const specimens: Specimen[] = builds.map((b, i) => ({
   year: years[b.name],
   note: b.name === "PocketWild" ? "once known as Entry No. 138" : undefined,
   status: b.name === "Synapse" ? "growing" : "shipped",
-  tagline: b.tagline,
   body: b.body,
   href: b.href,
   linkLabel: b.linkLabel,

@@ -47,7 +47,7 @@ export const nodes: GraphNode[] = [
     id: "jake",
     label: "Jake Herridge",
     kind: "person",
-    summary: "Builder and writer in Bentonville, Arkansas.",
+    summary: "Father, engineer, nerd, AI guy, wannabe philosopher. Bentonville, Arkansas.",
     href: "/about/",
   },
 
@@ -81,7 +81,7 @@ export const nodes: GraphNode[] = [
     label: "APD Storytelling System",
     kind: "build",
     status: "shipped",
-    summary: "Turns messy operational data into briefs and decks a board will actually read.",
+    summary: "A pipeline from operational metrics to briefs, decks, and white papers.",
     href: "https://github.com/jakelherridge/apd-storytelling-system",
   },
   {
@@ -89,7 +89,7 @@ export const nodes: GraphNode[] = [
     label: "Kitchen Happy",
     kind: "build",
     status: "shipped",
-    summary: "Real recipes and the skills to cook them, built with my wife Haley.",
+    summary: "My wife Haley's cooking site: recipes and the fundamentals behind them.",
     href: "https://kitchenhappy.club/",
   },
   {

@@ -40,7 +40,7 @@ export function siteGraph(): object[] {
         operatingSystem: b.os,
         url: b.href,
         author: { "@id": personId },
-        description: b.tagline,
+        description: b.blurb,
       })),
   ];
 }

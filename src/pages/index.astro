@@ -8,8 +8,9 @@ import { getCollection } from "astro:content";
 import professional from "../assets/jake-professional.jpg";
 import candid from "../assets/jake-candid.jpg";
 
-const headline = "I build things. Lately it feels like anything is buildable.";
-const words = headline.split(" ");
+const name = "Jake Herridge";
+let letterIndex = 0;
+const words = name.split(" ").map((word) => word.split("").map((ch) => ({ ch, i: letterIndex++ })));
 
 const featured = ["pocketwild", "synapse", "apd"]
   .map((id) => specimens.find((s) => s.id === id)!)
@@ -37,41 +38,38 @@ const desk = [
 
 <BaseLayout
   title="Jake Herridge"
-  description="Jake Herridge is a builder and writer in Bentonville, Arkansas. An iOS app, a knowledge graph, white papers on AI in real business work, stories, and art."
+  description="Jake Herridge: father, engineer, nerd, AI guy, wannabe philosopher. Bentonville, Arkansas. An iOS app, a knowledge graph, white papers on AI in real business work, stories, and art."
 >
-  <!-- Hero -->
+  <!-- Front door -->
   <section class="mx-auto max-w-5xl px-5 pt-14 pb-16 md:pt-20">
     <div class="grid items-center gap-10 md:grid-cols-[7fr_5fr]">
       <div>
         <h1
-          class="wonk kinetic text-4xl font-semibold leading-[1.03] tracking-tight md:text-6xl"
-          aria-label={headline}
+          class="wonk kinetic text-5xl font-semibold leading-[1.03] tracking-tight md:text-7xl"
+          aria-label={name}
         >
-          {words.map((w, i) => <span aria-hidden="true" style={`--i:${i}`}>{w}&nbsp;</span>)}
+          {
+            words.map((letters, w) => (
+              <>
+                {w > 0 && " "}
+                <span class="inline-block whitespace-nowrap" aria-hidden="true">
+                  {letters.map(({ ch, i }) => (
+                    <span class="kl" style={`--i:${i}`}>{ch}</span>
+                  ))}
+                </span>
+              </>
+            ))
+          }
         </h1>
-        <p
-          class="enter mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl"
-          style="--enter-step: 5"
-        >
-          I came up in operations, learning how real work gets done. Now I mostly make things and
-          write about it. Apps, tools, essays, the occasional flop.
+        <p class="enter mt-5 font-serif text-xl leading-snug text-ink md:text-2xl" style="--enter-step: 4">
+          Father, engineer, nerd, AI guy, wannabe philosopher.
         </p>
-        <div class="enter mt-8 flex flex-wrap items-center gap-5" style="--enter-step: 7">
-          <a
-            href="/contact/"
-            class="inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
-          >
-            Get in touch
-          </a>
-          <a
-            href="/map/"
-            class="text-sm text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
-          >
-            Or start with the map &rarr;
-          </a>
-        </div>
+        <p class="enter mt-3 max-w-xl text-lg leading-relaxed text-muted" style="--enter-step: 6">
+          I live in Bentonville, Arkansas, and I like making things. This site is where I keep
+          them.
+        </p>
       </div>
-      {/* Two photos, played against each other: polished and real. */}
+      {/* Two photos, polished and real. */}
       <div class="enter relative mx-auto w-full max-w-[280px] md:mx-0 md:max-w-none" style="--enter-step: 3">
         <Image
           src={professional}
@@ -105,16 +103,14 @@ const desk = [
       </a>
     </div>
     <p class="mt-2 max-w-2xl text-muted">
-      Everything I have built, written, and believe, joined by typed edges. It uses the same
-      structure as the knowledge system I keep. Click a dot to read it. Drag one to rearrange.
-      Dashed dots are projects that did not ship.
+      Builds, papers, values, and people, joined by typed edges.
     </p>
     <div class="reveal mt-6">
       <GraphMap variant="embed" />
     </div>
   </section>
 
-  <!-- Featured specimens -->
+  <!-- From the Collection -->
   <section class="border-y border-faint bg-surface">
     <div class="mx-auto max-w-5xl px-5 py-14">
       <div class="flex flex-wrap items-baseline justify-between gap-3">
@@ -138,27 +134,9 @@ const desk = [
     </div>
   </section>
 
-  <!-- Why I build -->
-  <section class="mx-auto max-w-3xl px-5 py-16 md:py-20">
-    <p class="reveal font-serif text-2xl leading-snug tracking-tight md:text-3xl">
-      For most of history, building something real took a team, a budget, and a yes from someone
-      above you. Not anymore.
-    </p>
-    <p class="reveal mt-6 max-w-2xl text-lg leading-relaxed text-muted">
-      One curious person with the right tools can make almost anything now. That is the part I
-      cannot get over, and most of what I do is just me chasing it. I built an iOS app without
-      writing the code. I have shipped tools that handed people their afternoons back. I write
-      because I finally have something I want to say.
-    </p>
-    <p class="reveal mt-4 max-w-2xl text-lg leading-relaxed text-muted">
-      The thread through all of it is simple. Get the boring work off people, so they can do the
-      part that needs a human.
-    </p>
-  </section>
-
   <!-- From the desk -->
-  <section class="mx-auto max-w-5xl px-5 pb-16">
-    <div class="flex flex-wrap items-baseline justify-between gap-3 border-t border-faint pt-12">
+  <section class="mx-auto max-w-5xl px-5 py-16 pb-24">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
       <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">From the desk</h2>
       <a
         href="/writing/"
@@ -192,23 +170,5 @@ const desk = [
         ))
       }
     </ul>
-  </section>
-
-  <!-- Closing -->
-  <section class="mx-auto max-w-5xl px-5 pb-24">
-    <div class="reveal rounded border border-faint bg-surface px-6 py-12 text-center sm:py-14">
-      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">
-        Building something good?
-      </h2>
-      <p class="mx-auto mt-3 max-w-xl text-muted">
-        Tell me about it. I am always up for a good problem, even just to think it through together.
-      </p>
-      <a
-        href="/contact/"
-        class="mt-7 inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
-      >
-        Get in touch
-      </a>
-    </div>
   </section>
 </BaseLayout>

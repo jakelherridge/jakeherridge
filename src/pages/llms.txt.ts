@@ -19,7 +19,7 @@ export const GET: APIRoute = async () => {
 
   txt += `\n## Builds\n`;
   for (const b of builds) {
-    txt += `- [${b.name}](${b.href}): ${b.tagline}\n`;
+    txt += `- ${b.href ? `[${b.name}](${b.href.startsWith("/") ? SITE + b.href : b.href})` : b.name}: ${b.blurb}.\n`;
   }
 
   txt += `\n## The Map\n`;

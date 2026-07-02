@@ -25,8 +25,8 @@ export const person = {
 export interface Build {
   name: string;
   category: string;
-  tagline: string;
-  body: string;
+  blurb: string; // one factual noun phrase, machine-facing (JSON-LD, llms.txt); not rendered on cards
+  body: string; // catalog-label copy: what it is, in facts
   href?: string;
   linkLabel?: string;
   appCategory?: string; // for SoftwareApplication JSON-LD
@@ -37,8 +37,8 @@ export const builds: Build[] = [
   {
     name: "PocketWild",
     category: "iOS app",
-    tagline: "A pocket-sized field journal where every creature you find gets a name.",
-    body: "A native iOS app I built end to end as a non-coder: I defined the product, drew the pixel art, and directed Claude Code through the Swift build, the iNaturalist computer vision, and the location and weather data. No ads, no subscriptions, no data collection.",
+    blurb: "iOS field journal app for the outdoors",
+    body: "A field journal for the outdoors: photograph creatures and plants, keep a private local collection. 228 species indexed, each with a hand-drawn sketch and a pixel sprite. 2,500 curated adventures across all 50 states. Swift, built by directing Claude Code. No accounts, no feed, no ads.",
     href: "https://www.pocketwild.app/",
     linkLabel: "pocketwild.app",
     appCategory: "LifestyleApplication",
@@ -47,40 +47,40 @@ export const builds: Build[] = [
   {
     name: "Synapse",
     category: "Knowledge system",
-    tagline: "A second brain built for an AI to read.",
-    body: "My knowledge system. It breaks what I learn into small typed nodes joined by typed edges, and every node carries its source and a verification status. An AI can traverse it and answer with citations. The Map on this site uses the same structure.",
+    blurb: "Typed-node knowledge graph built for AI traversal",
+    body: "A personal knowledge graph: small typed nodes joined by typed edges, each node carrying its source and a verification status. Built for an AI to traverse and answer from with citations. The Map on this site uses the same structure.",
     href: "/map/",
     linkLabel: "See the Map",
   },
   {
     name: "Synapse Capture",
     category: "Claude Code plugin",
-    tagline: "Saves what a working session decided.",
-    body: "A Claude Code plugin that distills a working session's decisions, pivots, and dead ends into typed nodes in Synapse, each with its provenance, so context carries across sessions.",
+    blurb: "Claude Code plugin that captures session decisions into Synapse",
+    body: "A Claude Code plugin. At the end of a working session it writes the session's decisions, pivots, and dead ends into Synapse as typed nodes, each with its provenance.",
   },
   {
     name: "APD Storytelling System",
     category: "Open source",
-    tagline: "Turns messy operational data into a brief and deck a board will actually read.",
-    body: "A Node.js pipeline that turns fulfillment-automation metrics into one-page strategic briefs, a thirteen-slide executive deck, white papers, and a chart library, all from one shared design system. Built as a working demonstration on synthetic data.",
+    blurb: "Pipeline from operational metrics to executive communications",
+    body: "A Node.js pipeline from fulfillment-automation metrics to one-page briefs, a thirteen-slide executive deck, white papers, and a chart library, all from one shared design system. Runs on synthetic data as a public demonstration.",
     href: "https://github.com/jakelherridge/apd-storytelling-system",
-    linkLabel: "View on GitHub",
+    linkLabel: "github.com/jakelherridge",
     appCategory: "BusinessApplication",
     os: "Node.js",
   },
   {
     name: "Kitchen Happy",
     category: "The web",
-    tagline: "Real recipes and the skills to cook them.",
-    body: "My wife Haley teaches home cooks the fundamentals, the handful of skills that make everything else easier. I help build and run the site and the content presence behind it, from the tech to the systems that keep it moving.",
+    blurb: "Haley Herridge's recipes and cooking-skills site",
+    body: "My wife Haley's cooking site: real recipes and the fundamental skills behind them. I run the site and the systems behind it.",
     href: "https://kitchenhappy.club/",
     linkLabel: "kitchenhappy.club",
   },
   {
     name: "Making Moves PT",
     category: "The web",
-    tagline: "A marketing site for a mobile physical therapy practice.",
-    body: "A site for a physical therapist who drives to patients around Northwest Arkansas. Static site with Calendly booking and structured data for local search.",
+    blurb: "Marketing site for a mobile physical therapy practice",
+    body: "A marketing site for a mobile physical-therapy practice in Northwest Arkansas. Static site, Calendly booking, structured data for local search.",
     href: "https://makingmovespt.com",
     linkLabel: "makingmovespt.com",
   },
