@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 /*
-  Design system: editorial reading-room.
-  Serif (Newsreader) carries the writing and display; Geist handles UI;
-  Geist Mono appears sparingly on the machine-readable surfaces.
-  One accent (deep pine), warm paper, warm ink. Single light theme.
+  Design system: a field journal on good paper.
+  Newsreader carries the reading; Fraunces gets the loud display moments;
+  Geist handles UI; Geist Mono is the specimen-label voice.
+  Two inks on warm paper: pine for what shipped, rust for what got shelved.
 */
 @theme {
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-serif: "Newsreader Variable", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-display: "Fraunces Variable", "Newsreader Variable", ui-serif, Georgia, serif;
   --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --color-paper: #fbfaf7;
@@ -19,6 +20,8 @@
   --color-accent: #1f6b54;
   --color-accent-strong: #164f3e;
   --color-accent-soft: #e9f1ed;
+  --color-rust: #9c4a2c;
+  --color-rust-soft: #f5eae4;
 }
 
 :root {
@@ -37,6 +40,121 @@ html {
 
 body {
   margin: 0;
+}
+
+/* ---------- Paper grain ---------- */
+/* A whisper of film grain over everything; the anti-slick layer. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Cross-document view transitions ---------- */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ---------- Field-journal utilities ---------- */
+/* Rubber stamp: mono caps, inked border, a slight lean, speckled by a noise mask. */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+  border: 1.5px solid currentColor;
+  border-radius: 4px;
+  padding: 0.34em 0.6em 0.28em;
+  rotate: -3deg;
+  opacity: 0.9;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='2' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 2.4 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+  mask-size: 200px 200px;
+}
+.stamp-shipped {
+  color: var(--color-accent);
+}
+.stamp-shelved {
+  color: var(--color-rust);
+}
+
+/* Crisp pixel art at any scale. */
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* Fraunces with the wonk switched on, for display moments only. */
+.wonk {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 0, "WONK" 1;
+}
+
+/* ---------- Motion ---------- */
+/* Scroll-driven reveal: scrubbed by the element's own entry into the viewport.
+   Progressive enhancement; content is never hidden without support. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 45%;
+    }
+  }
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Load-time entry with per-element stagger: style="--enter-step: 2" */
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    animation: enter-up 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--enter-step, 0) * 80ms);
+  }
+  .kinetic > span {
+    display: inline-block;
+    animation: letter-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 30ms);
+  }
+}
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes letter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em) rotate(2deg);
+  }
 }
 
 ::selection {
@@ -210,7 +328,8 @@ body {
 @media print {
   header,
   footer,
-  .skip-link {
+  .skip-link,
+  body::after {
     display: none !important;
   }
   article {

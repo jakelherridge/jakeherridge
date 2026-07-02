@@ -1,0 +1,146 @@
+---
+// A small pixel frog that lives on the footer ledge. An homage to Aldo,
+// the narrator of PocketWild. Click him for a field note.
+const FROG = [
+  "..GG......GG..",
+  ".GEEG....GEEG.",
+  ".GEPG....GPEG.",
+  ".GGGGGGGGGGGG.",
+  "GGGGGGGGGGGGGG",
+  "GGGGGGGGGGGGGG",
+  "GGDLLLLLLLLDGG",
+  ".GGLLLLLLLLGG.",
+  ".GGGGGGGGGGGG.",
+  "GGG.GG..GG.GGG",
+];
+
+const INK: Record<string, string> = {
+  G: "#1f6b54",
+  D: "#164f3e",
+  E: "#ffffff",
+  P: "#1b1a17",
+  L: "#bcd8cb",
+};
+
+const pixels = FROG.flatMap((row, y) =>
+  row.split("").flatMap((ch, x) => (ch === "." ? [] : [{ x, y, fill: INK[ch] }])),
+);
+---
+
+<div class="frog-perch" data-frog-root>
+  <p class="frog-bubble" id="frog-bubble" role="status" aria-live="polite" hidden></p>
+  <button
+    type="button"
+    class="frog-button"
+    id="frog-button"
+    aria-label="A small pixel frog. Press for a field note."
+    title="ribbit"
+  >
+    <svg
+      viewBox="0 0 14 10"
+      width="42"
+      height="30"
+      shape-rendering="crispEdges"
+      aria-hidden="true"
+      class="frog-sprite"
+    >
+      {pixels.map((p) => <rect x={p.x} y={p.y} width="1" height="1" fill={p.fill} />)}
+    </svg>
+  </button>
+</div>
+
+<style>
+  .frog-perch {
+    position: absolute;
+    right: 1.75rem;
+    top: 0;
+    transform: translateY(-100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .frog-button {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 0;
+  }
+  .frog-sprite {
+    display: block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .frog-button {
+      transform-origin: bottom center;
+      animation: frog-breathe 4s ease-in-out infinite;
+    }
+    .frog-button.hop {
+      animation: frog-hop 0.45s cubic-bezier(0.3, 0.8, 0.3, 1);
+    }
+  }
+  @keyframes frog-breathe {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(0.94);
+    }
+  }
+  @keyframes frog-hop {
+    0% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-9px) scaleY(1.05);
+    }
+    70% {
+      transform: translateY(0) scaleY(0.9);
+    }
+    100% {
+      transform: translateY(0) scaleY(1);
+    }
+  }
+  .frog-bubble {
+    margin: 0 0 0.35rem;
+    max-width: 15rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 6px 6px 2px 6px;
+    padding: 0.4rem 0.6rem;
+    box-shadow: 0 1px 2px rgb(27 26 23 / 0.06);
+  }
+</style>
+
+<script>
+  const NOTES = [
+    "ribbit.",
+    "Every capture gets a name.",
+    "Shipped beats perfect.",
+    "The flops taught the most.",
+    "Go outside. Log what you find.",
+  ];
+  const button = document.getElementById("frog-button");
+  const bubble = document.getElementById("frog-bubble");
+  let i = 0;
+  let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
+  button?.addEventListener("click", () => {
+    if (!bubble) return;
+    bubble.textContent = NOTES[i % NOTES.length];
+    bubble.hidden = false;
+    i += 1;
+    button.classList.remove("hop");
+    void (button as HTMLElement).offsetWidth;
+    button.classList.add("hop");
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      bubble.hidden = true;
+    }, 4200);
+  });
+</script>

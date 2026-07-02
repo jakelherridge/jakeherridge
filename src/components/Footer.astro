@@ -1,4 +1,6 @@
 ---
+import PixelFrog from "./PixelFrog.astro";
+
 const year = new Date().getFullYear();
 
 const links = [
@@ -10,7 +12,8 @@ const links = [
 ];
 ---
 
-<footer class="mt-24 border-t border-faint">
+<footer class="relative mt-24 border-t border-faint">
+  <PixelFrog />
   <div class="mx-auto max-w-5xl px-5 py-12">
     <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
@@ -31,8 +34,27 @@ const links = [
         }
       </nav>
     </div>
-    <p class="mt-10 text-xs text-muted">
-      © {year} Jake Herridge. Built to be read by humans and machines.
-    </p>
+    <div class="mt-10 flex flex-col gap-1 text-xs text-muted sm:flex-row sm:justify-between">
+      <p>© {year} Jake Herridge. Built to be read by humans and machines.</p>
+      <p
+        title="A moment here is a helek, an old unit of time. 1080 to the hour. I try to spend mine on purpose."
+      >
+        You have spent <span id="helek-count">1</span>
+        <span id="helek-word">moment</span> here.
+      </p>
+    </div>
   </div>
 </footer>
+
+<script>
+  // One helek: an old unit of time, 3 and a third seconds. 1080 to the hour.
+  const count = document.getElementById("helek-count");
+  const word = document.getElementById("helek-word");
+  let moments = 1;
+  setInterval(() => {
+    if (document.hidden || !count || !word) return;
+    moments += 1;
+    count.textContent = String(moments);
+    word.textContent = moments === 1 ? "moment" : "moments";
+  }, 3333);
+</script>

@@ -1,15 +1,14 @@
 ---
 const nav = [
-  { href: "/papers/", label: "Papers" },
-  { href: "/work/", label: "Builds" },
-  { href: "/lab/", label: "Lab" },
-  { href: "/about/", label: "About" },
-  { href: "/contact/", label: "Contact" },
+  { href: "/map/", label: "Map", match: ["/map/"] },
+  { href: "/collection/", label: "Collection", match: ["/collection/", "/work/", "/lab/"] },
+  { href: "/writing/", label: "Writing", match: ["/writing/", "/papers/", "/stories/"] },
+  { href: "/about/", label: "About", match: ["/about/"] },
+  { href: "/contact/", label: "Contact", match: ["/contact/"] },
 ];
 
 const path = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === "/" ? path === "/" : path === href || path.startsWith(href);
+const isActive = (item: (typeof nav)[number]) => item.match.some((m) => path.startsWith(m));
 ---
 
 <header class="border-b border-faint">
@@ -18,7 +17,8 @@ const isActive = (href: string) =>
   >
     <a
       href="/"
-      class="font-serif text-lg font-medium tracking-tight transition-colors hover:text-accent"
+      class="wonk text-lg font-semibold tracking-tight transition-colors hover:text-accent"
+      style="view-transition-name: wordmark"
     >
       Jake Herridge
     </a>
@@ -27,10 +27,10 @@ const isActive = (href: string) =>
         nav.map((item) => (
           <a
             href={item.href}
-            aria-current={isActive(item.href) ? "page" : undefined}
+            aria-current={isActive(item) ? "page" : undefined}
             class:list={[
               "transition-colors hover:text-accent",
-              isActive(item.href) ? "text-accent" : "text-muted",
+              isActive(item) ? "text-accent" : "text-muted",
             ]}
           >
             {item.label}
