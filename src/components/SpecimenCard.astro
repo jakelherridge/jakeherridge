@@ -1,0 +1,69 @@
+---
+import type { Specimen } from "../data/collection";
+
+interface Props {
+  specimen: Specimen;
+  tilt?: "left" | "right" | "none";
+}
+
+const { specimen: s, tilt = "none" } = Astro.props;
+
+const stampClass =
+  s.status === "shelved" ? "stamp-shelved" : "stamp-shipped";
+const stampWord = s.status === "growing" ? "growing" : s.status;
+const meta = [
+  `No. ${s.no}`,
+  s.category,
+  s.year,
+  s.note,
+].filter(Boolean);
+---
+
+<article
+  id={s.id}
+  class:list={[
+    "specimen group relative rounded-md border border-faint bg-surface p-6 transition-transform duration-200",
+    tilt === "left" && "specimen-tilt-left",
+    tilt === "right" && "specimen-tilt-right",
+  ]}
+>
+  <div class="flex items-start justify-between gap-4">
+    <p class="font-mono text-[0.68rem] tracking-wide text-muted">{meta.join(" · ")}</p>
+    <span class:list={["stamp", stampClass]} aria-label={`Status: ${stampWord}`}>
+      {stampWord}
+    </span>
+  </div>
+  <h3 class="wonk mt-3 text-2xl font-semibold tracking-tight">{s.name}</h3>
+  <p class="mt-1 font-serif text-lg italic text-muted">{s.tagline}</p>
+  <p class="mt-3 leading-relaxed">{s.body}</p>
+  {
+    s.href && (
+      <a
+        href={s.href}
+        rel={s.href.startsWith("http") ? "noopener" : undefined}
+        class="mt-4 inline-flex items-center gap-1 text-sm text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
+      >
+        {s.linkLabel ?? "Have a look"} &rarr;
+      </a>
+    )
+  }
+</article>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .specimen-tilt-left {
+      rotate: -0.45deg;
+    }
+    .specimen-tilt-right {
+      rotate: 0.4deg;
+    }
+    .specimen:hover {
+      rotate: 0deg;
+      translate: 0 -3px;
+      box-shadow: 0 10px 28px rgb(27 26 23 / 0.07);
+    }
+  }
+  .specimen:target {
+    border-color: var(--color-accent);
+  }
+</style>

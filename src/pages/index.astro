@@ -1,52 +1,78 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
+import GraphMap from "../components/GraphMap.astro";
+import SpecimenCard from "../components/SpecimenCard.astro";
+import { specimens } from "../data/collection";
+import { getCollection } from "astro:content";
 import professional from "../assets/jake-professional.jpg";
 import candid from "../assets/jake-candid.jpg";
 
-const pillars = [
+const headline = "I build things. Lately it feels like anything is buildable.";
+const words = headline.split(" ");
+
+const featured = ["pocketwild", "synapse", "apd"]
+  .map((id) => specimens.find((s) => s.id === id)!)
+  .filter(Boolean);
+
+const papers = (await getCollection("papers", (p) => p.data.status === "published")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const desk = [
+  ...papers.map((p) => ({
+    href: `/papers/${p.id}/`,
+    kind: "White paper",
+    title: p.data.title,
+    blurb: p.data.description,
+  })),
   {
-    href: "/papers/",
-    title: "White papers",
-    body: "Longer thinking, mostly about AI and how real work changes when you bring it in.",
-  },
-  {
-    href: "/work/",
-    title: "Builds",
-    body: "Things I have made. A wildlife app, a handful of tools, a few that found an audience.",
-  },
-  {
-    href: "/lab/",
-    title: "The Lab",
-    body: "The workshop. Half-built ideas, the ones that shipped, and the flops I learned the most from.",
+    href: "/stories/the-boy-and-the-sword/",
+    kind: "A story",
+    title: "The Boy and the Sword",
+    blurb: "A boy loses his magic sword and learns to fry his own egg.",
   },
 ];
 ---
 
 <BaseLayout
   title="Jake Herridge"
-  description="Jake Herridge is a builder and writer. An iOS app, internal tools, a stack of white papers, and a real excitement about how much one curious person can make right now."
+  description="Jake Herridge is a builder and writer. An iOS app, a knowledge graph, a stack of white papers, and a real excitement about how much one curious person can make right now."
 >
   <!-- Hero -->
-  <section class="mx-auto max-w-5xl px-5 pt-14 pb-20 md:pt-24">
-    <div class="grid items-center gap-10 md:grid-cols-[1.5fr_1fr]">
+  <section class="mx-auto max-w-5xl px-5 pt-14 pb-16 md:pt-20">
+    <div class="grid items-center gap-10 md:grid-cols-[7fr_5fr]">
       <div>
-        <h1 class="font-serif text-4xl leading-[1.04] tracking-tight md:text-6xl">
-          I build things. Lately it feels like anything is buildable.
+        <h1
+          class="wonk kinetic text-4xl font-semibold leading-[1.03] tracking-tight md:text-6xl"
+          aria-label={headline}
+        >
+          {words.map((w, i) => <span aria-hidden="true" style={`--i:${i}`}>{w}&nbsp;</span>)}
         </h1>
-        <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">
+        <p
+          class="enter mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl"
+          style="--enter-step: 5"
+        >
           I came up in operations, learning how real work gets done. Now I mostly make things and
           write about it. Apps, tools, essays, the occasional flop.
         </p>
-        <a
-          href="/contact/"
-          class="mt-8 inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
-        >
-          Get in touch
-        </a>
+        <div class="enter mt-8 flex flex-wrap items-center gap-5" style="--enter-step: 7">
+          <a
+            href="/contact/"
+            class="inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+          >
+            Get in touch
+          </a>
+          <a
+            href="/map/"
+            class="text-sm text-accent underline underline-offset-4 transition-colors hover:text-accent-strong"
+          >
+            Or start with the map &rarr;
+          </a>
+        </div>
       </div>
       {/* Two photos, played against each other: polished and real. */}
-      <div class="relative mx-auto w-full max-w-[280px] md:mx-0 md:max-w-none">
+      <div class="enter relative mx-auto w-full max-w-[280px] md:mx-0 md:max-w-none" style="--enter-step: 3">
         <Image
           src={professional}
           alt="Jake Herridge"
@@ -61,45 +87,99 @@ const pillars = [
           widths={[200, 320]}
           sizes="150px"
           format="webp"
-          class="absolute -bottom-5 -left-5 w-[42%] rounded-md border-4 border-paper object-cover shadow-md"
+          class="absolute -bottom-5 -left-5 w-[42%] -rotate-2 rounded-md border-4 border-paper object-cover shadow-md"
         />
       </div>
     </div>
   </section>
 
-  <!-- Why I build -->
-  <section class="border-y border-faint bg-surface">
-    <div class="mx-auto max-w-3xl px-5 py-16 md:py-20">
-      <p class="font-serif text-2xl leading-snug tracking-tight md:text-3xl">
-        For most of history, building something real took a team, a budget, and a yes from someone
-        above you. Not anymore.
-      </p>
-      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
-        One curious person with the right tools can make almost anything now. That is the part I
-        cannot get over, and most of what I do is just me chasing it. I built an iOS app without
-        writing the code. I have shipped tools that handed people their afternoons back. I write
-        because I finally have something I want to say.
-      </p>
-      <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
-        The thread through all of it is simple. Get the boring work off people, so they can do the
-        part that needs a human.
-      </p>
+  <!-- The Map -->
+  <section class="mx-auto max-w-5xl px-5 pb-16">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The Map</h2>
+      <a
+        href="/map/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        Open the full map &rarr;
+      </a>
+    </div>
+    <p class="mt-2 max-w-2xl text-muted">
+      How my head is organized. Everything I have built, written, and believe, joined by typed
+      edges. Click a dot. Drag one around. The dashed ones never shipped, and they stay on the map
+      anyway.
+    </p>
+    <div class="reveal mt-6">
+      <GraphMap variant="embed" />
     </div>
   </section>
 
-  <!-- Explore -->
-  <section class="mx-auto max-w-5xl px-5 py-16">
-    <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Have a look around</h2>
-    <ul class="mt-6 divide-y divide-faint border-t border-faint">
+  <!-- Featured specimens -->
+  <section class="border-y border-faint bg-surface">
+    <div class="mx-auto max-w-5xl px-5 py-14">
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">From the Collection</h2>
+        <a
+          href="/collection/"
+          class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+        >
+          The whole collection &rarr;
+        </a>
+      </div>
+      <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
+        {
+          featured.map((s, i) => (
+            <div class="reveal">
+              <SpecimenCard specimen={s} tilt={i % 2 === 0 ? "left" : "right"} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Why I build -->
+  <section class="mx-auto max-w-3xl px-5 py-16 md:py-20">
+    <p class="reveal font-serif text-2xl leading-snug tracking-tight md:text-3xl">
+      For most of history, building something real took a team, a budget, and a yes from someone
+      above you. Not anymore.
+    </p>
+    <p class="reveal mt-6 max-w-2xl text-lg leading-relaxed text-muted">
+      One curious person with the right tools can make almost anything now. That is the part I
+      cannot get over, and most of what I do is just me chasing it. I built an iOS app without
+      writing the code. I have shipped tools that handed people their afternoons back. I write
+      because I finally have something I want to say.
+    </p>
+    <p class="reveal mt-4 max-w-2xl text-lg leading-relaxed text-muted">
+      The thread through all of it is simple. Get the boring work off people, so they can do the
+      part that needs a human.
+    </p>
+  </section>
+
+  <!-- From the desk -->
+  <section class="mx-auto max-w-5xl px-5 pb-16">
+    <div class="flex flex-wrap items-baseline justify-between gap-3 border-t border-faint pt-12">
+      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">From the desk</h2>
+      <a
+        href="/writing/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        All the writing &rarr;
+      </a>
+    </div>
+    <ul class="mt-4 divide-y divide-faint">
       {
-        pillars.map((p) => (
-          <li>
-            <a href={p.href} class="group flex items-baseline justify-between gap-6 py-6">
+        desk.map((d) => (
+          <li class="reveal">
+            <a href={d.href} class="group flex items-baseline justify-between gap-6 py-5">
               <div>
-                <h3 class="font-serif text-xl tracking-tight transition-colors group-hover:text-accent md:text-2xl">
-                  {p.title}
+                <p class="font-mono text-[0.62rem] uppercase tracking-widest text-muted">
+                  {d.kind}
+                </p>
+                <h3 class="mt-0.5 font-serif text-xl tracking-tight transition-colors group-hover:text-accent">
+                  {d.title}
                 </h3>
-                <p class="mt-1 text-muted">{p.body}</p>
+                <p class="mt-1 text-sm text-muted">{d.blurb}</p>
               </div>
               <span
                 aria-hidden="true"
@@ -116,8 +196,10 @@ const pillars = [
 
   <!-- Closing -->
   <section class="mx-auto max-w-5xl px-5 pb-24">
-    <div class="rounded border border-faint bg-surface px-6 py-12 text-center sm:py-14">
-      <h2 class="font-serif text-2xl tracking-tight md:text-3xl">Building something good?</h2>
+    <div class="reveal rounded border border-faint bg-surface px-6 py-12 text-center sm:py-14">
+      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">
+        Building something good?
+      </h2>
       <p class="mx-auto mt-3 max-w-xl text-muted">
         Tell me about it. I am always up for a good problem, even just to think it through together.
       </p>

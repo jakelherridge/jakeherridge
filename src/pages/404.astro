@@ -5,15 +5,26 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <BaseLayout title="Not found" description="That page does not exist.">
   <section class="mx-auto max-w-2xl px-5 py-28 text-center">
     <p class="font-mono text-sm text-accent">404</p>
-    <h1 class="mt-3 font-serif text-4xl tracking-tight md:text-5xl">This page wandered off.</h1>
+    <h1 class="wonk mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+      No page here. That is ok.
+    </h1>
     <p class="mx-auto mt-4 max-w-md text-lg text-muted">
-      The link broke, or the page moved. Head back home and try again.
+      The link broke, or the page wandered off. A boy I wrote about once lost his magic sword and
+      still came home with firewood, a fish, and a lovely walking stick.
     </p>
-    <a
-      href="/"
-      class="mt-8 inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
-    >
-      Back home
-    </a>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-5">
+      <a
+        href="/"
+        class="inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-strong"
+      >
+        Back home
+      </a>
+      <a
+        href="/stories/the-boy-and-the-sword/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        Read the story &rarr;
+      </a>
+    </div>
   </section>
 </BaseLayout>

@@ -3,6 +3,59 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const linkedin = "https://www.linkedin.com/in/jake-herridge-2722b139";
 const github = "https://github.com/jakelherridge";
+
+// The shelf: books that rewired me, one line each.
+const shelf = [
+  {
+    title: "Man's Search for Meaning",
+    author: "Viktor Frankl",
+    take: "A why that can carry any how.",
+    color: "#1b1a17",
+    h: 11,
+  },
+  {
+    title: "Build",
+    author: "Tony Fadell",
+    take: "Make the painkiller, not the vitamin.",
+    color: "#1f6b54",
+    h: 9.5,
+  },
+  {
+    title: "Finite and Infinite Games",
+    author: "James Carse",
+    take: "Finite games end. Infinite games continue.",
+    color: "#a97e2f",
+    h: 10.5,
+  },
+  {
+    title: "The Messy Middle",
+    author: "Scott Belsky",
+    take: "The messy middle is the actual job.",
+    color: "#9c4a2c",
+    h: 9,
+  },
+  {
+    title: "Psycho-Cybernetics",
+    author: "Maxwell Maltz",
+    take: "The story you tell about yourself can be rewritten.",
+    color: "#31506b",
+    h: 10,
+  },
+  {
+    title: "Range",
+    author: "David Epstein",
+    take: "Range beats a head start.",
+    color: "#7a6a56",
+    h: 8.5,
+  },
+  {
+    title: "The Infinite Game",
+    author: "Simon Sinek",
+    take: "Play to keep playing.",
+    color: "#164f3e",
+    h: 9.8,
+  },
+];
 ---
 
 <BaseLayout
@@ -10,7 +63,7 @@ const github = "https://github.com/jakelherridge";
   description="Jake Herridge is a builder and writer. He came up in operations, now makes apps, tools, and white papers, and is fascinated by how much one curious person can build today."
 >
   <section class="mx-auto max-w-2xl px-5 py-16">
-    <h1 class="font-serif text-4xl tracking-tight md:text-5xl">Hi, I'm Jake.</h1>
+    <h1 class="wonk text-4xl font-semibold tracking-tight md:text-5xl">Hi, I'm Jake.</h1>
 
     <div class="paper-body mt-8">
       <p>
@@ -49,6 +102,33 @@ const github = "https://github.com/jakelherridge";
       </p>
     </div>
 
+    <section class="mt-14" aria-label="The shelf: books that shaped me">
+      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The shelf</h2>
+      <p class="mt-2 text-muted">
+        The books that rewired me. Hover a spine, or press one, for the line I kept.
+      </p>
+      <ul class="shelf reveal" data-shelf>
+        {
+          shelf.map((b, i) => (
+            <li>
+              <button
+                type="button"
+                class="spine"
+                style={`--spine-color:${b.color}; --spine-h:${b.h}rem; --spine-i:${i}`}
+                data-take={`"${b.take}" That is what I kept from ${b.title} by ${b.author}.`}
+                aria-label={`${b.title} by ${b.author}. ${b.take}`}
+              >
+                <span class="spine-title">{b.title}</span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="shelf-take font-serif text-lg italic text-muted" data-shelf-take aria-live="polite">
+        Seven spines, one line each.
+      </p>
+    </section>
+
     <dl
       class="mt-12 grid grid-cols-1 gap-x-8 gap-y-5 border-t border-faint pt-8 text-sm sm:grid-cols-2"
     >
@@ -83,3 +163,64 @@ const github = "https://github.com/jakelherridge";
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .shelf {
+    margin: 2rem 0 0;
+    padding: 0 0.4rem;
+    list-style: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.45rem;
+    border-bottom: 3px solid var(--color-ink);
+  }
+  .spine {
+    display: block;
+    writing-mode: vertical-rl;
+    height: var(--spine-h);
+    width: clamp(1.7rem, 6vw, 2.4rem);
+    border: 0;
+    border-radius: 3px 3px 0 0;
+    background: var(--spine-color);
+    color: var(--color-paper);
+    font-family: var(--font-serif);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    padding: 0.7rem 0;
+    cursor: pointer;
+    text-align: left;
+    transition:
+      translate 0.18s ease,
+      rotate 0.18s ease;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .spine:hover,
+    .spine:focus-visible {
+      translate: 0 -7px;
+      rotate: -1.5deg;
+    }
+  }
+  .spine-title {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 100%;
+  }
+  .shelf-take {
+    margin-top: 1rem;
+    min-height: 3.2rem;
+  }
+</style>
+
+<script>
+  const takeEl = document.querySelector<HTMLElement>("[data-shelf-take]");
+  document.querySelectorAll<HTMLButtonElement>(".spine").forEach((spine) => {
+    const show = () => {
+      if (takeEl) takeEl.textContent = spine.dataset.take ?? "";
+    };
+    spine.addEventListener("pointerenter", show);
+    spine.addEventListener("focus", show);
+    spine.addEventListener("click", show);
+  });
+</script>

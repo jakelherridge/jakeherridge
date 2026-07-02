@@ -9,6 +9,7 @@ const papers = (await getCollection("papers", (p) => p.data.status === "publishe
 
 const endpoints = [
   { href: "/llms.txt", label: "/llms.txt", note: "A curated index of everything here, for agents." },
+  { href: "/graph.json", label: "/graph.json", note: "Jake as a typed graph: nodes, edges, and how they connect." },
   { href: "/sitemap-index.xml", label: "/sitemap-index.xml", note: "Every page on the site." },
   ...papers.map((p) => ({
     href: `/papers/${p.id}.md`,
@@ -26,6 +27,9 @@ const prompts = [
   },
   {
     text: "Read the white papers indexed at https://jakeherridge.com/llms.txt and tell me the through-line across all of them.",
+  },
+  {
+    text: "Read https://jakeherridge.com/graph.json and describe how Jake's values connect to the things he has built. Follow the typed edges.",
   },
 ];
 ---

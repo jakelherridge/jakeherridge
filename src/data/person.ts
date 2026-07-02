@@ -27,8 +27,8 @@ export interface Build {
   category: string;
   tagline: string;
   body: string;
-  href: string;
-  linkLabel: string;
+  href?: string;
+  linkLabel?: string;
   appCategory?: string; // for SoftwareApplication JSON-LD
   os?: string;
 }
@@ -43,6 +43,20 @@ export const builds: Build[] = [
     linkLabel: "pocketwild.app",
     appCategory: "LifestyleApplication",
     os: "iOS",
+  },
+  {
+    name: "Synapse",
+    category: "Knowledge system",
+    tagline: "A second brain built for an AI to read.",
+    body: "My knowledge system. It breaks what I learn into small typed nodes joined by typed edges, and every node carries its source and a verification status. An AI can traverse it and answer with citations instead of vibes. The Map on this site is its public cousin.",
+    href: "/map/",
+    linkLabel: "See the public cousin",
+  },
+  {
+    name: "Synapse Capture",
+    category: "Claude Code plugin",
+    tagline: "The plugin that remembers what a session decided.",
+    body: "A Claude Code plugin that distills a working session's defining moments into typed nodes in Synapse. Decisions, pivots, and dead ends get captured with their provenance, so context compounds across sessions instead of being re-derived every morning.",
   },
   {
     name: "APD Storytelling System",
@@ -61,6 +75,14 @@ export const builds: Build[] = [
     body: "My wife Haley teaches home cooks the fundamentals, the handful of skills that make everything else easier. I help build and run the site and the content presence behind it, from the tech to the systems that keep it moving.",
     href: "https://kitchenhappy.club/",
     linkLabel: "kitchenhappy.club",
+  },
+  {
+    name: "Making Moves PT",
+    category: "The web",
+    tagline: "A friend's mobile physical therapy practice, findable.",
+    body: "A marketing site for a physical therapist who drives to you around Northwest Arkansas. A static site, booking that just works, and the local search plumbing that helps neighbors actually find him.",
+    href: "https://makingmovespt.com",
+    linkLabel: "makingmovespt.com",
   },
 ];
 

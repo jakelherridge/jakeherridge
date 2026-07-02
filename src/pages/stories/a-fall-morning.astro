@@ -1,0 +1,48 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "A Fall Morning";
+const description = "A haiku by Jake Herridge, from a morning walk.";
+
+const jsonLd = [
+  {
+    "@type": "CreativeWork",
+    headline: title,
+    description,
+    author: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/stories/a-fall-morning/",
+    genre: "haiku",
+  },
+  breadcrumb([
+    { name: "Writing", url: "https://jakeherridge.com/writing/" },
+    { name: title, url: "https://jakeherridge.com/stories/a-fall-morning/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto flex min-h-[62vh] max-w-2xl flex-col justify-center px-5 py-16">
+    <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">A haiku</p>
+    <h1 class="wonk mt-2 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
+
+    <div class="mt-14 font-serif text-2xl leading-[1.9] tracking-tight text-ink md:text-3xl">
+      <p class="enter" style="--enter-step: 1">Dawn sunlight peeks round,</p>
+      <p class="enter" style="--enter-step: 3">In, and through the changing leaves.</p>
+      <p class="enter" style="--enter-step: 5">And it changes me.</p>
+    </div>
+
+    <p class="enter mt-14 text-sm text-muted" style="--enter-step: 7">
+      From a morning walk. Bentonville, Arkansas.
+    </p>
+
+    <footer class="mt-16 border-t border-faint pt-6">
+      <a
+        href="/writing/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        &larr; Back to Writing
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

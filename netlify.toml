@@ -24,6 +24,17 @@
   status = 301
   force = true
 
+# Old section URLs live on in the Collection.
+[[redirects]]
+  from = "/work/*"
+  to = "/collection/"
+  status = 301
+
+[[redirects]]
+  from = "/lab/*"
+  to = "/collection/"
+  status = 301
+
 # Security headers. CSP keeps script-src 'unsafe-inline' for the inline
 # JSON-LD blocks; the site takes no user input, so the XSS surface is nil.
 [[headers]]

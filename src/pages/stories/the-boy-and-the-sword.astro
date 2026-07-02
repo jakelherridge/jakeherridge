@@ -1,0 +1,142 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "The Boy and the Sword";
+const description =
+  "A short story by Jake Herridge. A boy loses his magic sword and learns to fry his own egg.";
+
+const jsonLd = [
+  {
+    "@type": "ShortStory",
+    headline: title,
+    description,
+    author: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/stories/the-boy-and-the-sword/",
+    genre: "fable",
+  },
+  breadcrumb([
+    { name: "Writing", url: "https://jakeherridge.com/writing/" },
+    { name: title, url: "https://jakeherridge.com/stories/the-boy-and-the-sword/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-2xl px-5 py-16">
+    <header>
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">A story</p>
+      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+      <p class="mt-3 text-muted">by Jake Herridge</p>
+    </header>
+
+    <div class="paper-body story-body mt-10">
+      <p>
+        Once there was a boy. He had a sword. It was the most amazing sword. Not like most regular
+        old swords. This sword had a touch of magic. This sword knew exactly what the boy wanted to
+        do and would do just that. One time, for example, the boy wanted a fried egg for breakfast.
+        So, the sword cut an eggshell right off of an egg. Heated itself up. And fried an egg right
+        there on its blade while the boy held it. But now that sword was gone.
+      </p>
+      <p>
+        The boy's sword went missing sometime in the middle of the night. All the fun he had had
+        with the sword yesterday had worn him out. He had chopped down trees for his fire, speared
+        fish while wading in the river, and of course fried an egg. Needless to say, he didn't know
+        how to do any of those things without the sword. So, that night, he was so tired he fell
+        asleep while holding his sword. And that night, he dreamed that one day he may be able to
+        chop his own wood, and spear his own fish, and fry his own egg.
+      </p>
+      <p>
+        When the boy awoke, he wasn't sure what he should do now that the sword was gone. Yet, he
+        felt a sense that he should look for the magic sword. He thought, "life will be rather
+        boring without this sword." Although, it will be much too hard to find the sword. A regular
+        sword would be easy enough to find. But a magic sword is another thing entirely. He thought
+        that he might be able to find the magic sword if he still had the magic sword he was
+        looking for to guide him. What a silly thought.
+      </p>
+      <p>
+        So, the boy sat and the day went on, and the boy did not have any fun that day. When he
+        went to bed that night it took him much longer to fall asleep than the night before. He
+        thought to himself as he lay, "How boring life is without this sword. I must find it."
+        "Tomorrow I will go and find the sword." But when he awoke, he wasn't nearly as convicted
+        to look for the sword. Even though he had remembered the thoughts that he had before bed.
+        Why should he look for the sword? Where would he even start? So he went about his day. But
+        his day wasn't very fun. And he had trouble falling asleep yet again. The same thoughts.
+      </p>
+      <p>
+        When the boy awoke, he decided he must go find the sword. First, he went to the kitchen
+        where he would fry eggs with his sword. He looked and looked but didn't see the sword
+        anywhere. At this point it was later in the morning and he was getting rather hungry. He
+        had seen a pan in one of the cupboards when he was looking for the sword. So, he got the
+        pan out, and cracked an egg, and turned on the stove and fried himself an egg. After this
+        he had enough energy to keep looking for the sword.
+      </p>
+      <p>
+        Next, he went to the river to see if the sword had wandered off to where he liked to spear
+        fish. While walking to the river he tripped over a long stick and scraped his knee. It was
+        all bloody now. He was close enough to the river that he could clean off there, and the
+        stick he tripped over was such a lovely stick. He kept the stick and used it to hike to the
+        river.
+      </p>
+      <p>
+        He waded into the river and cleaned off his knee. The water was extra refreshing today and
+        felt like magic on his knee. He had never noticed how nice the water felt. Even so, this
+        would not distract his search, he didn't want to have any more not fun boring days. As the
+        boy put his head under the water a fish the size of a full-grown man darted right toward
+        him. He pointed his stick toward the fish and the fish speared itself right on his lovely
+        stick. The boy gasped as his head came out of the water. What a terrible experience. That
+        had never happened when he had his magic sword. And alas there was still no sword.
+      </p>
+      <p>
+        The boy headed to the forest to look for the sword. He looked and looked all over the
+        forest floor. But the sword was nowhere to be found. He thought to himself that the sword
+        had gotten itself stuck in a tree. You never know what those magic swords are capable of.
+        He climbed to the top of a tree that he thought was good for climbing. But he had never
+        climbed trees before, so he actually didn't know which trees are good for climbing. Right
+        as he got to the top of this tree, he heard a crack. The tree came tumbling down. The boy
+        hit the ground hard. But he was ok because it wasn't that big of a tree. He was
+        disappointed because he didn't find the sword. And his head hurt from the fall.
+      </p>
+      <p>
+        The sun was setting so he decided to walk home. As he thought about the sword, it was a sad
+        walk. But he also thought about how he had some wood for the fire now. And, how he had a
+        nice big fish. And, how he had a lovely walking stick. And, even the fact that he was not
+        hungry. When he got home, he built a fire with the wood from the tree that he cracked. He
+        roasted the fish that had run into his lovely stick, and he told his dad about all the
+        adventures from the day. And the boy could tell his dad was proud. Now the boy was tired.
+        So, he went to bed and he fell right to sleep.
+      </p>
+      <p>When he woke up the next day. There was no sword.</p>
+      <p>And that was ok.</p>
+    </div>
+
+    <footer class="mt-12 border-t border-faint pt-6">
+      <a
+        href="/writing/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        &larr; Back to Writing
+      </a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .story-body :global(p:first-of-type)::first-letter {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-weight: 600;
+    font-size: 3.4em;
+    float: left;
+    line-height: 0.82;
+    padding-right: 0.09em;
+    padding-top: 0.05em;
+  }
+  .story-body :global(p:nth-last-of-type(2)),
+  .story-body :global(p:last-of-type) {
+    font-style: italic;
+  }
+  .story-body :global(p:nth-last-of-type(2)) {
+    margin-top: 2.6em;
+  }
+</style>

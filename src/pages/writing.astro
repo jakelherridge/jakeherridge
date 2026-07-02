@@ -1,0 +1,85 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const papers = (await getCollection("papers", (p) => p.data.status === "published")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "long", timeZone: "UTC" });
+
+const small = [
+  {
+    href: "/stories/the-boy-and-the-sword/",
+    kind: "A story",
+    title: "The Boy and the Sword",
+    blurb: "A boy loses his magic sword and learns to fry his own egg.",
+  },
+  {
+    href: "/stories/a-fall-morning/",
+    kind: "A haiku",
+    title: "A Fall Morning",
+    blurb: "Three lines from a morning walk.",
+  },
+];
+---
+
+<BaseLayout
+  title="Writing"
+  description="White papers on bringing AI into real business work, plus a story and a haiku. Writing by Jake Herridge."
+>
+  <section class="mx-auto max-w-2xl px-5 py-14">
+    <header>
+      <h1 class="wonk text-4xl font-semibold tracking-tight md:text-5xl">Writing</h1>
+      <p class="mt-4 text-lg text-muted">
+        Longer thinking in white papers, plus a few smaller things that wanted to exist.
+      </p>
+    </header>
+
+    <h2 class="mt-12 border-b border-faint pb-3 font-mono text-xs uppercase tracking-widest text-muted">
+      White papers
+    </h2>
+    <ul class="divide-y divide-faint">
+      {
+        papers.map((paper) => (
+          <li class="py-7">
+            <a href={`/papers/${paper.id}/`} class="group block">
+              <div class="flex items-baseline justify-between gap-4">
+                <h3 class="font-serif text-xl tracking-tight transition-colors group-hover:text-accent md:text-2xl">
+                  {paper.data.title}
+                </h3>
+                <time
+                  datetime={paper.data.date.toISOString()}
+                  class="shrink-0 font-mono text-xs text-muted"
+                >
+                  {fmt(paper.data.date)}
+                </time>
+              </div>
+              <p class="mt-2 text-muted">{paper.data.description}</p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 class="mt-12 border-b border-faint pb-3 font-mono text-xs uppercase tracking-widest text-muted">
+      Stories and small things
+    </h2>
+    <ul class="divide-y divide-faint">
+      {
+        small.map((s) => (
+          <li class="py-7">
+            <a href={s.href} class="group block">
+              <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">{s.kind}</p>
+              <h3 class="mt-1 font-serif text-xl tracking-tight transition-colors group-hover:text-accent md:text-2xl">
+                {s.title}
+              </h3>
+              <p class="mt-2 text-muted">{s.blurb}</p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
