@@ -48,15 +48,15 @@ export const builds: Build[] = [
     name: "Synapse",
     category: "Knowledge system",
     tagline: "A second brain built for an AI to read.",
-    body: "My knowledge system. It breaks what I learn into small typed nodes joined by typed edges, and every node carries its source and a verification status. An AI can traverse it and answer with citations instead of vibes. The Map on this site is its public cousin.",
+    body: "My knowledge system. It breaks what I learn into small typed nodes joined by typed edges, and every node carries its source and a verification status. An AI can traverse it and answer with citations. The Map on this site uses the same structure.",
     href: "/map/",
-    linkLabel: "See the public cousin",
+    linkLabel: "See the Map",
   },
   {
     name: "Synapse Capture",
     category: "Claude Code plugin",
-    tagline: "The plugin that remembers what a session decided.",
-    body: "A Claude Code plugin that distills a working session's defining moments into typed nodes in Synapse. Decisions, pivots, and dead ends get captured with their provenance, so context compounds across sessions instead of being re-derived every morning.",
+    tagline: "Saves what a working session decided.",
+    body: "A Claude Code plugin that distills a working session's decisions, pivots, and dead ends into typed nodes in Synapse, each with its provenance, so context carries across sessions.",
   },
   {
     name: "APD Storytelling System",
@@ -79,8 +79,8 @@ export const builds: Build[] = [
   {
     name: "Making Moves PT",
     category: "The web",
-    tagline: "A friend's mobile physical therapy practice, findable.",
-    body: "A marketing site for a physical therapist who drives to you around Northwest Arkansas. A static site, booking that just works, and the local search plumbing that helps neighbors actually find him.",
+    tagline: "A marketing site for a mobile physical therapy practice.",
+    body: "A site for a physical therapist who drives to patients around Northwest Arkansas. Static site with Calendly booking and structured data for local search.",
     href: "https://makingmovespt.com",
     linkLabel: "makingmovespt.com",
   },
@@ -89,57 +89,18 @@ export const builds: Build[] = [
 export const internalWork = [
   {
     name: "The AI Hub",
-    body: "A single sign-on portal that put every internal AI tool we shipped behind one door, with usage tracked from day one. Before it, the tools were scattered and half-forgotten. After, we could see what people actually reached for.",
+    body: "A single sign-on portal that collects the company's internal AI tools in one place, with usage tracked from day one.",
   },
   {
     name: "Automated performance reviews",
-    body: "An automated performance-review system that took a dreaded annual scramble and turned it into something that mostly runs itself, writing its results straight into the system of record.",
+    body: "An automated performance-review system that runs the annual review cycle and writes its results into the system of record.",
   },
   {
     name: "Agents on the Anthropic API",
-    body: "An agent that reads a resume and surfaces companies with matching open roles, plus resume and job-description formatters that cut hours of cleanup out of every requisition.",
+    body: "An agent that reads a resume and surfaces companies with matching open roles, plus resume and job-description formatters that standardize every requisition.",
   },
   {
     name: "Production automation, no developer",
     body: "I direct Claude Code to specify, build, deploy, and maintain production Python and workflow automations, without a developer in the loop.",
-  },
-];
-
-export interface LabEntry {
-  title: string;
-  outcome: "shipped" | "shelved";
-  lesson: string;
-}
-
-export const lab: LabEntry[] = [
-  {
-    title: "PocketWild",
-    outcome: "shipped",
-    lesson:
-      "A non-coder can own a real product end to end, if they direct the AI well and keep the taste in their own hands.",
-  },
-  {
-    title: "Internal AI tools at work",
-    outcome: "shipped",
-    lesson:
-      "Adoption is the whole game. A tool only counts once people actually open it.",
-  },
-  {
-    title: "A 3D image generator app",
-    outcome: "shelved",
-    lesson:
-      "I chased the technology before the use. Built a cool demo nobody needed. Now I start with the person who has the problem.",
-  },
-  {
-    title: "A color-palette and wardrobe tool",
-    outcome: "shelved",
-    lesson:
-      "I built it for myself and figured everyone else wanted it too. They did not. Now I make sure the need is real before I start.",
-  },
-  {
-    title: "An occupation-code and wage-level generator",
-    outcome: "shelved",
-    lesson:
-      "The data was too thin to trust, and trust was the whole product. Some things should not be automated until the inputs are solid.",
   },
 ];

@@ -10,7 +10,7 @@ export const GET: APIRoute = async () => {
   );
 
   let txt = `# Jake Herridge\n\n`;
-  txt += `> Builder and writer in Bentonville, Arkansas. Came up in operations, now makes things: the PocketWild iOS app, internal tools, and a stack of practitioner white papers on bringing AI into real business work. Fascinated by how much one curious person can build now. Every paper below has a plain-Markdown version at the same path, with a .md extension.\n\n`;
+  txt += `> Builder and writer in Bentonville, Arkansas. Operations background. Makes things: the PocketWild iOS app, the Synapse knowledge system, internal AI tools, and practitioner white papers on bringing AI into real business work. Every paper below has a plain-Markdown version at the same path, with a .md extension.\n\n`;
 
   txt += `## White papers\n`;
   for (const p of papers) {

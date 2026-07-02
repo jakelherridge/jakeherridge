@@ -1,7 +1,7 @@
-// The Collection: every specimen worth showing, shipped or shelved.
+// The Collection: things Jake has made, shipped and shelved.
 // Derived from the identity data in person.ts so the two never drift.
 
-import { builds, lab } from "./person";
+import { builds } from "./person";
 
 export type SpecimenStatus = "shipped" | "shelved" | "growing";
 
@@ -58,13 +58,27 @@ export const specimens: Specimen[] = builds.map((b, i) => ({
 export interface ShelvedSpecimen {
   no: string;
   title: string;
-  lesson: string;
+  body: string;
 }
 
-export const shelved: ShelvedSpecimen[] = lab
-  .filter((e) => e.outcome === "shelved")
-  .map((e, i) => ({
-    no: String(specimens.length + i + 1).padStart(3, "0"),
-    title: e.title,
-    lesson: e.lesson,
-  }));
+// Projects built far enough to test, then stopped. Described, not moralized.
+const shelvedProjects = [
+  {
+    title: "A 3D image generator app",
+    body: "An app that generated 3D-effect images from flat photos. The demo worked. It never found a real use, so I stopped.",
+  },
+  {
+    title: "A color-palette and wardrobe tool",
+    body: "A tool that matched clothing colors to a personal palette and organized a wardrobe around it. I built it for myself and stopped there.",
+  },
+  {
+    title: "An occupation-code and wage-level generator",
+    body: "A tool that generated occupation codes and prevailing wage levels for job postings. The public wage data was too thin to rely on, so I shelved it.",
+  },
+];
+
+export const shelved: ShelvedSpecimen[] = shelvedProjects.map((e, i) => ({
+  no: String(specimens.length + i + 1).padStart(3, "0"),
+  title: e.title,
+  body: e.body,
+}));

@@ -9,14 +9,14 @@ import { art } from "../data/creative";
 
 <BaseLayout
   title="The Collection"
-  description="Everything Jake Herridge has made worth showing: apps, systems, sites, art, and the shelved experiments that taught the most."
+  description="Things Jake Herridge has made: an iOS app, a knowledge system, a Claude Code plugin, an open source pipeline, websites, art, and the projects he shelved."
 >
   <section class="mx-auto max-w-5xl px-5 py-14">
     <header class="max-w-2xl">
       <h1 class="wonk text-4xl font-semibold tracking-tight md:text-5xl">The Collection</h1>
       <p class="mt-4 text-lg leading-relaxed text-muted">
-        Everything I have made that is worth showing. Each entry gets a number and an honest
-        stamp. The shelved ones stay. They paid for the lessons the shipped ones run on.
+        Things I have made. Each entry gets a number and a status stamp: shipped, growing, or
+        shelved. The shelved projects are here too.
       </p>
     </header>
 
@@ -37,9 +37,8 @@ import { art } from "../data/creative";
         Built inside the business
       </h2>
       <p class="mt-3 max-w-2xl text-muted">
-        Some of this lives inside a company, so I can describe it but not show the screens. No
-        numbers on these. You will have to take my word, which is the point of the rest of the
-        page.
+        Tools I built for the companies I worked with. They live inside the business, so I can
+        describe them but not show the screens.
       </p>
       <dl class="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
         {
@@ -56,11 +55,11 @@ import { art } from "../data/creative";
     <!-- Shelved -->
     <section id="shelved" class="mt-16 scroll-mt-20 border-t border-faint pt-12">
       <div class="flex items-center gap-4">
-        <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The shelved drawer</h2>
+        <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">Shelved</h2>
         <span class="stamp stamp-shelved">shelved</span>
       </div>
       <p class="mt-3 max-w-2xl text-muted">
-        Not failures. Tuition. Each one comes with the field note I actually wrote down after.
+        Projects I built far enough to test, then stopped.
       </p>
       <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
         {
@@ -68,13 +67,7 @@ import { art } from "../data/creative";
             <article class="reveal rounded-md border border-dashed border-rust/40 bg-surface p-5">
               <p class="font-mono text-[0.68rem] tracking-wide text-muted">No. {e.no}</p>
               <h3 class="mt-2 font-serif text-xl tracking-tight">{e.title}</h3>
-              <p class="mt-3 text-sm leading-relaxed text-muted">
-                <span class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
-                  Field note
-                </span>
-                <br />
-                {e.lesson}
-              </p>
+              <p class="mt-3 text-sm leading-relaxed text-muted">{e.body}</p>
             </article>
           ))
         }
@@ -83,9 +76,9 @@ import { art } from "../data/creative";
 
     <!-- The art shelf -->
     <section id="art" class="mt-16 scroll-mt-20 border-t border-faint pt-12">
-      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">Made for the joy of it</h2>
+      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">Art and objects</h2>
       <p class="mt-3 max-w-2xl text-muted">
-        Not everything I make is useful, and that is deliberate. A few pieces from the shelf.
+        I also draw, sculpt, and make generative art. A few pieces.
       </p>
       <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
         {

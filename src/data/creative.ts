@@ -21,7 +21,7 @@ export const art: ArtPiece[] = [
     name: "Glitchy Gators",
     category: "Generative art",
     blurb:
-      "Ten thousand gators, no two alike, generated from more than three hundred attributes I drew by hand. An early experiment in building a system that makes things.",
+      "A generative collection of ten thousand unique gators on Polygon, assembled from more than three hundred hand-drawn attributes: staffs, storm clouds, branches, glitch effects.",
     image: gators,
     alt: "A grinning green gator holding a crystal-tipped staff, on a hot pink background",
   },
@@ -30,7 +30,7 @@ export const art: ArtPiece[] = [
     name: "Tiny Keycaps",
     category: "Sculpture",
     blurb:
-      "Keycaps sculpted, molded, and cast in resin. Tiny faces for a keyboard. Making something with your hands scratches a different itch.",
+      "Keycaps sculpted by hand, then molded and cast in resin. Monsters, animals, and faces, each sized to fit a keyboard switch.",
     image: keycaps,
     alt: "A grid of small hand-sculpted resin keycaps in bright colors",
   },
@@ -39,7 +39,7 @@ export const art: ArtPiece[] = [
     name: "Ornate Eagle Sword",
     category: "Sketch",
     blurb:
-      "A pencil sketch of a sword guarded by two eagles, borrowing from American and Japanese design at once. Drawn for no reason except wanting to see it.",
+      "A pencil sketch of a sword with two eagle heads forming the guard. American eagle imagery up top, a segmented pagoda-style grip below.",
     image: eagleSword,
     alt: "A pencil sketch of an ornate sword with two eagle heads forming the guard",
   },

@@ -39,7 +39,7 @@ export const relPhrase: Record<EdgeRel, { forward: string; reverse: string }> = 
   shaped: { forward: "shaped", reverse: "shaped by" },
   led_to: { forward: "led to", reverse: "grew out of" },
   part_of: { forward: "is part of", reverse: "includes" },
-  related: { forward: "runs beside", reverse: "runs beside" },
+  related: { forward: "related to", reverse: "related to" },
 };
 
 export const nodes: GraphNode[] = [
@@ -47,7 +47,7 @@ export const nodes: GraphNode[] = [
     id: "jake",
     label: "Jake Herridge",
     kind: "person",
-    summary: "Builder and writer in Bentonville, Arkansas. Everything here hangs off this node.",
+    summary: "Builder and writer in Bentonville, Arkansas.",
     href: "/about/",
   },
 
@@ -65,7 +65,7 @@ export const nodes: GraphNode[] = [
     label: "Synapse",
     kind: "build",
     status: "growing",
-    summary: "A knowledge graph of typed nodes and typed edges. This map is its public cousin.",
+    summary: "A knowledge graph of typed nodes and typed edges. This map uses the same structure.",
     href: "/collection/#synapse",
   },
   {
@@ -105,7 +105,7 @@ export const nodes: GraphNode[] = [
     label: "The AI Hub",
     kind: "build",
     status: "shipped",
-    summary: "One door for every internal AI tool we shipped, with usage tracked from day one.",
+    summary: "A single sign-on portal for a company's internal AI tools, with usage tracking.",
     href: "/collection/#inside",
   },
   {
@@ -113,7 +113,7 @@ export const nodes: GraphNode[] = [
     label: "Automated reviews",
     kind: "build",
     status: "shipped",
-    summary: "Turned a dreaded annual scramble into something that mostly runs itself.",
+    summary: "An automated review system that writes results into the system of record.",
     href: "/collection/#inside",
   },
   {
@@ -121,7 +121,7 @@ export const nodes: GraphNode[] = [
     label: "A 3D image maker",
     kind: "build",
     status: "shelved",
-    summary: "A cool demo nobody needed. It taught me to start with the person.",
+    summary: "Generated 3D-effect images from flat photos. Shelved without a real use.",
     href: "/collection/#shelved",
   },
   {
@@ -129,7 +129,7 @@ export const nodes: GraphNode[] = [
     label: "A wardrobe tool",
     kind: "build",
     status: "shelved",
-    summary: "I wanted it. Nobody else did. Now I check the need is real first.",
+    summary: "Matched clothing colors to a personal palette. Built for myself, then shelved.",
     href: "/collection/#shelved",
   },
   {
@@ -137,7 +137,7 @@ export const nodes: GraphNode[] = [
     label: "A wage data tool",
     kind: "build",
     status: "shelved",
-    summary: "The data was too thin to trust, and trust was the whole product.",
+    summary: "Generated occupation codes and wage levels. Shelved over unreliable source data.",
     href: "/collection/#shelved",
   },
 
@@ -190,7 +190,7 @@ export const nodes: GraphNode[] = [
     id: "keycaps",
     label: "Tiny Keycaps",
     kind: "creative",
-    summary: "Keycaps sculpted, molded, and memorialized in resin.",
+    summary: "Keycaps sculpted by hand, molded, and cast in resin.",
     href: "/collection/#keycaps",
   },
   {
@@ -206,7 +206,7 @@ export const nodes: GraphNode[] = [
     id: "curiosity",
     label: "Curiosity compounds",
     kind: "value",
-    summary: "Follow the pull, take it apart, keep what it teaches you.",
+    summary: "Take things apart to see how they work. Keep what that teaches.",
   },
   {
     id: "moments",
@@ -224,13 +224,13 @@ export const nodes: GraphNode[] = [
     id: "infinite-game",
     label: "The infinite game",
     kind: "value",
-    summary: "Play to keep playing. There is no finish line worth quitting for.",
+    summary: "Play to keep playing, not to finish.",
   },
   {
     id: "honest-flops",
     label: "Honest flops",
     kind: "value",
-    summary: "Shipped and shelved sit in the same collection. Both count.",
+    summary: "I show the shelved projects next to the shipped ones.",
   },
   {
     id: "boring-work",
