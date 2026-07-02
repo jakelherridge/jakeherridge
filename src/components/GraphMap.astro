@@ -1,0 +1,801 @@
+---
+// The Map: an interactive constellation of nodes and typed edges.
+// Server renders a seeded radial layout so the map exists without JS;
+// a small hand-rolled force simulation brings it to life.
+import { nodes, edges, kindMeta, relPhrase, type NodeKind } from "../data/graph";
+
+interface Props {
+  variant?: "embed" | "full";
+}
+const { variant = "full" } = Astro.props;
+
+const W = 900;
+const H = 620;
+const CX = W / 2;
+const CY = H / 2;
+
+const sector: Record<NodeKind, { angle: number; span: number; radius: number }> = {
+  person: { angle: 0, span: 0, radius: 0 },
+  build: { angle: -55, span: 135, radius: 190 },
+  paper: { angle: 42, span: 46, radius: 200 },
+  creative: { angle: 102, span: 72, radius: 190 },
+  value: { angle: 163, span: 84, radius: 152 },
+  influence: { angle: 215, span: 108, radius: 252 },
+  life: { angle: 287, span: 34, radius: 170 },
+};
+
+const nodeRadius: Record<NodeKind, number> = {
+  person: 11,
+  build: 7,
+  paper: 7,
+  creative: 6,
+  value: 5.5,
+  influence: 4.5,
+  life: 5,
+};
+
+const byKind = new Map<NodeKind, number>();
+const seeded = nodes.map((n) => {
+  if (n.kind === "person") {
+    return { ...n, x: CX, y: CY, r: nodeRadius.person, color: kindMeta.person.color };
+  }
+  const i = byKind.get(n.kind) ?? 0;
+  byKind.set(n.kind, i + 1);
+  const total = nodes.filter((m) => m.kind === n.kind).length;
+  const s = sector[n.kind];
+  const t = total === 1 ? 0 : i / (total - 1) - 0.5;
+  const angle = ((s.angle + t * s.span) * Math.PI) / 180;
+  const radius = s.radius + (i % 2) * 36;
+  return {
+    ...n,
+    x: Math.round(CX + Math.cos(angle) * radius),
+    y: Math.round(CY + Math.sin(angle) * radius),
+    r: nodeRadius[n.kind],
+    color: kindMeta[n.kind].color,
+  };
+});
+
+const seedById = new Map(seeded.map((n) => [n.id, n]));
+const legend = (Object.keys(kindMeta) as NodeKind[])
+  .filter((k) => k !== "person")
+  .map((k) => ({
+    kind: k,
+    label: kindMeta[k].label,
+    color: kindMeta[k].color,
+    count: nodes.filter((n) => n.kind === k).length,
+  }));
+
+const payload = {
+  nodes: seeded.map(({ id, label, kind, summary, href, status, x, y, r, color }) => ({
+    id,
+    label,
+    kind,
+    summary,
+    href,
+    status,
+    x,
+    y,
+    r,
+    color,
+  })),
+  edges,
+  relPhrase,
+  kindMeta,
+  w: W,
+  h: H,
+};
+---
+
+<div
+  class:list={["graph-map", variant === "embed" ? "graph-embed" : "graph-full"]}
+  data-graph-root
+>
+  <div class="graph-legend" role="group" aria-label="Filter the map by kind">
+    {
+      legend.map((l) => (
+        <button type="button" class="legend-chip" data-legend-kind={l.kind} aria-pressed="false">
+          <span class="legend-dot" style={`background:${l.color}`} aria-hidden="true" />
+          {l.label}
+          <span class="legend-count">{l.count}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="graph-scroll">
+    <svg
+      data-graph-svg
+      viewBox={`0 0 ${W} ${H}`}
+      role="application"
+      aria-label="An interactive map of Jake: builds, papers, creative work, values, influences, and life, joined by typed edges. Use Tab to move between nodes and Enter to open one."
+    >
+      <g data-edges>
+        {
+          edges.map((e) => {
+            const a = seedById.get(e.from)!;
+            const b = seedById.get(e.to)!;
+            return (
+              <line
+                class={`edge edge-${e.rel}`}
+                data-from={e.from}
+                data-to={e.to}
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+              />
+            );
+          })
+        }
+      </g>
+      <g data-nodes>
+        {
+          seeded.map((n) => (
+            <g
+              class={`node node-${n.kind}${n.status ? ` is-${n.status}` : ""}`}
+              data-node
+              data-id={n.id}
+              transform={`translate(${n.x} ${n.y})`}
+              tabindex="0"
+              role="button"
+              aria-label={`${n.label}. ${n.summary}`}
+            >
+              {n.status === "growing" && <circle class="node-ring" r={n.r + 4} />}
+              <circle class="node-dot" r={n.r} fill={n.color} style={`--node-color:${n.color}`} />
+              <text class="node-label" y={n.r + 13}>
+                {n.label}
+              </text>
+            </g>
+          ))
+        }
+      </g>
+    </svg>
+  </div>
+
+  <p class="graph-key">
+    solid = made or wrote &middot; dashed = shaped &middot; dotted = led to &middot; long dash =
+    runs beside
+  </p>
+
+  <aside class="graph-panel" data-panel hidden>
+    <button type="button" class="panel-close" data-panel-close aria-label="Close details">
+      &times;
+    </button>
+    <p class="panel-kind" data-panel-kind></p>
+    <h3 class="panel-title" data-panel-title></h3>
+    <p class="panel-summary" data-panel-summary></p>
+    <ul class="panel-connections" data-panel-connections></ul>
+    <a class="panel-link" data-panel-link hidden>Visit &rarr;</a>
+  </aside>
+
+  <script type="application/json" data-graph-data set:html={JSON.stringify(payload)} />
+</div>
+
+<style is:global>
+  .graph-map {
+    position: relative;
+    border: 1px solid var(--color-faint);
+    border-radius: 8px;
+    background:
+      radial-gradient(ellipse at center, rgb(255 255 255 / 0.65), transparent 70%),
+      var(--color-paper);
+    overflow: hidden;
+  }
+  .graph-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .graph-scroll svg {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+  }
+  .graph-full .graph-scroll svg {
+    max-height: 76vh;
+  }
+  .graph-embed .graph-scroll svg {
+    max-height: 540px;
+  }
+
+  .graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.75rem 0.9rem 0;
+    position: relative;
+    z-index: 2;
+  }
+  .legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.28rem 0.65rem;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      opacity 0.15s ease;
+  }
+  .legend-chip:hover {
+    color: var(--color-ink);
+  }
+  .legend-chip[aria-pressed="true"] {
+    color: var(--color-ink);
+    border-color: currentColor;
+  }
+  .graph-map.has-kind-filter .legend-chip[aria-pressed="false"] {
+    opacity: 0.45;
+  }
+  .legend-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    flex: none;
+  }
+  .legend-count {
+    opacity: 0.6;
+  }
+
+  .graph-key {
+    margin: 0;
+    padding: 0 0.9rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+  }
+
+  /* Edges */
+  .edge {
+    stroke: #d8d2c4;
+    stroke-width: 1;
+    transition: opacity 0.2s ease;
+  }
+  .edge-shaped {
+    stroke-dasharray: 5 4;
+  }
+  .edge-led_to {
+    stroke-dasharray: 1.5 3.5;
+    stroke-linecap: round;
+  }
+  .edge-related {
+    stroke-dasharray: 9 5;
+  }
+  .edge-part_of {
+    stroke-width: 1.7;
+  }
+  .edge.is-lit {
+    stroke: #8f887a;
+  }
+
+  /* Nodes */
+  .node {
+    cursor: pointer;
+    outline: none;
+  }
+  .node .node-dot {
+    transition:
+      r 0.15s ease,
+      opacity 0.2s ease;
+  }
+  .node:hover .node-dot,
+  .node.is-selected .node-dot {
+    r: calc(var(--r, 6px) + 2px);
+  }
+  .node:focus-visible .node-dot {
+    stroke: var(--color-accent);
+    stroke-width: 2.5px;
+    stroke-opacity: 0.9;
+  }
+  .node.is-shelved .node-dot {
+    fill: var(--color-paper);
+    stroke: var(--node-color);
+    stroke-width: 1.8;
+    stroke-dasharray: 2.5 2;
+  }
+  .node-ring {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .node-ring {
+      animation: ring-pulse 2.6s ease-in-out infinite;
+    }
+  }
+  @keyframes ring-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.15;
+      transform: scale(1.28);
+    }
+  }
+  .node-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--color-muted);
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: var(--color-paper);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .node-person .node-label {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    fill: var(--color-ink);
+  }
+  .node:hover .node-label,
+  .node.is-selected .node-label {
+    fill: var(--color-ink);
+  }
+
+  /* Focus dimming: when something is lit, everything else recedes. */
+  .graph-map.has-focus .node:not(.is-lit) .node-dot,
+  .graph-map.has-focus .node:not(.is-lit) .node-ring {
+    opacity: 0.18;
+  }
+  .graph-map.has-focus .node:not(.is-lit) .node-label {
+    opacity: 0.25;
+  }
+  .graph-map.has-focus .edge:not(.is-lit) {
+    opacity: 0.15;
+  }
+
+  /* Detail panel */
+  .graph-panel {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.9rem;
+    z-index: 3;
+    width: min(21rem, calc(100% - 1.8rem));
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 8px;
+    padding: 0.9rem 1rem 1rem;
+    box-shadow: 0 6px 24px rgb(27 26 23 / 0.09);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .graph-panel {
+      transition:
+        opacity 0.25s ease,
+        translate 0.25s ease;
+      @starting-style {
+        opacity: 0;
+        translate: 0 8px;
+      }
+    }
+  }
+  .panel-close {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.55rem;
+    border: 0;
+    background: none;
+    font-size: 1.1rem;
+    line-height: 1;
+    color: var(--color-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+  .panel-close:hover {
+    color: var(--color-ink);
+  }
+  .panel-kind {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--panel-color, var(--color-muted));
+  }
+  .panel-title {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .panel-summary {
+    margin: 0.4rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+  .panel-connections {
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    max-height: 7.5rem;
+    overflow-y: auto;
+  }
+  .panel-connections button {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--color-ink);
+    background: var(--color-paper);
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    cursor: pointer;
+  }
+  .panel-connections button:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .panel-connections .rel-word {
+    color: var(--color-muted);
+  }
+  .panel-link {
+    display: inline-block;
+    margin-top: 0.65rem;
+    font-size: 0.82rem;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .panel-link:hover {
+    color: var(--color-accent-strong);
+  }
+</style>
+
+<script>
+  interface GNode {
+    id: string;
+    label: string;
+    kind: string;
+    summary: string;
+    href?: string;
+    status?: string;
+    x: number;
+    y: number;
+    r: number;
+    color: string;
+    vx: number;
+    vy: number;
+    fixed: boolean;
+    el: SVGGElement;
+  }
+  interface GEdge {
+    from: string;
+    to: string;
+    rel: string;
+    el: SVGLineElement;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll<HTMLElement>("[data-graph-root]").forEach(init);
+
+  function init(root: HTMLElement) {
+    const dataEl = root.querySelector("[data-graph-data]");
+    const svg = root.querySelector<SVGSVGElement>("[data-graph-svg]");
+    if (!dataEl || !svg) return;
+    const data = JSON.parse(dataEl.textContent || "{}");
+    const W: number = data.w;
+    const H: number = data.h;
+    const relPhrase: Record<string, { forward: string; reverse: string }> = data.relPhrase;
+    const kindMeta: Record<string, { label: string; color: string }> = data.kindMeta;
+
+    const nodeEls = new Map<string, SVGGElement>();
+    svg.querySelectorAll<SVGGElement>("[data-node]").forEach((el) => {
+      nodeEls.set(el.dataset.id!, el);
+      el.style.setProperty("--r", `${parseFloat(el.querySelector(".node-dot")!.getAttribute("r")!)}px`);
+      el.style.touchAction = "none";
+    });
+
+    const nodes: GNode[] = data.nodes.map((n: GNode) => ({
+      ...n,
+      vx: 0,
+      vy: 0,
+      fixed: n.id === "jake",
+      el: nodeEls.get(n.id)!,
+    }));
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+
+    const edges: GEdge[] = [];
+    svg.querySelectorAll<SVGLineElement>(".edge").forEach((el) => {
+      edges.push({ from: el.dataset.from!, to: el.dataset.to!, rel: "", el });
+    });
+    data.edges.forEach((e: GEdge, i: number) => (edges[i].rel = e.rel));
+
+    const neighbors = new Map<string, Set<string>>();
+    nodes.forEach((n) => neighbors.set(n.id, new Set([n.id])));
+    edges.forEach((e) => {
+      neighbors.get(e.from)!.add(e.to);
+      neighbors.get(e.to)!.add(e.from);
+    });
+
+    // ----- Force simulation -----
+    let alpha = 0;
+    let raf = 0;
+    const PAD_X = 78;
+    const PAD_Y = 40;
+
+    function tick() {
+      // Pairwise repulsion.
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          let dx = b.x - a.x;
+          let dy = b.y - a.y;
+          let d2 = dx * dx + dy * dy;
+          if (d2 < 1) {
+            dx = (Math.random() - 0.5) * 2;
+            dy = (Math.random() - 0.5) * 2;
+            d2 = dx * dx + dy * dy;
+          }
+          const d = Math.sqrt(d2);
+          const min = a.r + b.r + 46;
+          const f = Math.min(4.2, (2400 * (d < min ? 2.2 : 1)) / d2);
+          const fx = (dx / d) * f;
+          const fy = (dy / d) * f;
+          a.vx -= fx;
+          a.vy -= fy;
+          b.vx += fx;
+          b.vy += fy;
+        }
+      }
+      // Springs along edges.
+      for (const e of edges) {
+        const a = byId.get(e.from)!;
+        const b = byId.get(e.to)!;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const rest = a.id === "jake" || b.id === "jake" ? 175 : 105;
+        const f = (d - rest) * 0.018;
+        const fx = (dx / d) * f;
+        const fy = (dy / d) * f;
+        a.vx += fx;
+        a.vy += fy;
+        b.vx -= fx;
+        b.vy -= fy;
+      }
+      // Gentle pull to center, integrate, clamp.
+      for (const n of nodes) {
+        if (n.fixed) {
+          n.vx = 0;
+          n.vy = 0;
+          continue;
+        }
+        n.vx += (W / 2 - n.x) * 0.0045;
+        n.vy += (H / 2 - n.y) * 0.0075;
+        n.vx *= 0.82;
+        n.vy *= 0.82;
+        n.x += n.vx * alpha * 2.2;
+        n.y += n.vy * alpha * 2.2;
+        n.x = Math.max(PAD_X, Math.min(W - PAD_X, n.x));
+        n.y = Math.max(PAD_Y, Math.min(H - PAD_Y - 8, n.y));
+      }
+    }
+
+    function render() {
+      for (const n of nodes) {
+        n.el.setAttribute("transform", `translate(${n.x.toFixed(1)} ${n.y.toFixed(1)})`);
+      }
+      for (const e of edges) {
+        const a = byId.get(e.from)!;
+        const b = byId.get(e.to)!;
+        e.el.setAttribute("x1", a.x.toFixed(1));
+        e.el.setAttribute("y1", a.y.toFixed(1));
+        e.el.setAttribute("x2", b.x.toFixed(1));
+        e.el.setAttribute("y2", b.y.toFixed(1));
+      }
+    }
+
+    function loop() {
+      tick();
+      render();
+      alpha *= 0.986;
+      if (alpha > 0.02) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = 0;
+      }
+    }
+
+    function heat(a: number) {
+      alpha = Math.max(alpha, a);
+      if (!raf && !reducedMotion) raf = requestAnimationFrame(loop);
+      if (reducedMotion) {
+        // Settle instantly, no animation.
+        for (let i = 0; i < 260 && alpha > 0.02; i++) {
+          tick();
+          alpha *= 0.986;
+        }
+        alpha = 0;
+        render();
+      }
+    }
+
+    // Start when the map scrolls into view.
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          heat(1);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
+    io.observe(root);
+
+    // ----- Focus, selection, panel -----
+    const panel = root.querySelector<HTMLElement>("[data-panel]")!;
+    const panelKind = root.querySelector<HTMLElement>("[data-panel-kind]")!;
+    const panelTitle = root.querySelector<HTMLElement>("[data-panel-title]")!;
+    const panelSummary = root.querySelector<HTMLElement>("[data-panel-summary]")!;
+    const panelConnections = root.querySelector<HTMLElement>("[data-panel-connections]")!;
+    const panelLink = root.querySelector<HTMLAnchorElement>("[data-panel-link]")!;
+    let selectedId: string | null = null;
+
+    function light(id: string | null, kind: string | null) {
+      root.classList.toggle("has-focus", Boolean(id || kind));
+      const lit = id ? neighbors.get(id)! : null;
+      for (const n of nodes) {
+        const on = lit ? lit.has(n.id) : kind ? n.kind === kind || n.kind === "person" : false;
+        n.el.classList.toggle("is-lit", on);
+        n.el.classList.toggle("is-selected", n.id === selectedId);
+      }
+      for (const e of edges) {
+        const on = id ? e.from === id || e.to === id : kind ? litEdgeForKind(e, kind) : false;
+        e.el.classList.toggle("is-lit", on);
+      }
+    }
+    function litEdgeForKind(e: GEdge, kind: string) {
+      return byId.get(e.from)!.kind === kind || byId.get(e.to)!.kind === kind;
+    }
+
+    function openPanel(id: string) {
+      const n = byId.get(id)!;
+      selectedId = id;
+      panelKind.textContent =
+        kindMeta[n.kind].label + (n.status ? ` · ${n.status}` : "");
+      panel.style.setProperty("--panel-color", n.color);
+      panelTitle.textContent = n.label;
+      panelSummary.textContent = n.summary;
+      panelConnections.innerHTML = "";
+      for (const e of edges) {
+        if (e.from !== id && e.to !== id) continue;
+        const otherId = e.from === id ? e.to : e.from;
+        const phrase =
+          e.from === id ? relPhrase[e.rel].forward : relPhrase[e.rel].reverse;
+        const other = byId.get(otherId)!;
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.innerHTML = `<span class="rel-word">${phrase}</span> ${other.label}`;
+        btn.addEventListener("click", () => {
+          openPanel(otherId);
+          light(otherId, null);
+        });
+        li.appendChild(btn);
+        panelConnections.appendChild(li);
+      }
+      if (n.href) {
+        panelLink.hidden = false;
+        panelLink.href = n.href;
+        panelLink.textContent =
+          n.href.startsWith("http") ? "Visit →" : "See more →";
+      } else {
+        panelLink.hidden = true;
+      }
+      panel.hidden = false;
+      light(id, null);
+    }
+
+    function closePanel() {
+      selectedId = null;
+      panel.hidden = true;
+      light(null, activeKind);
+    }
+
+    root.querySelector("[data-panel-close]")!.addEventListener("click", closePanel);
+    root.addEventListener("keydown", (ev) => {
+      if ((ev as KeyboardEvent).key === "Escape") closePanel();
+    });
+
+    // ----- Legend kind filter -----
+    let activeKind: string | null = null;
+    root.querySelectorAll<HTMLButtonElement>("[data-legend-kind]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const kind = chip.dataset.legendKind!;
+        activeKind = activeKind === kind ? null : kind;
+        root.querySelectorAll<HTMLButtonElement>("[data-legend-kind]").forEach((c) => {
+          c.setAttribute("aria-pressed", String(c.dataset.legendKind === activeKind));
+        });
+        root.classList.toggle("has-kind-filter", Boolean(activeKind));
+        if (!selectedId) light(null, activeKind);
+      });
+    });
+
+    // ----- Node interaction: hover, click, keyboard, drag -----
+    let dragging: GNode | null = null;
+    let moved = false;
+
+    for (const n of nodes) {
+      n.el.addEventListener("pointerenter", () => {
+        if (!selectedId && !dragging) light(n.id, null);
+      });
+      n.el.addEventListener("pointerleave", () => {
+        if (!selectedId && !dragging) light(null, activeKind);
+      });
+      n.el.addEventListener("keydown", (ev) => {
+        const key = (ev as KeyboardEvent).key;
+        if (key === "Enter" || key === " ") {
+          ev.preventDefault();
+          openPanel(n.id);
+        }
+      });
+      n.el.addEventListener("pointerdown", (ev) => {
+        dragging = n;
+        moved = false;
+        n.el.setPointerCapture((ev as PointerEvent).pointerId);
+      });
+      n.el.addEventListener("pointermove", (ev) => {
+        if (dragging !== n) return;
+        const pe = ev as PointerEvent;
+        if (pe.buttons === 0) return;
+        const pt = toSvgPoint(pe);
+        if (Math.abs(pt.x - n.x) + Math.abs(pt.y - n.y) > 3) moved = true;
+        if (!moved) return;
+        if (n.id !== "jake") {
+          n.x = pt.x;
+          n.y = pt.y;
+          n.fixed = true;
+          heat(0.4);
+        }
+      });
+      n.el.addEventListener("pointerup", () => {
+        if (dragging === n) {
+          if (n.id !== "jake") n.fixed = false;
+          if (!moved) openPanel(n.id);
+          dragging = null;
+        }
+      });
+      n.el.addEventListener("pointercancel", () => {
+        if (dragging === n) {
+          if (n.id !== "jake") n.fixed = false;
+          dragging = null;
+        }
+      });
+    }
+
+    function toSvgPoint(ev: PointerEvent) {
+      const pt = svg!.createSVGPoint();
+      pt.x = ev.clientX;
+      pt.y = ev.clientY;
+      return pt.matrixTransform(svg!.getScreenCTM()!.inverse());
+    }
+
+    // Click on empty canvas clears the selection.
+    svg.addEventListener("pointerdown", (ev) => {
+      if ((ev.target as Element).closest("[data-node]")) return;
+      closePanel();
+    });
+  }
+</script>

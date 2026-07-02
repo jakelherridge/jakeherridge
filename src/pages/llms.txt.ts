@@ -22,6 +22,10 @@ export const GET: APIRoute = async () => {
     txt += `- [${b.name}](${b.href}): ${b.tagline}\n`;
   }
 
+  txt += `\n## The Map\n`;
+  txt += `- [The Map](${SITE}/map/): Jake as an interactive graph of typed nodes and typed edges.\n`;
+  txt += `- [graph.json](${SITE}/graph.json): The same graph as JSON, built for agents. Kinds, relations, nodes, edges.\n`;
+
   txt += `\n## About\n`;
   txt += `- [About Jake Herridge](${SITE}/about/): Who he is, what he values, and why he builds.\n`;
   txt += `- [Contact](${SITE}/contact/): How to reach him.\n`;
