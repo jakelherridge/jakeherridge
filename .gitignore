@@ -21,3 +21,7 @@ _site/
 
 # macOS
 .DS_Store
+
+# AI working notes (local only)
+CLAUDE.md
+.claude/
