@@ -33,6 +33,14 @@ const graph = [...siteGraph(), ...jsonLd];
   <body class="flex min-h-[100dvh] flex-col bg-paper font-sans text-ink">
     <a href="#main" class="skip-link">Skip to content</a>
     <Header />
+    <div class="border-b border-faint bg-surface print:hidden">
+      <p
+        class="mx-auto flex max-w-5xl items-center gap-2.5 px-5 py-1.5 font-mono text-[0.65rem] tracking-wide text-muted"
+      >
+        <span class="stamp stamp-shipped shrink-0" style="font-size: 0.5rem">growing</span>
+        A work in progress. I build this site in the open, and it changes often.
+      </p>
+    </div>
     <main id="main" class="flex-1">
       <slot />
     </main>

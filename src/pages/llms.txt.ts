@@ -11,6 +11,7 @@ export const GET: APIRoute = async () => {
 
   let txt = `# Jake Herridge\n\n`;
   txt += `> Builder and writer in Bentonville, Arkansas. Operations background. Makes things: the PocketWild iOS app, the Synapse knowledge system, internal AI tools, and practitioner white papers on bringing AI into real business work. Every paper below has a plain-Markdown version at the same path, with a .md extension.\n\n`;
+  txt += `Status: this site is a work in progress, built in the open. Sections change and new ones appear often.\n\n`;
 
   txt += `## White papers\n`;
   for (const p of papers) {
