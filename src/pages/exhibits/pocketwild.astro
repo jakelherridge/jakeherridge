@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PocketwildExhibit from "../../components/PocketwildExhibit.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "PocketWild";
+const description =
+  "The PocketWild field journal, opened in the browser: log captures from the 228-species index, name them from the app's real name pool, and watch your meadow fill. Narrated by Aldo.";
+
+const jsonLd = [
+  {
+    "@type": "SoftwareApplication",
+    name: "PocketWild",
+    applicationCategory: "LifestyleApplication",
+    operatingSystem: "iOS",
+    url: "https://www.pocketwild.app/",
+    author: { "@id": "https://jakeherridge.com/#person" },
+    description:
+      "A native iOS field journal: photograph creatures and plants, keep a private local collection, narrated by Aldo the frog.",
+  },
+  breadcrumb([
+    { name: "Exhibits", url: "https://jakeherridge.com/exhibits/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/pocketwild/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header class="max-w-2xl">
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+        Exhibit · iOS app
+      </p>
+      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+        228 species · AI-curated pixel sprites · entries stamped with weather and moon phase ·
+        no accounts, no feed, no ads
+      </p>
+      <p class="mt-5 text-lg leading-relaxed text-muted">
+        A native iOS field journal: photograph creatures and plants, keep a private local
+        collection. The sprites were curated through AI generation and the app was built around
+        them, in Swift, by directing Claude Code. This room runs on the app's real data: its
+        species guide, its name generator, and its narrator.
+      </p>
+      <p class="mt-4 font-serif text-lg italic leading-relaxed text-ink">
+        The narrator is Aldo. He is a frog, named for Aldo Leopold, and he has been here a long
+        time. From here on, he does the talking.
+      </p>
+    </header>
+
+    <div class="mt-10">
+      <PocketwildExhibit />
+    </div>
+
+    <footer class="mt-12 border-t border-faint pt-6">
+      <a
+        href="https://www.pocketwild.app/"
+        rel="noopener"
+        class="text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        The real thing lives at pocketwild.app &rarr;
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

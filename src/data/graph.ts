@@ -58,7 +58,7 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shipped",
     summary: "A native iOS field journal. Every creature you find gets a name.",
-    href: "https://www.pocketwild.app/",
+    href: "/exhibits/pocketwild/",
   },
   {
     id: "synapse",

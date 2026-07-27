@@ -1,0 +1,1370 @@
+[
+  {
+    "n": 1,
+    "name": "American Robin",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 2,
+    "name": "Northern Cardinal",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 3,
+    "name": "Blue Jay",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 4,
+    "name": "American Crow",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 5,
+    "name": "Mourning Dove",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 6,
+    "name": "House Sparrow",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 7,
+    "name": "European Starling",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 8,
+    "name": "Canada Goose",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 9,
+    "name": "Mallard",
+    "category": "bird",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 10,
+    "name": "Red-tailed Hawk",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 11,
+    "name": "Downy Woodpecker",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 12,
+    "name": "American Goldfinch",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 13,
+    "name": "Song Sparrow",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 14,
+    "name": "Black-capped Chickadee",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 15,
+    "name": "Carolina Wren",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 16,
+    "name": "Red-winged Blackbird",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 17,
+    "name": "Tufted Titmouse",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 18,
+    "name": "White-breasted Nuthatch",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 19,
+    "name": "Northern Mockingbird",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 20,
+    "name": "Dark-eyed Junco",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 21,
+    "name": "Eastern Bluebird",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 22,
+    "name": "House Finch",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 23,
+    "name": "Ruby-throated Hummingbird",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 24,
+    "name": "Great Blue Heron",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 25,
+    "name": "Turkey Vulture",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 26,
+    "name": "Barn Swallow",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 27,
+    "name": "Red-bellied Woodpecker",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 28,
+    "name": "Cooper's Hawk",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 29,
+    "name": "Wild Turkey",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 30,
+    "name": "American Kestrel",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 31,
+    "name": "Osprey",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 32,
+    "name": "Great Horned Owl",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 33,
+    "name": "Bald Eagle",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 34,
+    "name": "Barred Owl",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 35,
+    "name": "Cedar Waxwing",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 36,
+    "name": "Belted Kingfisher",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 37,
+    "name": "Killdeer",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 38,
+    "name": "Eastern/Western Meadowlark",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 39,
+    "name": "Pileated Woodpecker",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 40,
+    "name": "Baltimore Oriole",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 41,
+    "name": "Indigo Bunting",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 42,
+    "name": "Wood Duck",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 43,
+    "name": "Ring-billed Gull",
+    "category": "bird",
+    "rarity": "Common"
+  },
+  {
+    "n": 44,
+    "name": "Brown Pelican",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 45,
+    "name": "Sandhill Crane",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 46,
+    "name": "Anna's Hummingbird",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 47,
+    "name": "Steller's Jay",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 48,
+    "name": "Mountain Bluebird",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 49,
+    "name": "Western Tanager",
+    "category": "bird",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 50,
+    "name": "Painted Bunting",
+    "category": "bird",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 51,
+    "name": "Snowy Owl",
+    "category": "bird",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 52,
+    "name": "Roseate Spoonbill",
+    "category": "bird",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 53,
+    "name": "Peregrine Falcon",
+    "category": "bird",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 54,
+    "name": "Great Gray Owl",
+    "category": "bird",
+    "rarity": "Rare"
+  },
+  {
+    "n": 55,
+    "name": "Whooping Crane",
+    "category": "bird",
+    "rarity": "Rare"
+  },
+  {
+    "n": 56,
+    "name": "California Condor",
+    "category": "bird",
+    "rarity": "Very Rare"
+  },
+  {
+    "n": 57,
+    "name": "Scissor-tailed Flycatcher",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 58,
+    "name": "Greater Roadrunner",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 59,
+    "name": "Common Loon",
+    "category": "bird",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 60,
+    "name": "Atlantic Puffin",
+    "category": "bird",
+    "rarity": "Rare"
+  },
+  {
+    "n": 61,
+    "name": "Eastern Gray Squirrel",
+    "category": "mammal",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 62,
+    "name": "White-tailed Deer",
+    "category": "mammal",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 63,
+    "name": "Eastern Cottontail",
+    "category": "mammal",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 64,
+    "name": "Raccoon",
+    "category": "mammal",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 65,
+    "name": "Fox Squirrel",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 66,
+    "name": "Eastern Chipmunk",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 67,
+    "name": "Virginia Opossum",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 68,
+    "name": "Striped Skunk",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 69,
+    "name": "Groundhog/Woodchuck",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 70,
+    "name": "Coyote",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 71,
+    "name": "Red Fox",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 72,
+    "name": "North American Beaver",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 73,
+    "name": "Mule Deer",
+    "category": "mammal",
+    "rarity": "Common"
+  },
+  {
+    "n": 74,
+    "name": "American Black Bear",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 75,
+    "name": "Gray Fox",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 76,
+    "name": "River Otter",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 77,
+    "name": "Bobcat",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 78,
+    "name": "Nine-banded Armadillo",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 79,
+    "name": "American Elk/Wapiti",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 80,
+    "name": "Pronghorn",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 81,
+    "name": "American Bison",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 82,
+    "name": "Moose",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 83,
+    "name": "Mountain Lion/Cougar",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 84,
+    "name": "Black-tailed Prairie Dog",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 85,
+    "name": "Manatee",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 86,
+    "name": "Sea Otter",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 87,
+    "name": "Grizzly Bear",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 88,
+    "name": "Gray Wolf",
+    "category": "mammal",
+    "rarity": "Rare"
+  },
+  {
+    "n": 89,
+    "name": "Bighorn Sheep",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 90,
+    "name": "Mountain Goat",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 91,
+    "name": "North American Porcupine",
+    "category": "mammal",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 92,
+    "name": "Fisher",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 93,
+    "name": "Wolverine",
+    "category": "mammal",
+    "rarity": "Very Rare"
+  },
+  {
+    "n": 94,
+    "name": "Humpback Whale",
+    "category": "mammal",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 95,
+    "name": "Black-footed Ferret",
+    "category": "mammal",
+    "rarity": "Very Rare"
+  },
+  {
+    "n": 96,
+    "name": "Red Maple",
+    "category": "tree",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 97,
+    "name": "White Oak",
+    "category": "tree",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 98,
+    "name": "Eastern White Pine",
+    "category": "tree",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 99,
+    "name": "Sugar Maple",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 100,
+    "name": "Loblolly Pine",
+    "category": "tree",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 101,
+    "name": "Eastern Red Cedar",
+    "category": "tree",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 102,
+    "name": "American Sycamore",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 103,
+    "name": "Sweetgum",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 104,
+    "name": "Douglas Fir",
+    "category": "tree",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 105,
+    "name": "Ponderosa Pine",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 106,
+    "name": "Quaking Aspen",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 107,
+    "name": "Live Oak",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 108,
+    "name": "Eastern Hemlock",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 109,
+    "name": "American Beech",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 110,
+    "name": "Bald Cypress",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 111,
+    "name": "Paper Birch",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 112,
+    "name": "Tulip Tree/Yellow Poplar",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 113,
+    "name": "Coast Redwood",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 114,
+    "name": "Giant Sequoia",
+    "category": "tree",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 115,
+    "name": "Saguaro Cactus",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 116,
+    "name": "Bur Oak",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 117,
+    "name": "Colorado Blue Spruce",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 118,
+    "name": "Joshua Tree",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 119,
+    "name": "Longleaf Pine",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 120,
+    "name": "Black Walnut",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 121,
+    "name": "Western Red Cedar",
+    "category": "tree",
+    "rarity": "Common"
+  },
+  {
+    "n": 122,
+    "name": "Sitka Spruce",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 123,
+    "name": "American Elm",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 124,
+    "name": "Bristlecone Pine",
+    "category": "tree",
+    "rarity": "Rare"
+  },
+  {
+    "n": 125,
+    "name": "Mangrove (Red)",
+    "category": "tree",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 126,
+    "name": "Common Milkweed",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 127,
+    "name": "Black-eyed Susan",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 128,
+    "name": "Purple Coneflower",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 129,
+    "name": "Common Dandelion",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 130,
+    "name": "Wild Violet",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 131,
+    "name": "Goldenrod",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 132,
+    "name": "Queen Anne's Lace",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 133,
+    "name": "Red Clover",
+    "category": "wildflower",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 134,
+    "name": "Indian Paintbrush",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 135,
+    "name": "Bluebonnet",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 136,
+    "name": "California Poppy",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 137,
+    "name": "Trillium",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 138,
+    "name": "Wild Columbine",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 139,
+    "name": "Butterfly Weed",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 140,
+    "name": "Fireweed",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 141,
+    "name": "Bloodroot",
+    "category": "wildflower",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 142,
+    "name": "Lady's Slipper Orchid",
+    "category": "wildflower",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 143,
+    "name": "Indian Pipe/Ghost Plant",
+    "category": "wildflower",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 144,
+    "name": "Venus Flytrap",
+    "category": "wildflower",
+    "rarity": "Rare"
+  },
+  {
+    "n": 145,
+    "name": "Desert Marigold",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 146,
+    "name": "Lupine",
+    "category": "wildflower",
+    "rarity": "Common"
+  },
+  {
+    "n": 147,
+    "name": "Shooting Star",
+    "category": "wildflower",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 148,
+    "name": "Jack-in-the-Pulpit",
+    "category": "wildflower",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 149,
+    "name": "Saguaro Flower",
+    "category": "wildflower",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 150,
+    "name": "Skunk Cabbage",
+    "category": "wildflower",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 151,
+    "name": "Monarch Butterfly",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 152,
+    "name": "Western Honeybee",
+    "category": "insect",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 153,
+    "name": "Common Eastern Bumble Bee",
+    "category": "insect",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 154,
+    "name": "Painted Lady Butterfly",
+    "category": "insect",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 155,
+    "name": "Eastern Tiger Swallowtail",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 156,
+    "name": "Common Green Darner",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 157,
+    "name": "Seven-spotted Ladybug",
+    "category": "insect",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 158,
+    "name": "Luna Moth",
+    "category": "insect",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 159,
+    "name": "Praying Mantis",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 160,
+    "name": "Black Swallowtail",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 161,
+    "name": "Firefly/Lightning Bug",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 162,
+    "name": "Woolly Bear Caterpillar",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 163,
+    "name": "Periodical Cicada",
+    "category": "insect",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 164,
+    "name": "Garden Spider (Black & Yellow)",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 165,
+    "name": "Eastern Black Swallowtail",
+    "category": "insect",
+    "rarity": "Common"
+  },
+  {
+    "n": 166,
+    "name": "Cecropia Moth",
+    "category": "insect",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 167,
+    "name": "Atlas Moth / Polyphemus Moth",
+    "category": "insect",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 168,
+    "name": "Hummingbird Moth",
+    "category": "insect",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 169,
+    "name": "Walking Stick",
+    "category": "insect",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 170,
+    "name": "Hercules Beetle",
+    "category": "insect",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 171,
+    "name": "Tarantula (Desert)",
+    "category": "insect",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 172,
+    "name": "Giant Water Bug",
+    "category": "insect",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 173,
+    "name": "Pipevine Swallowtail",
+    "category": "insect",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 174,
+    "name": "Io Moth",
+    "category": "insect",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 175,
+    "name": "Regal Moth/Royal Walnut",
+    "category": "insect",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 176,
+    "name": "Western Fence Lizard",
+    "category": "reptileAmphibian",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 177,
+    "name": "Green Anole",
+    "category": "reptileAmphibian",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 178,
+    "name": "American Bullfrog",
+    "category": "reptileAmphibian",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 179,
+    "name": "Eastern Box Turtle",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 180,
+    "name": "Red-eared Slider",
+    "category": "reptileAmphibian",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 181,
+    "name": "Spring Peeper",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 182,
+    "name": "American Toad",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 183,
+    "name": "Green Tree Frog",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 184,
+    "name": "Garter Snake (Common)",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 185,
+    "name": "Five-lined Skink",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 186,
+    "name": "American Alligator",
+    "category": "reptileAmphibian",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 187,
+    "name": "Painted Turtle",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 188,
+    "name": "Black Rat Snake",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 189,
+    "name": "Eastern Newt (Red Eft)",
+    "category": "reptileAmphibian",
+    "rarity": "Common"
+  },
+  {
+    "n": 190,
+    "name": "Gila Monster",
+    "category": "reptileAmphibian",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 191,
+    "name": "Eastern Diamondback Rattlesnake",
+    "category": "reptileAmphibian",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 192,
+    "name": "Hellbender",
+    "category": "reptileAmphibian",
+    "rarity": "Rare"
+  },
+  {
+    "n": 193,
+    "name": "Desert Tortoise",
+    "category": "reptileAmphibian",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 194,
+    "name": "Horned Lizard",
+    "category": "reptileAmphibian",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 195,
+    "name": "Timber Rattlesnake",
+    "category": "reptileAmphibian",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 196,
+    "name": "Largemouth Bass",
+    "category": "fish",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 197,
+    "name": "Bluegill",
+    "category": "fish",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 198,
+    "name": "Channel Catfish",
+    "category": "fish",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 199,
+    "name": "Rainbow Trout",
+    "category": "fish",
+    "rarity": "Common"
+  },
+  {
+    "n": 200,
+    "name": "Brook Trout",
+    "category": "fish",
+    "rarity": "Common"
+  },
+  {
+    "n": 201,
+    "name": "Smallmouth Bass",
+    "category": "fish",
+    "rarity": "Common"
+  },
+  {
+    "n": 202,
+    "name": "Brown Trout",
+    "category": "fish",
+    "rarity": "Common"
+  },
+  {
+    "n": 203,
+    "name": "Crappie (Black/White)",
+    "category": "fish",
+    "rarity": "Common"
+  },
+  {
+    "n": 204,
+    "name": "Common Carp",
+    "category": "fish",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 205,
+    "name": "Walleye",
+    "category": "fish",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 206,
+    "name": "Yellow Perch",
+    "category": "fish",
+    "rarity": "Common"
+  },
+  {
+    "n": 207,
+    "name": "Chinook/King Salmon",
+    "category": "fish",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 208,
+    "name": "Northern Pike",
+    "category": "fish",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 209,
+    "name": "Striped Bass",
+    "category": "fish",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 210,
+    "name": "Redfish/Red Drum",
+    "category": "fish",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 211,
+    "name": "Steelhead",
+    "category": "fish",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 212,
+    "name": "Lake Sturgeon",
+    "category": "fish",
+    "rarity": "Rare"
+  },
+  {
+    "n": 213,
+    "name": "Paddlefish",
+    "category": "fish",
+    "rarity": "Rare"
+  },
+  {
+    "n": 214,
+    "name": "Turkey Tail",
+    "category": "mushroom",
+    "rarity": "Very Common"
+  },
+  {
+    "n": 215,
+    "name": "Fly Agaric",
+    "category": "mushroom",
+    "rarity": "Common"
+  },
+  {
+    "n": 216,
+    "name": "Chicken of the Woods",
+    "category": "mushroom",
+    "rarity": "Common"
+  },
+  {
+    "n": 217,
+    "name": "Oyster Mushroom",
+    "category": "mushroom",
+    "rarity": "Common"
+  },
+  {
+    "n": 218,
+    "name": "Morel",
+    "category": "mushroom",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 219,
+    "name": "Chanterelle",
+    "category": "mushroom",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 220,
+    "name": "Giant Puffball",
+    "category": "mushroom",
+    "rarity": "Common"
+  },
+  {
+    "n": 221,
+    "name": "Lion's Mane",
+    "category": "mushroom",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 222,
+    "name": "Reishi",
+    "category": "mushroom",
+    "rarity": "Common"
+  },
+  {
+    "n": 223,
+    "name": "Amanita (Destroying Angel)",
+    "category": "mushroom",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 224,
+    "name": "Hen of the Woods/Maitake",
+    "category": "mushroom",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 225,
+    "name": "Jack O'Lantern",
+    "category": "mushroom",
+    "rarity": "Moderate"
+  },
+  {
+    "n": 226,
+    "name": "Porcini/King Bolete",
+    "category": "mushroom",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 227,
+    "name": "Devil's Tooth/Bleeding Tooth",
+    "category": "mushroom",
+    "rarity": "Uncommon"
+  },
+  {
+    "n": 228,
+    "name": "Indigo Milk Cap",
+    "category": "mushroom",
+    "rarity": "Uncommon"
+  }
+]

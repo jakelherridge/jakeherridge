@@ -38,7 +38,7 @@ export const builds: Build[] = [
     name: "PocketWild",
     category: "iOS app",
     blurb: "iOS field journal app for the outdoors",
-    body: "A field journal for the outdoors: photograph creatures and plants, keep a private local collection. 228 species indexed, each with a hand-drawn sketch and a pixel sprite. 2,500 curated adventures across all 50 states. Swift, built by directing Claude Code. No accounts, no feed, no ads.",
+    body: "A field journal for the outdoors: photograph creatures and plants, keep a private local collection. 228 species indexed, each with an AI-curated pixel sprite the app was built around. Narrated by Aldo, a frog named for Aldo Leopold. Swift, built by directing Claude Code. No accounts, no feed, no ads.",
     href: "https://www.pocketwild.app/",
     linkLabel: "pocketwild.app",
     appCategory: "LifestyleApplication",

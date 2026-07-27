@@ -1,0 +1,810 @@
+---
+// The PocketWild room: a web echo of the app's Meadow. Visitors log
+// captures from the index; creatures join their meadow (localStorage).
+// Names roll from the app's real CreatureNamePool, entries stamp with
+// the real date and computed moon phase, and Aldo narrates in his own
+// voice (tools/aldo_voice_bible.md). Guide data is the app's actual
+// species seed, served from /pocketwild/species.json.
+import index from "../data/pocketwild-index.json";
+
+const categories = [
+  { id: "all", label: "All", count: index.length },
+  ...["bird", "mammal", "tree", "wildflower", "insect", "reptileAmphibian", "fish", "mushroom"]
+    .map((id) => ({
+      id,
+      label:
+        id === "reptileAmphibian"
+          ? "Reptiles and amphibians"
+          : id.charAt(0).toUpperCase() + id.slice(1) + (id === "fish" ? "" : "s"),
+      count: index.filter((s) => s.category === id).length,
+    })),
+];
+---
+
+<section id="meadow" class="pw scroll-mt-20" data-pw>
+  <!-- The Meadow -->
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The Meadow</h2>
+    <p class="font-mono text-xs text-muted"><span data-pw-count>0</span> logged by you</p>
+  </div>
+
+  <div class="pw-scene mt-5" data-scene aria-label="Your meadow. Creatures you log appear here.">
+    <div class="pw-ground" aria-hidden="true"></div>
+    <div class="pw-creatures" data-creatures></div>
+    <button type="button" class="pw-aldo" data-aldo aria-label="Aldo the frog. Press to hear him.">
+      <img src="/pocketwild/aldo.png" alt="" width="64" height="64" class="pixelated" />
+    </button>
+    <p class="pw-bubble" data-bubble aria-live="polite">
+      This is the meadow. Quiet, mostly. Creatures turn up when somebody logs them... that would
+      be you. The index is below. Take your time.
+    </p>
+  </div>
+
+  <!-- The Index -->
+  <div class="mt-12 flex flex-wrap items-baseline justify-between gap-3">
+    <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The Index</h2>
+    <p class="font-mono text-xs text-muted">228 species</p>
+  </div>
+  <p class="mt-2 font-serif text-lg italic text-muted">
+    Two hundred twenty-eight of them. I know most by sight.
+  </p>
+
+  <div class="mt-4 flex flex-wrap gap-1.5" role="group" aria-label="Filter the index">
+    {
+      categories.map((c, i) => (
+        <button
+          type="button"
+          class="pw-chip"
+          data-filter={c.id}
+          aria-pressed={i === 0 ? "true" : "false"}
+        >
+          {c.label} <span class="opacity-55">{c.count}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="pw-grid mt-5" data-grid>
+    {
+      index.map((s) => (
+        <button
+          type="button"
+          class="pw-tile"
+          data-species={s.n}
+          data-category={s.category}
+          aria-label={`${s.name}. ${s.rarity}. Open the guide.`}
+          title={s.name}
+        >
+          <img
+            src={`/pocketwild/sprites/${s.n}.png`}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            class="pixelated"
+          />
+        </button>
+      ))
+    }
+  </div>
+
+  <!-- Guide / entry overlay -->
+  <div class="pw-overlay" data-overlay hidden>
+    <div class="pw-card" role="dialog" aria-modal="true" aria-labelledby="pw-card-title">
+      <button type="button" class="pw-close" data-close aria-label="Close">&times;</button>
+      <div class="pw-card-body" data-card-body></div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .pw-scene {
+    position: relative;
+    height: 380px;
+    border: 1px solid var(--color-faint);
+    border-radius: 8px;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(233 241 237 / 0.35) 0%,
+        rgb(210 228 214 / 0.55) 58%,
+        rgb(196 219 199 / 0.9) 100%
+      ),
+      var(--color-paper);
+  }
+  .pw-ground {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 42%;
+    background: linear-gradient(to bottom, rgb(178 205 181 / 0.55), rgb(160 192 165 / 0.85));
+    border-top: 1px solid rgb(140 172 146 / 0.5);
+  }
+  .pw-creatures {
+    position: absolute;
+    inset: 0;
+  }
+  .pw-creature {
+    position: absolute;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transform-origin: bottom center;
+  }
+  .pw-creature img {
+    display: block;
+    transform-origin: bottom center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pw-creature img {
+      animation:
+        pw-sway var(--sway-dur, 4s) ease-in-out infinite alternate,
+        pw-hop var(--hop-dur, 9s) ease-in-out infinite;
+      animation-delay: var(--sway-delay, 0s), var(--hop-delay, 3s);
+    }
+    .pw-creature.pw-arriving img {
+      animation: pw-drop 0.55s cubic-bezier(0.25, 0.9, 0.3, 1.15);
+    }
+  }
+  @keyframes pw-sway {
+    from {
+      transform: rotate(calc(var(--sway-deg, 2deg) * -1));
+    }
+    to {
+      transform: rotate(var(--sway-deg, 2deg));
+    }
+  }
+  @keyframes pw-hop {
+    0%,
+    91%,
+    100% {
+      translate: 0 0;
+    }
+    94% {
+      translate: 0 -9px;
+    }
+    97% {
+      translate: 0 0;
+    }
+  }
+  @keyframes pw-drop {
+    from {
+      translate: 0 -90px;
+      opacity: 0;
+    }
+    60% {
+      translate: 0 4px;
+      opacity: 1;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+  .pw-aldo {
+    position: absolute;
+    right: 1.1rem;
+    bottom: 0.9rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 5;
+  }
+  .pw-aldo img {
+    width: 72px;
+    height: 72px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pw-aldo img {
+      animation: pw-breathe 4.5s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+  }
+  @keyframes pw-breathe {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(0.96);
+    }
+  }
+  .pw-bubble {
+    position: absolute;
+    right: 1rem;
+    bottom: 6rem;
+    z-index: 5;
+    margin: 0;
+    max-width: 17rem;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 8px 8px 2px 8px;
+    padding: 0.6rem 0.8rem;
+    box-shadow: 0 2px 10px rgb(27 26 23 / 0.06);
+  }
+  .pixelated {
+    image-rendering: pixelated;
+  }
+
+  .pw-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.32rem 0.7rem;
+    cursor: pointer;
+  }
+  .pw-chip:hover {
+    color: var(--color-ink);
+  }
+  .pw-chip[aria-pressed="true"] {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+
+  .pw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 0.4rem;
+  }
+  .pw-tile {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0.3rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 6px;
+    background: var(--color-surface);
+    cursor: pointer;
+    transition:
+      border-color 0.12s ease,
+      translate 0.12s ease;
+  }
+  .pw-tile:hover {
+    border-color: var(--color-accent);
+    translate: 0 -2px;
+  }
+  .pw-tile img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+  }
+
+  .pw-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgb(27 26 23 / 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .pw-card {
+    position: relative;
+    width: min(30rem, 100%);
+    max-height: 86vh;
+    overflow-y: auto;
+    background: var(--color-paper);
+    border: 1px solid var(--color-faint);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem 1.5rem;
+    box-shadow: 0 14px 44px rgb(27 26 23 / 0.18);
+  }
+  .pw-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.7rem;
+    border: 0;
+    background: none;
+    font-size: 1.3rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+  .pw-close:hover {
+    color: var(--color-ink);
+  }
+  .pw-sprite-hero {
+    display: flex;
+    justify-content: center;
+    padding: 0.9rem 0 0.6rem;
+  }
+  .pw-kind {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-rust);
+  }
+  .pw-title {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0.15rem 0 0;
+  }
+  .pw-sci {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0.1rem 0 0;
+    font-size: 0.95rem;
+  }
+  .pw-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.7rem;
+  }
+  .pw-tag {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    color: var(--color-muted);
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    border-radius: 999px;
+    padding: 0.18rem 0.55rem;
+  }
+  .pw-aldo-says {
+    margin-top: 1rem;
+    border-left: 2px solid var(--color-accent);
+    padding-left: 0.9rem;
+  }
+  .pw-aldo-says p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: var(--color-ink);
+    margin: 0 0 0.55rem;
+  }
+  .pw-aldo-says p:last-child {
+    margin-bottom: 0;
+  }
+  .pw-attr {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin: 0.9rem 0 0.2rem;
+  }
+  .pw-plain {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+  }
+  .pw-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+  }
+  .pw-btn {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.55rem 1rem;
+    border-radius: 5px;
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .pw-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .pw-btn-solid {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  .pw-btn-solid:hover {
+    background: var(--color-accent-strong);
+    border-color: var(--color-accent-strong);
+    color: #fff;
+  }
+  .pw-entry-stamp {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-muted);
+    margin-top: 0.6rem;
+    line-height: 1.7;
+  }
+</style>
+
+<script>
+  interface Species {
+    n: number;
+    name: string;
+    sci: string;
+    category: string;
+    range: string;
+    habitat: string;
+    season: string;
+    rarity: string;
+    aldo: { facts: string[]; size: string; look: string; home: string } | null;
+  }
+  interface Entry {
+    id: string;
+    n: number;
+    name: string;
+    date: string; // ISO
+  }
+
+  const REVEAL_FIRST = "First one. The first one is always the strangest.";
+  const REVEALS = [
+    "It'll find its spot. They always do.",
+    "You found this one.",
+    "Huh. It walked right in.",
+    "Settled already. That was quick.",
+  ];
+  const IDLE = [
+    "The moss is wet today.",
+    "I've been here a long time. The meadow keeps its own hours.",
+    "A heron startled me once. Twice, actually.",
+    "Whatever that is over there... it's brown.",
+    "Some days the light does this. Worth a look.",
+  ];
+  const EMPTY_LINE = "Nobody here yet. The moss doesn't mind.";
+
+  function init(root: HTMLElement) {
+    const scene = root.querySelector<HTMLElement>("[data-scene]")!;
+    const creaturesEl = root.querySelector<HTMLElement>("[data-creatures]")!;
+    const bubble = root.querySelector<HTMLElement>("[data-bubble]")!;
+    const countEl = root.querySelector<HTMLElement>("[data-pw-count]")!;
+    const overlay = root.querySelector<HTMLElement>("[data-overlay]")!;
+    const cardBody = root.querySelector<HTMLElement>("[data-card-body]")!;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let speciesCache: Species[] | null = null;
+    let namesCache: any = null;
+    let lastFocus: HTMLElement | null = null;
+    let idleIdx = 0;
+    let revealIdx = 0;
+
+    const load = (): Entry[] => {
+      try {
+        return JSON.parse(localStorage.getItem("pw-meadow") || "[]");
+      } catch {
+        return [];
+      }
+    };
+    const save = (entries: Entry[]) => localStorage.setItem("pw-meadow", JSON.stringify(entries));
+    let entries = load();
+
+    async function getSpecies(): Promise<Species[]> {
+      if (!speciesCache) {
+        const res = await fetch("/pocketwild/species.json");
+        speciesCache = (await res.json()).species;
+      }
+      return speciesCache!;
+    }
+    async function getNames() {
+      if (!namesCache) {
+        const res = await fetch("/pocketwild/names.json");
+        namesCache = await res.json();
+      }
+      return namesCache;
+    }
+
+    // The app's roll: 30% universal pool, else category pool; 25% of rolls
+    // get a hand-curated adjective in front.
+    async function rollName(category: string): Promise<string> {
+      const d = await getNames();
+      const key = category === "reptileAmphibian" ? "reptile" : category;
+      const pool =
+        Math.random() < d.universalNameProbability
+          ? d.universal
+          : (d.pools[key] ?? d.universal);
+      let name = pool[Math.floor(Math.random() * pool.length)];
+      if (Math.random() < d.compoundProbability) {
+        const adj = d.adjectives[Math.floor(Math.random() * d.adjectives.length)];
+        name = `${adj} ${name}`;
+      }
+      return name;
+    }
+
+    // Moon phase from the synodic month; no API, just arithmetic.
+    function moonPhase(date: Date): { name: string; glyph: string } {
+      const synodic = 29.53058867;
+      const epoch = Date.UTC(2000, 0, 6, 18, 14) / 86400000;
+      const days = date.getTime() / 86400000 - epoch;
+      const age = ((days % synodic) + synodic) % synodic;
+      const idx = Math.floor((age / synodic) * 8 + 0.5) % 8;
+      const names = [
+        "New moon",
+        "Waxing crescent",
+        "First quarter",
+        "Waxing gibbous",
+        "Full moon",
+        "Waning gibbous",
+        "Last quarter",
+        "Waning crescent",
+      ];
+      const glyphs = ["\u{1F311}", "\u{1F312}", "\u{1F313}", "\u{1F314}", "\u{1F315}", "\u{1F316}", "\u{1F317}", "\u{1F318}"];
+      return { name: names[idx], glyph: glyphs[idx] };
+    }
+
+    const hash = (s: string) => {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    };
+
+    function say(line: string) {
+      bubble.textContent = line;
+    }
+
+    // ----- Meadow rendering: seeded slots, three depth rows, sway + hop -----
+    function renderMeadow(arrivingId?: string) {
+      creaturesEl.innerHTML = "";
+      countEl.textContent = String(entries.length);
+      if (!entries.length) {
+        say(EMPTY_LINE);
+        return;
+      }
+      const W = scene.clientWidth;
+      const usable = W - 130; // keep clear of Aldo's corner
+      const slots = Math.max(4, Math.floor(usable / 78));
+      entries.forEach((e, i) => {
+        const h = hash(e.id);
+        const row = h % 3; // 0 back, 2 front
+        const slot = i % slots;
+        const lap = Math.floor(i / slots);
+        const x = 14 + slot * (usable / slots) + ((h >> 3) % 25) + lap * 19;
+        const bottomPct = [30, 19, 8][row] + ((h >> 8) % 5);
+        const scale = [1.9, 2.2, 2.5][row];
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "pw-creature";
+        if (e.id === arrivingId) btn.classList.add("pw-arriving");
+        btn.style.left = `${Math.min(x, W - 70)}px`;
+        btn.style.bottom = `${bottomPct}%`;
+        btn.style.zIndex = String(2 + row);
+        btn.setAttribute("aria-label", `${e.name}. Open the entry.`);
+        btn.addEventListener("click", () => openEntry(e));
+
+        const img = document.createElement("img");
+        img.src = `/pocketwild/sprites/${e.n}.png`;
+        img.alt = "";
+        img.className = "pixelated";
+        img.decoding = "async";
+        img.addEventListener("load", () => {
+          img.style.width = `${Math.round(img.naturalWidth * scale * 0.75)}px`;
+        });
+        img.style.setProperty("--sway-dur", `${3.4 + ((h >> 4) % 26) / 10}s`);
+        img.style.setProperty("--sway-deg", `${1.4 + ((h >> 6) % 16) / 10}deg`);
+        img.style.setProperty("--sway-delay", `${-((h >> 9) % 40) / 10}s`);
+        img.style.setProperty("--hop-dur", `${7 + ((h >> 11) % 70) / 10}s`);
+        img.style.setProperty("--hop-delay", `${((h >> 13) % 50) / 10}s`);
+        btn.appendChild(img);
+        creaturesEl.appendChild(btn);
+      });
+    }
+
+    // ----- Overlay plumbing -----
+    function openOverlay() {
+      lastFocus = document.activeElement as HTMLElement;
+      overlay.hidden = false;
+      root.querySelector<HTMLElement>("[data-close]")!.focus();
+      document.addEventListener("keydown", onKey);
+    }
+    function closeOverlay() {
+      overlay.hidden = true;
+      document.removeEventListener("keydown", onKey);
+      lastFocus?.focus();
+    }
+    function onKey(ev: KeyboardEvent) {
+      if (ev.key === "Escape") closeOverlay();
+    }
+    overlay.addEventListener("pointerdown", (ev) => {
+      if (ev.target === overlay) closeOverlay();
+    });
+    root.querySelector("[data-close]")!.addEventListener("click", closeOverlay);
+
+    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+    // ----- Species guide card -----
+    async function openGuide(n: number) {
+      const all = await getSpecies();
+      const s = all.find((x) => x.n === n);
+      if (!s) return;
+      const a = s.aldo;
+      cardBody.innerHTML = `
+        <p class="pw-kind">${esc(s.category === "reptileAmphibian" ? "reptile / amphibian" : s.category)} · No. ${s.n}</p>
+        <h3 class="pw-title" id="pw-card-title">${esc(s.name)}</h3>
+        <p class="pw-sci">${esc(s.sci)}</p>
+        <div class="pw-sprite-hero"><img src="/pocketwild/sprites/${s.n}.png" alt="" class="pixelated" style="height:132px;width:auto"></div>
+        <div class="pw-meta">
+          <span class="pw-tag">${esc(s.rarity)}</span>
+          <span class="pw-tag">${esc(s.season)}</span>
+          <span class="pw-tag">${esc(s.range)}</span>
+        </div>
+        ${
+          a
+            ? `
+        <p class="pw-attr">Aldo, on looks</p>
+        <div class="pw-aldo-says"><p>${esc(a.look)}</p><p>${esc(a.size)}</p></div>
+        <p class="pw-attr">Where it lives</p>
+        <div class="pw-aldo-says"><p>${esc(a.home)}</p></div>
+        <p class="pw-attr">Three things Aldo knows</p>
+        <div class="pw-aldo-says">${a.facts.map((f) => `<p>${esc(f)}</p>`).join("")}</div>`
+            : ""
+        }
+        <div class="pw-actions">
+          <button type="button" class="pw-btn pw-btn-solid" data-log>Log it</button>
+        </div>`;
+      cardBody.querySelector("[data-log]")!.addEventListener("click", () => capture(s));
+      openOverlay();
+    }
+
+    // ----- Capture -----
+    async function capture(s: Species) {
+      const name = await rollName(s.category);
+      const entry: Entry = {
+        id: `${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`,
+        n: s.n,
+        name,
+        date: new Date().toISOString(),
+      };
+      entries.push(entry);
+      save(entries);
+      renderMeadow(entry.id);
+      say(entries.length === 1 ? REVEAL_FIRST : REVEALS[revealIdx++ % REVEALS.length]);
+      openEntry(entry, true);
+    }
+
+    // ----- Entry card -----
+    function openEntry(e: Entry, fresh = false) {
+      getSpecies().then((all) => {
+        const s = all.find((x) => x.n === e.n);
+        if (!s) return;
+        const d = new Date(e.date);
+        const moon = moonPhase(d);
+        const dateStr = d.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const no = entries.findIndex((x) => x.id === e.id) + 1;
+        cardBody.innerHTML = `
+          <p class="pw-kind">Field journal · Entry No. ${String(no).padStart(3, "0")}</p>
+          <h3 class="pw-title" id="pw-card-title">${esc(e.name)}</h3>
+          <p class="pw-sci">${esc(s.name)} · ${esc(s.sci)}</p>
+          <div class="pw-sprite-hero"><img src="/pocketwild/sprites/${s.n}.png" alt="" class="pixelated" style="height:132px;width:auto"></div>
+          <p class="pw-entry-stamp">${esc(dateStr)}<br>${moon.glyph} ${esc(moon.name)} · ${esc(s.rarity)}</p>
+          ${fresh ? `<div class="pw-aldo-says" style="margin-top:0.9rem"><p>${esc(entries.length === 1 ? REVEAL_FIRST : "It seems settled already.")}</p></div>` : ""}
+          <div class="pw-actions">
+            <button type="button" class="pw-btn" data-reroll>Roll another name</button>
+            <button type="button" class="pw-btn" data-download>Download the entry</button>
+            <button type="button" class="pw-btn" data-release>Let it go</button>
+          </div>`;
+        cardBody.querySelector("[data-reroll]")!.addEventListener("click", async () => {
+          e.name = await rollName(s.category);
+          save(entries);
+          renderMeadow();
+          openEntry(e, fresh);
+        });
+        cardBody.querySelector("[data-download]")!.addEventListener("click", () =>
+          downloadEntry(e, s, no, dateStr, moon),
+        );
+        cardBody.querySelector("[data-release]")!.addEventListener("click", () => {
+          entries = entries.filter((x) => x.id !== e.id);
+          save(entries);
+          renderMeadow();
+          say("Off it goes. The meadow doesn't hold a grudge.");
+          closeOverlay();
+        });
+        openOverlay();
+      });
+    }
+
+    // ----- Entry card PNG -----
+    async function downloadEntry(
+      e: Entry,
+      s: Species,
+      no: number,
+      dateStr: string,
+      moon: { name: string; glyph: string },
+    ) {
+      const W = 800,
+        H = 1000;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d")!;
+      ctx.fillStyle = "#fbfaf7";
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "#e7e3da";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(24, 24, W - 48, H - 48);
+
+      const sprite = new Image();
+      sprite.src = `/pocketwild/sprites/${s.n}.png`;
+      await new Promise((r) => {
+        sprite.onload = r;
+        sprite.onerror = r;
+      });
+      ctx.imageSmoothingEnabled = false;
+      const scale = Math.min(420 / sprite.naturalWidth, 380 / sprite.naturalHeight);
+      const sw = sprite.naturalWidth * scale,
+        sh = sprite.naturalHeight * scale;
+      ctx.drawImage(sprite, (W - sw) / 2, 210, sw, sh);
+
+      ctx.fillStyle = "#6c6a63";
+      ctx.font = "600 22px 'Geist Mono Variable', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(`FIELD JOURNAL · ENTRY NO. ${String(no).padStart(3, "0")}`, W / 2, 96);
+      ctx.fillStyle = "#1b1a17";
+      ctx.font = "600 58px 'Fraunces Variable', Georgia, serif";
+      ctx.fillText(e.name, W / 2, 168, W - 120);
+      ctx.fillStyle = "#6c6a63";
+      ctx.font = "italic 26px 'Newsreader Variable', Georgia, serif";
+      ctx.fillText(`${s.name} · ${s.sci}`, W / 2, 660, W - 120);
+      ctx.font = "24px 'Geist Mono Variable', monospace";
+      ctx.fillText(dateStr, W / 2, 730);
+      ctx.fillText(`${moon.name} · ${s.rarity}`, W / 2, 768);
+      ctx.fillStyle = "#1f6b54";
+      ctx.font = "22px 'Geist Mono Variable', monospace";
+      ctx.fillText("PocketWild · pocketwild.app", W / 2, H - 72);
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `pocketwild-entry-${String(no).padStart(3, "0")}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }, "image/png");
+    }
+
+    // ----- Index wiring -----
+    root.querySelectorAll<HTMLButtonElement>("[data-species]").forEach((tile) => {
+      tile.addEventListener("click", () => openGuide(parseInt(tile.dataset.species!, 10)));
+    });
+    root.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-filter]")
+          .forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        const f = chip.dataset.filter!;
+        root.querySelectorAll<HTMLElement>("[data-species]").forEach((t) => {
+          t.style.display = f === "all" || t.dataset.category === f ? "" : "none";
+        });
+      });
+    });
+
+    // ----- Aldo -----
+    root.querySelector("[data-aldo]")!.addEventListener("click", () => {
+      say(IDLE[idleIdx++ % IDLE.length]);
+    });
+
+    renderMeadow();
+    if (!reduced) {
+      addEventListener("resize", () => renderMeadow(), { passive: true });
+    }
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-pw]");
+  if (root) init(root);
+</script>

@@ -1,23 +1,12 @@
 ---
 import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import gatorPoster from "../../assets/gators/gator-10.jpg";
-
-const exhibits = [
-  {
-    href: "/exhibits/gators/",
-    title: "Glitchy Gator Club",
-    label: "Generative art · 2021",
-    line: "10,946 characters from 300+ hand-drawn attributes, minted on Polygon. Build your own from the real layers.",
-    image: gatorPoster,
-    alt: "A pink gator with seven glitching rainbow eyes and gold horns",
-  },
-];
+import { exhibits } from "../../data/exhibits";
 ---
 
 <BaseLayout
   title="Exhibits"
-  description="Exhibit rooms for Jake Herridge's favorite projects. Open now: the Glitchy Gator Club. More rooms open through the month."
+  description="Exhibit rooms for Jake Herridge's favorite projects: the PocketWild field journal and the Glitchy Gator Club. More rooms open through the month."
 >
   <section class="mx-auto max-w-5xl px-5 py-14">
     <h1 class="wonk text-4xl font-semibold tracking-tight md:text-5xl">Exhibits</h1>
@@ -33,7 +22,10 @@ const exhibits = [
                 widths={[480, 720, 960]}
                 sizes="(max-width: 640px) 92vw, 480px"
                 format="webp"
-                class="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                class:list={[
+                  "aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]",
+                  e.pixelated && "pixelated",
+                ]}
               />
             </div>
             <p class="mt-3 font-mono text-[0.65rem] uppercase tracking-widest text-rust">
