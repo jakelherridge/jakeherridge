@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import GatorMachine from "../../components/GatorMachine.astro";
 import { breadcrumb } from "../../lib/schema";
 import { gators } from "../../data/gators";
 
@@ -49,8 +50,13 @@ const jsonLd = [
       </p>
     </header>
 
+    <div class="mt-12">
+      <GatorMachine />
+    </div>
+
     <!-- The wall -->
-    <div class="gator-wall mt-10" role="list">
+    <h2 class="wonk mt-14 text-2xl font-semibold tracking-tight md:text-3xl">The wall</h2>
+    <div class="gator-wall mt-6" role="list">
       {
         gators.map((g) => (
           <figure class:list={["gator-tile reveal", g.big && "gator-big"]} role="listitem">

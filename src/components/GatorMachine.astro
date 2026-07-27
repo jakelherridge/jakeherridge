@@ -1,0 +1,457 @@
+---
+// The gator machine: pick one of each layer, in the order the generator
+// stacked them. Layers are the real hand-drawn attributes, served from
+// /gators/. State lives in the URL hash so a gator can be shared.
+import manifest from "../data/gator-machine.json";
+
+interface Item {
+  slug: string;
+  name: string;
+}
+interface Category {
+  id: string;
+  label: string;
+  items: Item[];
+}
+const categories = manifest.categories as Category[];
+
+const DEFAULTS: Record<string, string> = {
+  background: "teal",
+  body: "green",
+  arms: "boxer",
+  mouth: "big-cheesin",
+  eyes: "cute",
+  head: "burger",
+};
+
+const pick = (c: Category) =>
+  c.items.find((i) => i.slug === DEFAULTS[c.id]) ?? c.items[0];
+
+const initial = categories.map((c) => ({ cat: c, item: pick(c) }));
+const combos = categories.reduce((n, c) => n * c.items.length, 1);
+const comboLabel = combos.toLocaleString("en-US");
+---
+
+<section id="machine" class="scroll-mt-20">
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The gator machine</h2>
+    <p class="font-mono text-xs text-muted">{comboLabel} possible gators</p>
+  </div>
+  <p class="mt-2 max-w-2xl text-muted">
+    The real layers, stacked in the generator's order: background, body, arms, mouth, eyes,
+    head. Pick one of each.
+  </p>
+
+  <div class="machine mt-6" data-machine data-size={manifest.size}>
+    <!-- Stage -->
+    <div class="machine-left">
+      <div
+        class="machine-stage"
+        data-stage
+        role="img"
+        aria-label={`A gator built from: ${initial.map((s) => s.item.name).join(", ")}`}
+      >
+        {
+          initial.map(({ cat, item }, i) => (
+            <img
+              data-layer={cat.id}
+              src={`/gators/layers/${cat.id}/${item.slug}.webp`}
+              alt=""
+              width={manifest.size}
+              height={manifest.size}
+              decoding="async"
+              loading={i === 0 ? "eager" : "eager"}
+            />
+          ))
+        }
+      </div>
+      <p class="machine-recipe" data-recipe aria-live="polite">
+        {initial.map((s) => s.item.name.toLowerCase()).join(" · ")}
+      </p>
+      <div class="machine-actions">
+        <button type="button" class="machine-btn machine-btn-solid" data-shuffle>
+          Shuffle
+        </button>
+        <button type="button" class="machine-btn" data-download>Download PNG</button>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="machine-right">
+      <div class="machine-tabs" role="tablist" aria-label="Layer categories">
+        {
+          categories.map((c, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`tab-${c.id}`}
+              aria-controls={`panel-${c.id}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+              class="machine-tab"
+              data-tab={c.id}
+            >
+              {c.label}
+              <span class="machine-tab-count">{c.items.length}</span>
+            </button>
+          ))
+        }
+      </div>
+      {
+        categories.map((c, ci) => (
+          <div
+            id={`panel-${c.id}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${c.id}`}
+            class="machine-panel"
+            data-panel={c.id}
+            hidden={ci !== 0}
+          >
+            <div class="machine-grid">
+              {c.items.map((item) => (
+                <button
+                  type="button"
+                  class="machine-thumb"
+                  data-option
+                  data-cat={c.id}
+                  data-slug={item.slug}
+                  aria-pressed={initial.find((s) => s.cat.id === c.id)?.item.slug === item.slug ? "true" : "false"}
+                  aria-label={`${c.label}: ${item.name}`}
+                  title={item.name}
+                >
+                  <img
+                    src={`/gators/thumbs/${c.id}/${item.slug}.webp`}
+                    alt=""
+                    width={176}
+                    height={176}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <script type="application/json" data-machine-data set:html={JSON.stringify(categories.map((c) => ({ id: c.id, items: c.items })))} />
+</section>
+
+<style>
+  .machine {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (min-width: 768px) {
+    .machine {
+      grid-template-columns: 5fr 7fr;
+      gap: 1.5rem;
+    }
+  }
+  .machine-stage {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+  }
+  .machine-stage :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .machine-stage :global(img.swapping) {
+      animation: layer-pop 0.22s ease;
+    }
+  }
+  @keyframes layer-pop {
+    0% {
+      opacity: 0.35;
+      transform: scale(1.015);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .machine-recipe {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+    color: var(--color-muted);
+    min-height: 1.5em;
+  }
+  .machine-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+  }
+  .machine-btn {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.55rem 1rem;
+    border-radius: 5px;
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .machine-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .machine-btn-solid {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  .machine-btn-solid:hover {
+    background: var(--color-accent-strong);
+    border-color: var(--color-accent-strong);
+    color: #fff;
+  }
+  .machine-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .machine-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.32rem 0.7rem;
+    cursor: pointer;
+  }
+  .machine-tab:hover {
+    color: var(--color-ink);
+  }
+  .machine-tab[aria-selected="true"] {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+  .machine-tab-count {
+    opacity: 0.55;
+  }
+  .machine-panel {
+    margin-top: 0.8rem;
+  }
+  .machine-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.45rem;
+    max-height: 26rem;
+    overflow-y: auto;
+    padding: 2px;
+  }
+  @media (min-width: 640px) {
+    .machine-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .machine-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+  .machine-thumb {
+    padding: 0;
+    border: 1.5px solid var(--color-faint);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-surface);
+    cursor: pointer;
+    line-height: 0;
+    transition:
+      border-color 0.12s ease,
+      translate 0.12s ease;
+  }
+  .machine-thumb:hover {
+    border-color: var(--color-muted);
+    translate: 0 -1px;
+  }
+  .machine-thumb[aria-pressed="true"] {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+  .machine-thumb :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-machine]");
+  const dataEl = document.querySelector("[data-machine-data]");
+  if (root && dataEl) init(root, JSON.parse(dataEl.textContent || "[]"));
+
+  interface MItem {
+    slug: string;
+    name: string;
+  }
+  interface MCat {
+    id: string;
+    items: MItem[];
+  }
+
+  function init(root: HTMLElement, categories: MCat[]) {
+    const stage = root.querySelector<HTMLElement>("[data-stage]")!;
+    const recipe = root.querySelector<HTMLElement>("[data-recipe]")!;
+    const layerImgs = new Map<string, HTMLImageElement>();
+    stage.querySelectorAll<HTMLImageElement>("[data-layer]").forEach((img) => {
+      layerImgs.set(img.dataset.layer!, img);
+    });
+
+    const state = new Map<string, string>();
+    categories.forEach((c) => {
+      const img = layerImgs.get(c.id)!;
+      const slug = img.src.split("/").pop()!.replace(".webp", "");
+      state.set(c.id, slug);
+    });
+
+    const nameOf = (catId: string, slug: string) =>
+      categories.find((c) => c.id === catId)?.items.find((i) => i.slug === slug)?.name ?? slug;
+
+    function updateMeta() {
+      const parts = categories.map((c) => nameOf(c.id, state.get(c.id)!));
+      recipe.textContent = parts.map((p) => p.toLowerCase()).join(" · ");
+      stage.setAttribute("aria-label", `A gator built from: ${parts.join(", ")}`);
+      const hash = "g=" + categories.map((c) => state.get(c.id)).join(".");
+      history.replaceState(null, "", "#" + hash);
+    }
+
+    function markPressed(catId: string) {
+      root
+        .querySelectorAll<HTMLButtonElement>(`[data-option][data-cat="${catId}"]`)
+        .forEach((b) => {
+          b.setAttribute("aria-pressed", String(b.dataset.slug === state.get(catId)));
+        });
+    }
+
+    // Preload with strong refs and a timeout: Image.decode() alone can hang
+    // forever if the detached image is garbage collected mid-decode.
+    const pending = new Set<HTMLImageElement>();
+    function preload(url: string) {
+      return new Promise<void>((resolve) => {
+        const im = new Image();
+        pending.add(im);
+        let settled = false;
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          pending.delete(im);
+          resolve();
+        };
+        im.onload = done;
+        im.onerror = done;
+        setTimeout(done, 1200);
+        im.src = url;
+      });
+    }
+
+    async function setLayer(catId: string, slug: string, animate = true) {
+      if (state.get(catId) === slug) return;
+      state.set(catId, slug);
+      markPressed(catId);
+      updateMeta();
+      const img = layerImgs.get(catId)!;
+      const url = `/gators/layers/${catId}/${slug}.webp`;
+      await preload(url);
+      if (state.get(catId) !== slug) return; // superseded by a later pick
+      img.src = url;
+      if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        img.classList.remove("swapping");
+        void img.offsetWidth;
+        img.classList.add("swapping");
+      }
+    }
+
+    // Restore a shared gator from the hash.
+    const m = location.hash.match(/g=([a-z0-9.-]+)/);
+    if (m) {
+      const slugs = m[1].split(".");
+      categories.forEach((c, i) => {
+        if (slugs[i] && c.items.some((it) => it.slug === slugs[i])) {
+          setLayer(c.id, slugs[i], false);
+        }
+      });
+    }
+
+    // Option clicks.
+    root.querySelectorAll<HTMLButtonElement>("[data-option]").forEach((btn) => {
+      btn.addEventListener("click", () => setLayer(btn.dataset.cat!, btn.dataset.slug!));
+    });
+
+    // Tabs.
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>("[data-tab]")];
+    function selectTab(tab: HTMLButtonElement) {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        root.querySelector<HTMLElement>(`[data-panel="${t.dataset.tab}"]`)!.hidden = !on;
+      });
+      tab.focus({ preventScroll: true });
+    }
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => selectTab(tab));
+      tab.addEventListener("keydown", (ev) => {
+        const key = ev.key;
+        if (key !== "ArrowRight" && key !== "ArrowLeft") return;
+        ev.preventDefault();
+        const next = key === "ArrowRight" ? (i + 1) % tabs.length : (i - 1 + tabs.length) % tabs.length;
+        selectTab(tabs[next]);
+      });
+    });
+
+    // Shuffle.
+    root.querySelector("[data-shuffle]")?.addEventListener("click", () => {
+      categories.forEach((c) => {
+        const item = c.items[Math.floor(Math.random() * c.items.length)];
+        setLayer(c.id, item.slug);
+      });
+    });
+
+    // Download: composite the on-screen stage layers onto a canvas.
+    root.querySelector("[data-download]")?.addEventListener("click", () => {
+      const size = parseInt(root.dataset.size || "800", 10);
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d")!;
+      for (const c of categories) {
+        const img = layerImgs.get(c.id)!;
+        if (img.complete && img.naturalWidth > 0) {
+          ctx.drawImage(img, 0, 0, size, size);
+        }
+      }
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "glitchy-gator.png";
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }, "image/png");
+    });
+  }
+</script>

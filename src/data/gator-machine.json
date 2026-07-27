@@ -1,0 +1,701 @@
+{
+  "size": 800,
+  "categories": [
+    {
+      "id": "background",
+      "label": "Background",
+      "items": [
+        {
+          "slug": "blue",
+          "name": "Blue"
+        },
+        {
+          "slug": "green",
+          "name": "Green"
+        },
+        {
+          "slug": "orange-yellow",
+          "name": "Orange Yellow"
+        },
+        {
+          "slug": "pink",
+          "name": "Pink"
+        },
+        {
+          "slug": "purple",
+          "name": "Purple"
+        },
+        {
+          "slug": "red",
+          "name": "Red"
+        },
+        {
+          "slug": "red-purple",
+          "name": "Red Purple"
+        },
+        {
+          "slug": "teal",
+          "name": "Teal"
+        },
+        {
+          "slug": "white",
+          "name": "White"
+        },
+        {
+          "slug": "yellow",
+          "name": "Yellow"
+        }
+      ]
+    },
+    {
+      "id": "body",
+      "label": "Body",
+      "items": [
+        {
+          "slug": "aquatic",
+          "name": "Aquatic"
+        },
+        {
+          "slug": "aquatic-glow",
+          "name": "Aquatic Glow"
+        },
+        {
+          "slug": "deep-gator",
+          "name": "Deep Gator"
+        },
+        {
+          "slug": "deep-gator-glow",
+          "name": "Deep Gator Glow"
+        },
+        {
+          "slug": "dream",
+          "name": "Dream"
+        },
+        {
+          "slug": "golden-boy",
+          "name": "Golden Boy"
+        },
+        {
+          "slug": "golden-boy-glow",
+          "name": "Golden Boy Glow"
+        },
+        {
+          "slug": "golden-glow",
+          "name": "Golden Glow"
+        },
+        {
+          "slug": "green",
+          "name": "Green"
+        },
+        {
+          "slug": "green-glow",
+          "name": "Green Glow"
+        },
+        {
+          "slug": "monkey",
+          "name": "Monkey"
+        },
+        {
+          "slug": "monkey-glow",
+          "name": "Monkey Glow"
+        },
+        {
+          "slug": "neon-green",
+          "name": "Neon Green"
+        },
+        {
+          "slug": "pink",
+          "name": "Pink"
+        },
+        {
+          "slug": "pink-glow",
+          "name": "Pink Glow"
+        },
+        {
+          "slug": "purple-glow",
+          "name": "Purple Glow"
+        },
+        {
+          "slug": "rainbow",
+          "name": "Rainbow"
+        },
+        {
+          "slug": "rainbow-glow",
+          "name": "Rainbow Glow"
+        },
+        {
+          "slug": "red",
+          "name": "Red"
+        },
+        {
+          "slug": "red-glow",
+          "name": "Red Glow"
+        },
+        {
+          "slug": "salamander",
+          "name": "Salamander"
+        },
+        {
+          "slug": "tiger-glow",
+          "name": "Tiger Glow"
+        },
+        {
+          "slug": "tigress",
+          "name": "Tigress"
+        },
+        {
+          "slug": "tigress-glow",
+          "name": "Tigress Glow"
+        },
+        {
+          "slug": "inserted-image",
+          "name": "Inserted Image"
+        }
+      ]
+    },
+    {
+      "id": "arms",
+      "label": "Arms",
+      "items": [
+        {
+          "slug": "ape",
+          "name": "Ape"
+        },
+        {
+          "slug": "battle-axe",
+          "name": "Battle Axe"
+        },
+        {
+          "slug": "big-skeleton",
+          "name": "Big Skeleton"
+        },
+        {
+          "slug": "boxer",
+          "name": "Boxer"
+        },
+        {
+          "slug": "buff",
+          "name": "Buff"
+        },
+        {
+          "slug": "business",
+          "name": "Business"
+        },
+        {
+          "slug": "cat",
+          "name": "Cat"
+        },
+        {
+          "slug": "demon",
+          "name": "Demon"
+        },
+        {
+          "slug": "dragon",
+          "name": "Dragon"
+        },
+        {
+          "slug": "ice-king",
+          "name": "Ice King"
+        },
+        {
+          "slug": "jet-blasts",
+          "name": "Jet Blasts"
+        },
+        {
+          "slug": "kitty-paws",
+          "name": "Kitty Paws"
+        },
+        {
+          "slug": "laser-gun",
+          "name": "Laser Gun"
+        },
+        {
+          "slug": "lobster",
+          "name": "Lobster"
+        },
+        {
+          "slug": "love",
+          "name": "Love"
+        },
+        {
+          "slug": "magic-gator",
+          "name": "MAgic Gator"
+        },
+        {
+          "slug": "mama",
+          "name": "Mama"
+        },
+        {
+          "slug": "mich-man",
+          "name": "Mich Man"
+        },
+        {
+          "slug": "robot",
+          "name": "Robot"
+        },
+        {
+          "slug": "skele",
+          "name": "Skele"
+        },
+        {
+          "slug": "slime",
+          "name": "Slime"
+        },
+        {
+          "slug": "small-skeleton",
+          "name": "Small Skeleton"
+        },
+        {
+          "slug": "snakes",
+          "name": "Snakes"
+        },
+        {
+          "slug": "spearfish",
+          "name": "Spearfish"
+        },
+        {
+          "slug": "sword",
+          "name": "Sword"
+        },
+        {
+          "slug": "tentacles",
+          "name": "Tentacles"
+        },
+        {
+          "slug": "tree",
+          "name": "Tree"
+        },
+        {
+          "slug": "tropical-bird",
+          "name": "Tropical Bird"
+        },
+        {
+          "slug": "weird-blue",
+          "name": "Weird Blue"
+        }
+      ]
+    },
+    {
+      "id": "mouth",
+      "label": "Mouth",
+      "items": [
+        {
+          "slug": "average-gator",
+          "name": "Average Gator"
+        },
+        {
+          "slug": "baby-smile",
+          "name": "Baby Smile"
+        },
+        {
+          "slug": "big-cheesin",
+          "name": "Big Cheesin"
+        },
+        {
+          "slug": "big-cheesinwith-gold",
+          "name": "Big Cheesinwith Gold"
+        },
+        {
+          "slug": "bucky",
+          "name": "Bucky"
+        },
+        {
+          "slug": "cheesey",
+          "name": "Cheesey"
+        },
+        {
+          "slug": "cigar",
+          "name": "Cigar"
+        },
+        {
+          "slug": "curly-smile",
+          "name": "Curly Smile"
+        },
+        {
+          "slug": "hungry",
+          "name": "Hungry"
+        },
+        {
+          "slug": "iced-out",
+          "name": "Iced Out"
+        },
+        {
+          "slug": "prehistoric",
+          "name": "Prehistoric"
+        },
+        {
+          "slug": "regular",
+          "name": "Regular"
+        },
+        {
+          "slug": "rounded",
+          "name": "Rounded"
+        },
+        {
+          "slug": "saber",
+          "name": "Saber"
+        },
+        {
+          "slug": "smiley",
+          "name": "Smiley"
+        },
+        {
+          "slug": "spiky",
+          "name": "Spiky"
+        },
+        {
+          "slug": "spiky-chompy",
+          "name": "Spiky Chompy"
+        },
+        {
+          "slug": "spiky-rainbow",
+          "name": "Spiky Rainbow"
+        },
+        {
+          "slug": "tasty",
+          "name": "Tasty"
+        },
+        {
+          "slug": "walrus",
+          "name": "Walrus"
+        },
+        {
+          "slug": "whale",
+          "name": "Whale"
+        }
+      ]
+    },
+    {
+      "id": "eyes",
+      "label": "Eyes",
+      "items": [
+        {
+          "slug": "baked",
+          "name": "Baked"
+        },
+        {
+          "slug": "alien",
+          "name": "Alien"
+        },
+        {
+          "slug": "alienalien",
+          "name": "Alienalien"
+        },
+        {
+          "slug": "baby",
+          "name": "Baby"
+        },
+        {
+          "slug": "beedy",
+          "name": "Beedy"
+        },
+        {
+          "slug": "cute",
+          "name": "Cute"
+        },
+        {
+          "slug": "cyclops",
+          "name": "Cyclops"
+        },
+        {
+          "slug": "ded",
+          "name": "Ded"
+        },
+        {
+          "slug": "double-cyclops",
+          "name": "Double Cyclops"
+        },
+        {
+          "slug": "dragon",
+          "name": "Dragon"
+        },
+        {
+          "slug": "floating",
+          "name": "Floating"
+        },
+        {
+          "slug": "happy-quadro",
+          "name": "Happy Quadro"
+        },
+        {
+          "slug": "heart",
+          "name": "Heart"
+        },
+        {
+          "slug": "hypno",
+          "name": "Hypno"
+        },
+        {
+          "slug": "hypnosis",
+          "name": "Hypnosis"
+        },
+        {
+          "slug": "laser",
+          "name": "Laser"
+        },
+        {
+          "slug": "lazer-vision",
+          "name": "Lazer Vision"
+        },
+        {
+          "slug": "mean",
+          "name": "Mean"
+        },
+        {
+          "slug": "money",
+          "name": "Money"
+        },
+        {
+          "slug": "nerd-alert",
+          "name": "Nerd Alert"
+        },
+        {
+          "slug": "normie-cute",
+          "name": "Normie Cute"
+        },
+        {
+          "slug": "quadro",
+          "name": "Quadro"
+        },
+        {
+          "slug": "shades",
+          "name": "Shades"
+        },
+        {
+          "slug": "small",
+          "name": "Small"
+        },
+        {
+          "slug": "spidey",
+          "name": "Spidey"
+        },
+        {
+          "slug": "super-cute",
+          "name": "Super Cute"
+        },
+        {
+          "slug": "sus",
+          "name": "Sus"
+        },
+        {
+          "slug": "teardrop",
+          "name": "Teardrop"
+        },
+        {
+          "slug": "two-demensional",
+          "name": "Two Demensional"
+        },
+        {
+          "slug": "skull-eyes",
+          "name": "Skull Eyes"
+        }
+      ]
+    },
+    {
+      "id": "head",
+      "label": "Head",
+      "items": [
+        {
+          "slug": "antenae",
+          "name": "Antenae"
+        },
+        {
+          "slug": "arrow-head",
+          "name": "Arrow Head"
+        },
+        {
+          "slug": "beanie",
+          "name": "Beanie"
+        },
+        {
+          "slug": "bear-ears",
+          "name": "Bear Ears"
+        },
+        {
+          "slug": "bunny-ears",
+          "name": "Bunny Ears"
+        },
+        {
+          "slug": "burger",
+          "name": "Burger"
+        },
+        {
+          "slug": "buzzy-bees",
+          "name": "Buzzy Bees"
+        },
+        {
+          "slug": "circus",
+          "name": "Circus"
+        },
+        {
+          "slug": "crown",
+          "name": "Crown"
+        },
+        {
+          "slug": "deep-sea",
+          "name": "Deep Sea"
+        },
+        {
+          "slug": "dog-beanie",
+          "name": "Dog Beanie"
+        },
+        {
+          "slug": "fat-cat",
+          "name": "Fat Cat"
+        },
+        {
+          "slug": "goku",
+          "name": "Goku"
+        },
+        {
+          "slug": "b",
+          "name": "B"
+        },
+        {
+          "slug": "bean",
+          "name": "Bean"
+        },
+        {
+          "slug": "big-c",
+          "name": "Big C"
+        },
+        {
+          "slug": "curle",
+          "name": "Curle"
+        },
+        {
+          "slug": "dem",
+          "name": "Dem"
+        },
+        {
+          "slug": "e",
+          "name": "E"
+        },
+        {
+          "slug": "ea",
+          "name": "Ea"
+        },
+        {
+          "slug": "elv",
+          "name": "Elv"
+        },
+        {
+          "slug": "fr",
+          "name": "Fr"
+        },
+        {
+          "slug": "grea",
+          "name": "Grea"
+        },
+        {
+          "slug": "ha",
+          "name": "Ha"
+        },
+        {
+          "slug": "herm",
+          "name": "Herm"
+        },
+        {
+          "slug": "monk",
+          "name": "Monk"
+        },
+        {
+          "slug": "pancak",
+          "name": "Pancak"
+        },
+        {
+          "slug": "phon",
+          "name": "Phon"
+        },
+        {
+          "slug": "pink-spik",
+          "name": "Pink Spik"
+        },
+        {
+          "slug": "safa",
+          "name": "Safa"
+        },
+        {
+          "slug": "spi",
+          "name": "Spi"
+        },
+        {
+          "slug": "sta",
+          "name": "Sta"
+        },
+        {
+          "slug": "thunderclo",
+          "name": "Thunderclo"
+        },
+        {
+          "slug": "toph",
+          "name": "Toph"
+        },
+        {
+          "slug": "unico",
+          "name": "Unico"
+        },
+        {
+          "slug": "viki",
+          "name": "Viki"
+        },
+        {
+          "slug": "jiggly-hat",
+          "name": "Jiggly Hat"
+        },
+        {
+          "slug": "karen",
+          "name": "Karen"
+        },
+        {
+          "slug": "metroid",
+          "name": "Metroid"
+        },
+        {
+          "slug": "octopus",
+          "name": "Octopus"
+        },
+        {
+          "slug": "old-lady",
+          "name": "Old Lady"
+        },
+        {
+          "slug": "party-hat",
+          "name": "Party Hat"
+        },
+        {
+          "slug": "space-brain",
+          "name": "Space Brain"
+        },
+        {
+          "slug": "spooky",
+          "name": "Spooky"
+        },
+        {
+          "slug": "stubby",
+          "name": "Stubby"
+        },
+        {
+          "slug": "trex-skull",
+          "name": "TRex Skull"
+        },
+        {
+          "slug": "tress",
+          "name": "Tress"
+        },
+        {
+          "slug": "volcano",
+          "name": "Volcano"
+        },
+        {
+          "slug": "waterfall",
+          "name": "Waterfall"
+        },
+        {
+          "slug": "worm",
+          "name": "Worm"
+        }
+      ]
+    }
+  ]
+}

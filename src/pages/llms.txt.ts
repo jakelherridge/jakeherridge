@@ -23,7 +23,7 @@ export const GET: APIRoute = async () => {
   }
 
   txt += `\n## Exhibits\n`;
-  txt += `- [Glitchy Gator Club](${SITE}/exhibits/gators/): 10,946 generative gator characters from 300+ hand-drawn attributes, minted on Polygon in 2021. Collection: https://opensea.io/collection/glitchygatorclub\n`;
+  txt += `- [Glitchy Gator Club](${SITE}/exhibits/gators/): 10,946 generative gator characters from 300+ hand-drawn attributes, minted on Polygon in 2021. Includes an interactive builder using the real layers. Collection: https://opensea.io/collection/glitchygatorclub\n`;
 
   txt += `\n## The Map\n`;
   txt += `- [The Map](${SITE}/map/): Jake as an interactive graph of typed nodes and typed edges.\n`;
