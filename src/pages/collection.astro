@@ -88,6 +88,14 @@ import { art } from "../data/creative";
                 </p>
                 <h3 class="mt-1 font-serif text-lg tracking-tight">{a.name}</h3>
                 <p class="mt-2 text-sm leading-relaxed text-muted">{a.blurb}</p>
+                {a.href && (
+                  <a
+                    href={a.href}
+                    class="mt-3 inline-block text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+                  >
+                    {a.linkLabel ?? "See more"} &rarr;
+                  </a>
+                )}
               </figcaption>
             </figure>
           ))

@@ -7,6 +7,7 @@ import { specimens } from "../data/collection";
 import { getCollection } from "astro:content";
 import professional from "../assets/jake-professional.jpg";
 import candid from "../assets/jake-candid.jpg";
+import gatorPoster from "../assets/gators/gator-10.jpg";
 
 const name = "Jake Herridge";
 let letterIndex = 0;
@@ -89,6 +90,44 @@ const desk = [
         />
       </div>
     </div>
+  </section>
+
+  <!-- Exhibits -->
+  <section class="mx-auto max-w-5xl px-5 pb-16">
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">Exhibits</h2>
+      <a
+        href="/exhibits/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        All exhibits &rarr;
+      </a>
+    </div>
+    <a href="/exhibits/gators/" class="group reveal mt-6 grid gap-0 overflow-hidden rounded-md border border-faint bg-surface md:grid-cols-[5fr_7fr]">
+      <div class="overflow-hidden">
+        <Image
+          src={gatorPoster}
+          alt="A pink gator with seven glitching rainbow eyes and gold horns"
+          widths={[480, 720, 960]}
+          sizes="(max-width: 768px) 92vw, 420px"
+          format="webp"
+          class="aspect-[4/3] h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] md:aspect-auto"
+        />
+      </div>
+      <div class="p-6 md:p-8">
+        <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+          Now open · Generative art · 2021
+        </p>
+        <h3 class="wonk mt-2 text-2xl font-semibold tracking-tight transition-colors group-hover:text-accent md:text-3xl">
+          Glitchy Gator Club
+        </h3>
+        <p class="mt-2 leading-relaxed text-muted">
+          10,946 characters composed from more than 300 hand-drawn attributes, minted on Polygon
+          in December 2021. Eleven of them are on the wall.
+        </p>
+        <p class="mt-4 text-sm text-accent underline underline-offset-4">Enter the exhibit &rarr;</p>
+      </div>
+    </a>
   </section>
 
   <!-- The Map -->

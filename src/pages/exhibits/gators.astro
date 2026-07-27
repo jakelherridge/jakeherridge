@@ -1,0 +1,247 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { breadcrumb } from "../../lib/schema";
+import { gators } from "../../data/gators";
+
+const title = "Glitchy Gator Club";
+const description =
+  "10,946 generative gator characters composed from more than 300 hand-drawn attributes, minted on Polygon in December 2021. An exhibit of the art and the build.";
+
+const jsonLd = [
+  {
+    "@type": "CreativeWork",
+    name: title,
+    description:
+      "A generative art collection: 10,946 unique gator characters composed from more than 300 hand-drawn attributes, minted on the Polygon blockchain.",
+    dateCreated: "2021-12",
+    creator: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/exhibits/gators/",
+    sameAs: "https://opensea.io/collection/glitchygatorclub",
+  },
+  breadcrumb([
+    { name: "Exhibits", url: "https://jakeherridge.com/exhibits/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/gators/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header class="max-w-2xl">
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+        Exhibit · Generative art
+      </p>
+      <h1
+        class="glitch wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl"
+        data-text={title}
+      >
+        {title}
+      </h1>
+      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+        10,946 characters · 300+ hand-drawn attributes · Polygon · December 2021
+      </p>
+      <p class="mt-5 text-lg leading-relaxed text-muted">
+        More than 300 attributes drawn by hand: heads, eyes, arms, bodies, backgrounds. A
+        generation system composed them into 10,946 unique characters, each minted to the Polygon
+        blockchain. The point was learning the whole stack: the drawing, the generation code, the
+        smart contract, the mint.
+      </p>
+    </header>
+
+    <!-- The wall -->
+    <div class="gator-wall mt-10" role="list">
+      {
+        gators.map((g) => (
+          <figure class:list={["gator-tile reveal", g.big && "gator-big"]} role="listitem">
+            <Image
+              src={g.image}
+              alt={g.alt}
+              widths={[380, 560, 760]}
+              sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 360px"
+              format="webp"
+              class="h-full w-full object-cover"
+            />
+          </figure>
+        ))
+      }
+    </div>
+
+    <p class="mt-6 font-mono text-xs text-muted">
+      From the trait sheet: 58 kinds of arms · 17 backgrounds · 57 bodies · 58 kinds of eyes ·
+      100 heads
+    </p>
+
+    <footer class="mt-10 border-t border-faint pt-6">
+      <a
+        href="https://opensea.io/collection/glitchygatorclub"
+        rel="noopener"
+        class="text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        The full club lives on OpenSea &rarr;
+      </a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  /* Title glitch: chromatic split in the site's two inks, mostly at rest. */
+  .glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .glitch::before {
+      color: var(--color-rust);
+      animation: glitch-a 3.2s infinite steps(1);
+    }
+    .glitch::after {
+      color: var(--color-accent);
+      animation: glitch-b 3.2s infinite steps(1);
+    }
+  }
+  @keyframes glitch-a {
+    0%,
+    91%,
+    96.5%,
+    100% {
+      opacity: 0;
+      transform: none;
+      clip-path: none;
+    }
+    92% {
+      opacity: 0.85;
+      transform: translate(-4px, 1px);
+      clip-path: inset(12% 0 58% 0);
+    }
+    94.5% {
+      opacity: 0.85;
+      transform: translate(3px, -1px);
+      clip-path: inset(62% 0 8% 0);
+    }
+  }
+  @keyframes glitch-b {
+    0%,
+    91.5%,
+    96%,
+    100% {
+      opacity: 0;
+      transform: none;
+      clip-path: none;
+    }
+    93% {
+      opacity: 0.85;
+      transform: translate(4px, -1px);
+      clip-path: inset(38% 0 34% 0);
+    }
+    95% {
+      opacity: 0.85;
+      transform: translate(-3px, 2px);
+      clip-path: inset(2% 0 74% 0);
+    }
+  }
+
+  /* The wall: dense grid, two celebrity tiles. */
+  .gator-wall {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    grid-auto-flow: dense;
+  }
+  @media (min-width: 768px) {
+    .gator-wall {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .gator-tile {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid var(--color-faint);
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .gator-big {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .gator-tile :global(img) {
+    display: block;
+  }
+  /* Hover glitch: a quick jitter and two tinted slices. */
+  .gator-tile::before,
+  .gator-tile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .gator-tile::before {
+    background: var(--color-rust);
+    mix-blend-mode: screen;
+  }
+  .gator-tile::after {
+    background: var(--color-accent);
+    mix-blend-mode: screen;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .gator-tile:hover :global(img) {
+      animation: tile-jitter 0.32s steps(2) infinite;
+    }
+    .gator-tile:hover::before {
+      animation: slice-a 0.32s steps(2) infinite;
+    }
+    .gator-tile:hover::after {
+      animation: slice-b 0.32s steps(2) infinite;
+    }
+  }
+  @keyframes tile-jitter {
+    0% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(-2px, 1px);
+    }
+    50% {
+      transform: translate(2px, -1px);
+    }
+    75% {
+      transform: translate(-1px, -1px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes slice-a {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.18;
+      clip-path: inset(18% 0 64% 0);
+      transform: translateX(-3px);
+    }
+  }
+  @keyframes slice-b {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.18;
+      clip-path: inset(58% 0 22% 0);
+      transform: translateX(3px);
+    }
+  }
+</style>

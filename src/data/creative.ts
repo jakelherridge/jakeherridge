@@ -13,6 +13,8 @@ export interface ArtPiece {
   blurb: string;
   image: ImageMetadata;
   alt: string;
+  href?: string;
+  linkLabel?: string;
 }
 
 export const art: ArtPiece[] = [
@@ -21,9 +23,11 @@ export const art: ArtPiece[] = [
     name: "Glitchy Gators",
     category: "Generative art",
     blurb:
-      "A generative collection of ten thousand unique gators on Polygon, assembled from more than three hundred hand-drawn attributes: staffs, storm clouds, branches, glitch effects.",
+      "A generative collection of 10,946 unique gators on Polygon, assembled from more than 300 hand-drawn attributes: staffs, storm clouds, branches, glitch effects.",
     image: gators,
     alt: "A grinning green gator holding a crystal-tipped staff, on a hot pink background",
+    href: "/exhibits/gators/",
+    linkLabel: "See the exhibit",
   },
   {
     id: "keycaps",
