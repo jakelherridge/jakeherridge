@@ -73,3 +73,18 @@ for (const cat of CATEGORIES) {
 
 await writeFile(MANIFEST, JSON.stringify(manifest, null, 2));
 console.log(`Manifest -> ${MANIFEST}`);
+
+// Favorites: full composed gators named by token number, for the wall.
+const FAV_OUT = new URL("../src/assets/gators-wall", import.meta.url).pathname;
+await mkdir(FAV_OUT, { recursive: true });
+const favs = (await readdir(path.join(SRC, "Favorites"))).filter((f) =>
+  f.toLowerCase().endsWith(".png"),
+);
+for (const f of favs) {
+  const token = f.replace(/\.png$/i, "");
+  await sharp(path.join(SRC, "Favorites", f))
+    .resize(900, 900)
+    .webp({ quality: 82 })
+    .toFile(path.join(FAV_OUT, `${token}.webp`));
+}
+console.log(`Favorites: ${favs.length} wall gators -> src/assets/gators-wall`);
