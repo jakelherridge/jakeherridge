@@ -1,7 +1,9 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import MonsterBook from "../../components/MonsterBook.astro";
 import { breadcrumb } from "../../lib/schema";
+import headerMonster from "../../assets/monsters-header.png";
 
 const title = "The Monster Book";
 const description =
@@ -25,19 +27,32 @@ const jsonLd = [
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <article class="mx-auto max-w-5xl px-5 py-14">
-    <header class="max-w-2xl">
-      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
-        Exhibit · Coloring book
-      </p>
-      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
-      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
-        16 pages · ink on paper, drawn by hand · scanned at print resolution
-      </p>
-      <p class="mt-5 text-lg leading-relaxed text-muted">
-        A coloring book in progress: monsters drawn by hand in ink, scanned, and cleaned for
-        print. This is the notebook, opened. Flip through the pages, pick from the book's
-        palette, and color. The monsters take color. The paper around them is locked.
-      </p>
+    <header class="grid items-center gap-8 md:grid-cols-[7fr_5fr]">
+      <div>
+        <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+          Exhibit · Coloring book
+        </p>
+        <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+        <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+          16 pages · ink on paper, drawn by hand · scanned at print resolution
+        </p>
+        <p class="mt-5 text-lg leading-relaxed text-muted">
+          A coloring book in progress: monsters drawn by hand in ink, scanned, and cleaned for
+          print. This is the notebook, opened. Flip through the pages, pick from the book's
+          palette, and color. The monsters take color. The paper around them is locked.
+        </p>
+        <p class="mt-3 text-sm text-muted">
+          The one on the right came out of this page's own machine.
+        </p>
+      </div>
+      <Image
+        src={headerMonster}
+        alt="A colored page from the book: a blue four-eyed monster with gold tusks, orange claws, and pink paw pads"
+        widths={[420, 640, 900]}
+        sizes="(max-width: 768px) 82vw, 380px"
+        format="png"
+        class="mx-auto w-full max-w-[300px] -rotate-1 rounded-md border border-faint shadow-sm md:mx-0 md:max-w-none"
+      />
     </header>
 
     <div class="mt-10">

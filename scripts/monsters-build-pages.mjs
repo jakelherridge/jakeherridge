@@ -23,21 +23,6 @@ for (const f of files) {
 }
 console.log(`Pages: ${n} -> public/monsters/pages`);
 
-// Poster: first monster's upper body on warm paper, 900x675.
-const paper = { r: 244, g: 240, b: 230 };
-const page = await sharp(path.join(SRC, "monster_001.png"))
-  .resize({ width: 900 })
-  .grayscale()
-  .toBuffer();
-const meta = await sharp(page).metadata();
-const top = Math.round((meta.height - 675) * 0.28);
-const crop = await sharp(page)
-  .extract({ left: 0, top, width: 900, height: 675 })
-  .toBuffer();
-await sharp({
-  create: { width: 900, height: 675, channels: 3, background: paper },
-})
-  .composite([{ input: crop, blend: "multiply" }])
-  .png()
-  .toFile(new URL("../src/assets/monsters-poster.png", import.meta.url).pathname);
-console.log("Poster -> src/assets/monsters-poster.png");
+// Poster + header are hand-picked colored pages (src/assets/monsters-header.png,
+// src/assets/monsters-poster.png), not generated here. Jake colored monster 04
+// in the exhibit itself and that download became the exhibit's face.

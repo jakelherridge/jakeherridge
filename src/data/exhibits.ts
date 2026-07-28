@@ -22,7 +22,7 @@ export const exhibits: Exhibit[] = [
     label: "Now open · Coloring book",
     line: "16 hand-drawn ink monsters as a notebook you can flip through and color. The paper is locked; the monsters are not.",
     image: monstersPoster,
-    alt: "A hand-drawn ink monster on warm paper",
+    alt: "A colored page from the book: a blue four-eyed monster with gold tusks",
   },
   {
     href: "/exhibits/synapse/",
