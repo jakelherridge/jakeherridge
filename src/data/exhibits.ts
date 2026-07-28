@@ -1,6 +1,6 @@
 // The exhibit rooms, in opening order. Drives /exhibits/ and the home wall.
 import type { ImageMetadata } from "astro";
-import gatorPoster from "../assets/gators/gator-10.jpg";
+import gatorPoster from "../assets/gators/gator-poster.png";
 import pocketwildPoster from "../assets/pocketwild-poster.png";
 import synapsePoster from "../assets/synapse-poster.png";
 import monstersPoster from "../assets/monsters-poster.png";
@@ -47,6 +47,6 @@ export const exhibits: Exhibit[] = [
     label: "Generative art · 2021",
     line: "10,946 characters from 300+ hand-drawn attributes, minted on Polygon. Build your own from the real layers.",
     image: gatorPoster,
-    alt: "A pink gator with seven glitching rainbow eyes and gold horns",
+    alt: "A gator built in the machine: green, grinning, a burger for a hat",
   },
 ];
