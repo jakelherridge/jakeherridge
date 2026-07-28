@@ -1,0 +1,565 @@
+---
+// The Synapse room: an ask-machine that walks real typed edges step by
+// step, and "the stacks," a browsable wiki of the exported nodes.
+// Node data comes from /synapse/nodes.json (see scripts/synapse-export.mjs).
+import { demos } from "../data/synapse-demo";
+
+const KINDS = [
+  ["all", "All"],
+  ["concept", "Concepts"],
+  ["source", "Sources"],
+  ["entity", "People and things"],
+  ["project", "Projects"],
+  ["finding", "Findings"],
+  ["decision", "Decisions"],
+  ["roadmap-step", "Roadmap"],
+] as const;
+
+const REL_LABEL: Record<string, string> = {
+  supports: "supports",
+  contradicts: "contradicts",
+  depends_on: "depends on",
+  derived_from: "derived from",
+  part_of: "part of",
+  preceded_by: "preceded by",
+  followed_by: "followed by",
+  related_to: "related to",
+  restates: "restates",
+  supersedes: "supersedes",
+};
+---
+
+<section class="syn" data-syn data-rels={JSON.stringify(REL_LABEL)}>
+  <!-- Ask it -->
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">Ask it something</h2>
+    <p class="font-mono text-xs text-muted">the traversal is the answer</p>
+  </div>
+  <p class="mt-2 max-w-2xl text-muted">
+    Pick a question. The machine scans the digest, walks the typed edges, checks each node's
+    status, and only then writes an answer, citing what it read. This is the same procedure the
+    private vault holds its AI to.
+  </p>
+
+  <div class="mt-4 flex flex-wrap gap-1.5">
+    {
+      demos.map((d, i) => (
+        <button type="button" class="syn-chip" data-demo={d.id} aria-pressed={i === 0 ? "true" : "false"}>
+          {d.q}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="syn-machine mt-4">
+    <div class="syn-trace" data-trace aria-live="polite"></div>
+    <div class="syn-answer" data-answer hidden></div>
+  </div>
+
+  <!-- The stacks -->
+  <div class="mt-14 flex flex-wrap items-baseline justify-between gap-3">
+    <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The stacks</h2>
+    <p class="font-mono text-xs text-muted"><span data-count>49</span> public nodes</p>
+  </div>
+  <p class="mt-2 max-w-2xl text-muted">
+    Real nodes from the vault, frontmatter and all. Grayed links point at nodes that stay
+    private.
+  </p>
+
+  <div class="mt-4 flex flex-wrap gap-1.5" role="group" aria-label="Filter by kind">
+    {
+      KINDS.map(([id, label], i) => (
+        <button type="button" class="syn-chip" data-kind={id} aria-pressed={i === 0 ? "true" : "false"}>
+          {label} <span class="syn-chip-count" data-kind-count={id}></span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="syn-stacks mt-5">
+    <div class="syn-list" data-list aria-label="Nodes"></div>
+    <article class="syn-reader" data-reader>
+      <p class="text-muted">Pick a node from the shelf. Or follow a citation from an answer above.</p>
+    </article>
+  </div>
+</section>
+
+<style is:global>
+  .syn-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.34rem 0.75rem;
+    cursor: pointer;
+    text-align: left;
+  }
+  .syn-chip:hover {
+    color: var(--color-ink);
+  }
+  .syn-chip[aria-pressed="true"] {
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+  .syn-chip-count {
+    opacity: 0.55;
+  }
+
+  .syn-machine {
+    border: 1px solid var(--color-faint);
+    border-radius: 8px;
+    background: var(--color-ink);
+    overflow: hidden;
+  }
+  .syn-trace {
+    padding: 1rem 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    line-height: 1.9;
+    color: #d8d4c9;
+    min-height: 9.5rem;
+  }
+  .syn-trace .op {
+    display: inline-block;
+    width: 3.6rem;
+    color: #8fb8a8;
+  }
+  .syn-trace .line {
+    opacity: 0;
+  }
+  .syn-trace .line.on {
+    opacity: 1;
+    transition: opacity 0.18s ease;
+  }
+  .syn-answer {
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+    background: var(--color-surface);
+    padding: 1.1rem 1.2rem 1.2rem;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--color-ink);
+  }
+  .syn-answer cite {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    background: var(--color-accent-soft);
+    color: var(--color-accent-strong);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .syn-answer cite:hover {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .syn-stacks {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .syn-stacks {
+      grid-template-columns: 5fr 7fr;
+    }
+  }
+  .syn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 34rem;
+    overflow-y: auto;
+    padding: 2px;
+  }
+  .syn-item {
+    text-align: left;
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.12s ease;
+  }
+  .syn-item:hover {
+    border-color: var(--color-muted);
+  }
+  .syn-item[aria-current="true"] {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+  .syn-item-top {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--color-muted);
+  }
+  .syn-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    flex: none;
+  }
+  .syn-dot.v {
+    background: var(--color-accent);
+  }
+  .syn-dot.nyv {
+    background: transparent;
+    border: 1.5px dashed var(--color-rust);
+  }
+  .syn-item-title {
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    color: var(--color-ink);
+    margin-top: 0.15rem;
+  }
+  .syn-item-sum {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    margin-top: 0.1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .syn-reader {
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    border-radius: 8px;
+    padding: 1.3rem 1.4rem 1.4rem;
+    min-height: 16rem;
+  }
+  .syn-kindline {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .syn-kind {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-rust);
+  }
+  .syn-title {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
+    margin: 0.3rem 0 0;
+  }
+  .syn-summary {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-muted);
+    margin: 0.35rem 0 0;
+  }
+  .syn-frontmatter {
+    margin-top: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    line-height: 1.8;
+    color: var(--color-muted);
+  }
+  .syn-edges {
+    margin-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .syn-edge-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+  .syn-rel {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    min-width: 7.2rem;
+  }
+  .syn-rel.contradicts {
+    color: var(--color-rust);
+  }
+  .syn-edge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    background: var(--color-paper);
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.16rem 0.5rem;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .syn-edge:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .syn-locked {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    border: 1px dashed var(--color-faint);
+    border-radius: 999px;
+    padding: 0.16rem 0.5rem;
+    color: var(--color-muted);
+    cursor: help;
+  }
+  .syn-body {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+  .syn-body h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 1.1em 0 0.35em;
+  }
+  .syn-body p {
+    margin: 0.55em 0;
+  }
+  .syn-body ul {
+    padding-left: 1.2em;
+    list-style: disc;
+    margin: 0.55em 0;
+  }
+  .syn-body a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+  .syn-body blockquote {
+    border-left: 2px solid var(--color-faint);
+    padding-left: 0.8em;
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0.6em 0;
+  }
+  .syn-body code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--color-accent-soft);
+    border-radius: 3px;
+    padding: 0.08em 0.3em;
+  }
+  .syn-backlinks {
+    margin-top: 1.1rem;
+    border-top: 1px solid var(--color-faint);
+    padding-top: 0.8rem;
+  }
+</style>
+
+<script>
+  interface SynNode {
+    id: string;
+    title: string;
+    kind: string;
+    summary: string;
+    tags: string[];
+    status: string;
+    provenance: string;
+    authored_by: string;
+    edges: Record<string, string[] | number>;
+    bodyHtml: string;
+  }
+
+  import { demos } from "../data/synapse-demo";
+
+  function init(root: HTMLElement) {
+    const relLabel: Record<string, string> = JSON.parse(root.dataset.rels || "{}");
+    const listEl = root.querySelector<HTMLElement>("[data-list]")!;
+    const reader = root.querySelector<HTMLElement>("[data-reader]")!;
+    const trace = root.querySelector<HTMLElement>("[data-trace]")!;
+    const answer = root.querySelector<HTMLElement>("[data-answer]")!;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let nodes: SynNode[] = [];
+    let byId = new Map<string, SynNode>();
+    let backlinks = new Map<string, Set<string>>();
+    let activeKind = "all";
+    let timer = 0;
+
+    const esc = (s: string) =>
+      s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+    // ----- Ask machine -----
+    function runDemo(id: string) {
+      const d = demos.find((x) => x.id === id);
+      if (!d) return;
+      root.querySelectorAll<HTMLButtonElement>("[data-demo]").forEach((c) => {
+        c.setAttribute("aria-pressed", String(c.dataset.demo === id));
+      });
+      clearTimeout(timer);
+      trace.innerHTML = "";
+      answer.hidden = true;
+      const lines = d.steps.map((s) => {
+        const div = document.createElement("div");
+        div.className = "line";
+        div.innerHTML = `<span class="op">${esc(s.op)}</span>${esc(s.text)}`;
+        trace.appendChild(div);
+        return div;
+      });
+      const reveal = (i: number) => {
+        if (i < lines.length) {
+          lines[i].classList.add("on");
+          timer = window.setTimeout(() => reveal(i + 1), reduced ? 0 : 330);
+        } else {
+          answer.innerHTML = d.answerHtml;
+          answer.hidden = false;
+          answer.querySelectorAll<HTMLElement>("cite[data-n]").forEach((c) => {
+            c.addEventListener("click", () => openNode(c.dataset.n!));
+            c.setAttribute("role", "link");
+            c.setAttribute("tabindex", "0");
+            c.addEventListener("keydown", (ev) => {
+              if ((ev as KeyboardEvent).key === "Enter") openNode(c.dataset.n!);
+            });
+          });
+        }
+      };
+      reveal(0);
+    }
+
+    // ----- Stacks -----
+    function statusDot(status: string) {
+      return `<span class="syn-dot ${status === "verified" ? "v" : "nyv"}" title="${esc(status)}"></span>`;
+    }
+
+    function renderList() {
+      listEl.innerHTML = "";
+      const shown = nodes.filter((n) => activeKind === "all" || n.kind === activeKind);
+      for (const n of shown) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "syn-item";
+        btn.dataset.node = n.id;
+        btn.innerHTML = `
+          <div class="syn-item-top">${statusDot(n.status)} ${esc(n.kind)} · ${esc(n.status)}</div>
+          <div class="syn-item-title">${esc(n.title)}</div>
+          <div class="syn-item-sum">${esc(n.summary)}</div>`;
+        btn.addEventListener("click", () => openNode(n.id));
+        listEl.appendChild(btn);
+      }
+    }
+
+    function openNode(id: string, push = true) {
+      const n = byId.get(id);
+      if (!n) return;
+      if (push) history.replaceState(null, "", `#node/${id}`);
+      listEl.querySelectorAll<HTMLElement>("[data-node]").forEach((b) => {
+        b.setAttribute("aria-current", String(b.dataset.node === id));
+      });
+      const edgeRows = Object.entries(n.edges)
+        .filter(([k]) => !k.endsWith("_locked"))
+        .map(([rel, targets]) => {
+          const locked = (n.edges[rel + "_locked"] as number) || 0;
+          const chips = (targets as string[])
+            .map((t) => {
+              const target = byId.get(t);
+              return `<button type="button" class="syn-edge" data-go="${esc(t)}">${esc(target?.title ?? t)}</button>`;
+            })
+            .join("");
+          const lockedChip = locked
+            ? `<span class="syn-locked" title="Private nodes stay private">+${locked} private</span>`
+            : "";
+          return `<div class="syn-edge-row"><span class="syn-rel ${rel === "contradicts" ? "contradicts" : ""}">${esc(relLabel[rel] ?? rel)} &rarr;</span>${chips}${lockedChip}</div>`;
+        })
+        .join("");
+
+      const back = [...(backlinks.get(id) ?? [])].filter((b) => b !== id);
+      const backRow = back.length
+        ? `<div class="syn-backlinks"><span class="syn-rel">linked from &larr;</span> ${back
+            .map((b) => `<button type="button" class="syn-edge" data-go="${esc(b)}">${esc(byId.get(b)?.title ?? b)}</button>`)
+            .join(" ")}</div>`
+        : "";
+
+      reader.innerHTML = `
+        <div class="syn-kindline">
+          <span class="syn-kind">${esc(n.kind)}</span>
+          <span class="stamp ${n.status === "verified" ? "stamp-shipped" : "stamp-shelved"}" style="font-size:0.5rem">${esc(n.status)}</span>
+        </div>
+        <h3 class="syn-title">${esc(n.title)}</h3>
+        ${n.summary ? `<p class="syn-summary">${esc(n.summary)}</p>` : ""}
+        <div class="syn-frontmatter">
+          ${n.tags.length ? `tags: ${esc(n.tags.join(", "))}<br>` : ""}
+          ${n.provenance ? `provenance: ${esc(n.provenance)}<br>` : ""}
+          ${n.authored_by ? `authored by: ${esc(n.authored_by)}` : ""}
+        </div>
+        ${edgeRows ? `<div class="syn-edges">${edgeRows}</div>` : ""}
+        <div class="syn-body">${n.bodyHtml}</div>
+        ${backRow}`;
+      reader.querySelectorAll<HTMLElement>("[data-go]").forEach((b) => {
+        b.addEventListener("click", () => openNode(b.dataset.go!));
+      });
+      reader.querySelectorAll<HTMLAnchorElement>("a[data-wiki]").forEach((a) => {
+        a.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          openNode(a.getAttribute("href")!.replace("#node/", ""));
+        });
+      });
+      if (reader.getBoundingClientRect().top < 0) {
+        reader.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }
+    }
+
+    // ----- Boot -----
+    fetch("/synapse/nodes.json")
+      .then((r) => r.json())
+      .then((data) => {
+        nodes = data.nodes;
+        byId = new Map(nodes.map((n) => [n.id, n]));
+        for (const n of nodes) {
+          for (const [k, targets] of Object.entries(n.edges)) {
+            if (k.endsWith("_locked")) continue;
+            for (const t of targets as string[]) {
+              if (!backlinks.has(t)) backlinks.set(t, new Set());
+              backlinks.get(t)!.add(n.id);
+            }
+          }
+        }
+        root.querySelector("[data-count]")!.textContent = String(nodes.length);
+        root.querySelectorAll<HTMLElement>("[data-kind-count]").forEach((el) => {
+          const k = el.dataset.kindCount!;
+          el.textContent = String(
+            k === "all" ? nodes.length : nodes.filter((n) => n.kind === k).length,
+          );
+        });
+        renderList();
+        const m = location.hash.match(/^#node\/([a-z0-9-]+)/);
+        if (m && byId.has(m[1])) openNode(m[1], false);
+      });
+
+    root.querySelectorAll<HTMLButtonElement>("[data-kind]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        activeKind = chip.dataset.kind!;
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-kind]")
+          .forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        renderList();
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>("[data-demo]").forEach((chip) => {
+      chip.addEventListener("click", () => runDemo(chip.dataset.demo!));
+    });
+
+    runDemo(demos[0].id);
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-syn]");
+  if (root) init(root);
+</script>

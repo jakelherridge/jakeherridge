@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SynapseExhibit from "../../components/SynapseExhibit.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "Synapse";
+const description =
+  "Jake Herridge's knowledge system, opened: 49 real nodes with typed edges, provenance, and verification statuses, plus a machine that walks the graph and answers with citations.";
+
+const jsonLd = [
+  {
+    "@type": "CreativeWork",
+    name: "Synapse",
+    description:
+      "A personal knowledge graph of typed nodes and typed edges, each carrying a source and a verification status, built for an AI to traverse and cite.",
+    creator: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/exhibits/synapse/",
+  },
+  breadcrumb([
+    { name: "Exhibits", url: "https://jakeherridge.com/exhibits/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/synapse/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header class="max-w-2xl">
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+        Exhibit · Knowledge system
+      </p>
+      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+        49 public nodes of a larger private graph · 7 kinds · typed edges · every node carries a
+        source and a status
+      </p>
+      <p class="mt-5 text-lg leading-relaxed text-muted">
+        My knowledge system, running in the open. Synapse breaks what I learn into small typed
+        nodes joined by typed edges. Every node records where it came from and whether a human
+        has verified it. It grew out of Andrej Karpathy's Obsidian pattern: structure an AI can
+        traverse, instead of a retrieval pipeline. These are real nodes from my vault. The
+        career wing and the unfinished writing stay private, and locked links say so.
+      </p>
+    </header>
+
+    <div class="mt-10">
+      <SynapseExhibit />
+    </div>
+
+    <footer class="mt-12 border-t border-faint pt-6">
+      <a
+        href="/map/"
+        class="text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        The Map is the same idea, turned on its author &rarr;
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

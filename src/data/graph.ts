@@ -66,7 +66,7 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "growing",
     summary: "A knowledge graph of typed nodes and typed edges. This map uses the same structure.",
-    href: "/collection/#synapse",
+    href: "/exhibits/synapse/",
   },
   {
     id: "synapse-capture",

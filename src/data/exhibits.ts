@@ -2,6 +2,7 @@
 import type { ImageMetadata } from "astro";
 import gatorPoster from "../assets/gators/gator-10.jpg";
 import pocketwildPoster from "../assets/pocketwild-poster.png";
+import synapsePoster from "../assets/synapse-poster.png";
 
 export interface Exhibit {
   href: string;
@@ -14,6 +15,14 @@ export interface Exhibit {
 }
 
 export const exhibits: Exhibit[] = [
+  {
+    href: "/exhibits/synapse/",
+    title: "Synapse",
+    label: "Now open · Knowledge system",
+    line: "49 real nodes with typed edges and verification statuses, and a machine that walks the graph and answers with citations.",
+    image: synapsePoster,
+    alt: "A diagram of typed nodes connected by different edge styles",
+  },
   {
     href: "/exhibits/pocketwild/",
     title: "PocketWild",
