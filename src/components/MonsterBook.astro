@@ -1,0 +1,565 @@
+---
+// The Monster Book: a spiral notebook of 16 hand-drawn monsters you can
+// flip through and color. Strict palette, flood-fill bounded by the ink,
+// and the paper around each monster is locked: at load we flood from the
+// page borders to build an "outside" mask, and clicks there bounce.
+// Colors multiply over a textured warm paper so fills read like marker.
+const PAGES = 16;
+
+const PALETTE = [
+  "#5c7f4e",
+  "#1f6b54",
+  "#5b8fb3",
+  "#31506b",
+  "#c9a227",
+  "#d07f2e",
+  "#9c4a2c",
+  "#b04a3a",
+  "#6d4a7e",
+  "#d98a9e",
+  "#7a5b3e",
+  "#4a4741",
+];
+---
+
+<section class="mb-root" data-book data-pages={PAGES}>
+  <div class="mb-frame">
+    <div class="mb-spiral" aria-hidden="true"></div>
+    <div class="mb-stage" data-stage>
+      <canvas data-canvas width="1131" height="1600" aria-label="Coloring page. Pick a color, then click inside the monster."></canvas>
+      <img data-flip alt="" class="mb-flip" hidden />
+    </div>
+    <div class="mb-nav">
+      <button type="button" class="mb-btn" data-prev aria-label="Previous page">&larr; Back</button>
+      <p class="mb-pageno"><span data-pageno>1</span> / {PAGES}</p>
+      <button type="button" class="mb-btn" data-next aria-label="Next page">Next &rarr;</button>
+    </div>
+  </div>
+
+  <div class="mb-dock">
+    <div class="mb-palette" role="group" aria-label="The book's palette">
+      {
+        PALETTE.map((c, i) => (
+          <button
+            type="button"
+            class="mb-swatch"
+            data-color={c}
+            style={`--c:${c}`}
+            aria-label={`Color ${i + 1}`}
+            aria-pressed={i === 0 ? "true" : "false"}
+          />
+        ))
+      }
+      <button type="button" class="mb-swatch mb-eraser" data-color="eraser" aria-label="Eraser" aria-pressed="false">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <p class="mb-hint" data-hint aria-live="polite">Pick a color. Click inside a monster.</p>
+    <div class="mb-actions">
+      <button type="button" class="mb-btn" data-undo>Undo</button>
+      <button type="button" class="mb-btn" data-clear>Clear page</button>
+      <button type="button" class="mb-btn" data-save>Download the page</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mb-root {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 900px) {
+    .mb-root {
+      grid-template-columns: 7fr 5fr;
+      align-items: start;
+    }
+  }
+  .mb-frame {
+    border: 1px solid var(--color-faint);
+    border-radius: 10px;
+    background: var(--color-surface);
+    padding: 1rem 1rem 0.8rem;
+  }
+  .mb-spiral {
+    height: 22px;
+    margin: 0 auto 0.6rem;
+    width: 86%;
+    background-image: radial-gradient(
+      circle at 50% 42%,
+      transparent 0 4.5px,
+      #9a958a 4.5px 6.5px,
+      transparent 6.5px
+    );
+    background-size: 26px 22px;
+    background-repeat: repeat-x;
+    background-position: center;
+  }
+  .mb-stage {
+    position: relative;
+    perspective: 1400px;
+  }
+  .mb-stage canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-faint);
+    border-radius: 4px;
+    cursor: crosshair;
+    touch-action: manipulation;
+  }
+  .mb-flip {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    transform-origin: top center;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgb(27 26 23 / 0.14);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mb-flip.out {
+      animation: mb-flip-out 0.5s cubic-bezier(0.5, 0, 0.8, 0.4) forwards;
+    }
+    .mb-flip.in {
+      animation: mb-flip-in 0.5s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+    }
+  }
+  @keyframes mb-flip-out {
+    from {
+      transform: rotateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: rotateX(-135deg);
+      opacity: 0;
+    }
+  }
+  @keyframes mb-flip-in {
+    from {
+      transform: rotateX(-135deg);
+      opacity: 0;
+    }
+    to {
+      transform: rotateX(0);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mb-stage.shake {
+      animation: mb-shake 0.3s ease;
+    }
+  }
+  @keyframes mb-shake {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    30% {
+      translate: -5px 0;
+    }
+    60% {
+      translate: 5px 0;
+    }
+  }
+  .mb-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.7rem;
+  }
+  .mb-pageno {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-muted);
+  }
+  .mb-btn {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 0.95rem;
+    border-radius: 5px;
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .mb-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .mb-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .mb-dock {
+    position: sticky;
+    top: 1rem;
+  }
+  .mb-palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    gap: 0.5rem;
+  }
+  .mb-swatch {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 2px solid rgb(27 26 23 / 0.12);
+    background: var(--c);
+    cursor: pointer;
+    transition:
+      translate 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  .mb-swatch:hover {
+    translate: 0 -2px;
+  }
+  .mb-swatch[aria-pressed="true"] {
+    box-shadow:
+      0 0 0 2px var(--color-paper),
+      0 0 0 4px var(--color-ink);
+  }
+  .mb-eraser {
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .mb-hint {
+    margin: 0.9rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    min-height: 1.4em;
+  }
+  .mb-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+</style>
+
+<script>
+  const PAPER = { r: 247, g: 243, b: 234 };
+  const LINE_LUM = 140;
+  const HINT_DEFAULT = "Pick a color. Click inside a monster.";
+  const HINT_LOCKED = "The paper around the monster is locked.";
+
+  function init(root: HTMLElement) {
+    const pages = parseInt(root.dataset.pages || "16", 10);
+    const canvas = root.querySelector<HTMLCanvasElement>("[data-canvas]")!;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+    const stage = root.querySelector<HTMLElement>("[data-stage]")!;
+    const flipImg = root.querySelector<HTMLImageElement>("[data-flip]")!;
+    const hint = root.querySelector<HTMLElement>("[data-hint]")!;
+    const pagenoEl = root.querySelector<HTMLElement>("[data-pageno]")!;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let W = canvas.width;
+    let H = canvas.height;
+    let page = 1;
+    let color = root.querySelector<HTMLElement>("[data-color]")!.dataset.color!;
+    let busy = false;
+    let hintTimer = 0;
+
+    // Working layers.
+    const lineCanvas = document.createElement("canvas");
+    const colorCanvas = document.createElement("canvas");
+    let lineMask: Uint8Array = new Uint8Array(0);
+    let outsideMask: Uint8Array = new Uint8Array(0);
+    let colorData: ImageData | null = null;
+
+    // Paper texture tile: soft noise.
+    const tex = document.createElement("canvas");
+    tex.width = tex.height = 160;
+    {
+      const tctx = tex.getContext("2d")!;
+      const img = tctx.createImageData(160, 160);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = 236 + Math.floor(Math.random() * 20);
+        img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+        img.data[i + 3] = 255;
+      }
+      tctx.putImageData(img, 0, 0);
+    }
+
+    type Hist = { x: number; y: number; c: string };
+    const store = (): Record<string, Hist[]> => {
+      try {
+        return JSON.parse(localStorage.getItem("monsterbook") || "{}");
+      } catch {
+        return {};
+      }
+    };
+    const saveStore = (s: Record<string, Hist[]>) =>
+      localStorage.setItem("monsterbook", JSON.stringify(s));
+    const key = (p: number) => String(p).padStart(2, "0");
+
+    function setHint(text: string, revert = false) {
+      hint.textContent = text;
+      clearTimeout(hintTimer);
+      if (revert) hintTimer = window.setTimeout(() => (hint.textContent = HINT_DEFAULT), 2200);
+    }
+
+    function composite() {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = `rgb(${PAPER.r} ${PAPER.g} ${PAPER.b})`;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "multiply";
+      ctx.drawImage(colorCanvas, 0, 0);
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = ctx.createPattern(tex, "repeat")!;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      ctx.drawImage(lineCanvas, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+    }
+
+    function buildMasks() {
+      const lctx = lineCanvas.getContext("2d", { willReadFrequently: true })!;
+      const data = lctx.getImageData(0, 0, W, H).data;
+      const n = W * H;
+      lineMask = new Uint8Array(n);
+      for (let i = 0; i < n; i++) {
+        if (data[i * 4] < LINE_LUM) lineMask[i] = 1;
+      }
+      // Flood from the borders: everything reachable is "outside".
+      outsideMask = new Uint8Array(n);
+      const queue = new Int32Array(n);
+      let qh = 0,
+        qt = 0;
+      const push = (p: number) => {
+        if (!outsideMask[p] && !lineMask[p]) {
+          outsideMask[p] = 1;
+          queue[qt++] = p;
+        }
+      };
+      for (let x = 0; x < W; x++) {
+        push(x);
+        push((H - 1) * W + x);
+      }
+      for (let y = 0; y < H; y++) {
+        push(y * W);
+        push(y * W + W - 1);
+      }
+      while (qh < qt) {
+        const p = queue[qh++];
+        const x = p % W;
+        if (x > 0) push(p - 1);
+        if (x < W - 1) push(p + 1);
+        if (p >= W) push(p - W);
+        if (p < n - W) push(p + W);
+      }
+    }
+
+    function applyFill(px: number, py: number, c: string, record: boolean): boolean {
+      const start = py * W + px;
+      if (px < 0 || py < 0 || px >= W || py >= H) return false;
+      if (lineMask[start]) return false;
+      if (outsideMask[start]) {
+        if (record) {
+          stage.classList.remove("shake");
+          void stage.offsetWidth;
+          stage.classList.add("shake");
+          setHint(HINT_LOCKED, true);
+        }
+        return false;
+      }
+      // BFS the region.
+      const n = W * H;
+      const seen = new Uint8Array(n);
+      const queue = new Int32Array(n);
+      let qh = 0,
+        qt = 0;
+      seen[start] = 1;
+      queue[qt++] = start;
+      const region: number[] = [];
+      while (qh < qt) {
+        const p = queue[qh++];
+        region.push(p);
+        const x = p % W;
+        const check = (q: number) => {
+          if (!seen[q] && !lineMask[q]) {
+            seen[q] = 1;
+            queue[qt++] = q;
+          }
+        };
+        if (x > 0) check(p - 1);
+        if (x < W - 1) check(p + 1);
+        if (p >= W) check(p - W);
+        if (p < n - W) check(p + W);
+      }
+      // Dilate 2px so fills tuck under the ink's soft edge.
+      const paint = new Set<number>(region);
+      let ring = region;
+      for (let d = 0; d < 2; d++) {
+        const next: number[] = [];
+        for (const p of ring) {
+          const x = p % W;
+          const cand = [p - 1, p + 1, p - W, p + W];
+          for (const q of cand) {
+            if (q < 0 || q >= n) continue;
+            if (x === 0 && q === p - 1) continue;
+            if (x === W - 1 && q === p + 1) continue;
+            if (!paint.has(q)) {
+              paint.add(q);
+              next.push(q);
+            }
+          }
+        }
+        ring = next;
+      }
+      // Paint.
+      const cd = colorData!;
+      if (c === "eraser") {
+        for (const p of paint) cd.data[p * 4 + 3] = 0;
+      } else {
+        const r = parseInt(c.slice(1, 3), 16);
+        const g = parseInt(c.slice(3, 5), 16);
+        const b = parseInt(c.slice(5, 7), 16);
+        for (const p of paint) {
+          cd.data[p * 4] = r;
+          cd.data[p * 4 + 1] = g;
+          cd.data[p * 4 + 2] = b;
+          cd.data[p * 4 + 3] = 255;
+        }
+      }
+      colorCanvas.getContext("2d")!.putImageData(cd, 0, 0);
+      if (record) {
+        const s = store();
+        (s[key(page)] ||= []).push({ x: px, y: py, c });
+        saveStore(s);
+      }
+      return true;
+    }
+
+    async function loadPage(p: number) {
+      busy = true;
+      const img = new Image();
+      img.src = `/monsters/pages/${key(p)}.png`;
+      await new Promise((res) => {
+        img.onload = res;
+        img.onerror = res;
+      });
+      W = img.naturalWidth || 1131;
+      H = img.naturalHeight || 1600;
+      canvas.width = W;
+      canvas.height = H;
+      lineCanvas.width = colorCanvas.width = W;
+      lineCanvas.height = colorCanvas.height = H;
+      const lctx = lineCanvas.getContext("2d", { willReadFrequently: true })!;
+      lctx.fillStyle = "#fff";
+      lctx.fillRect(0, 0, W, H);
+      lctx.drawImage(img, 0, 0, W, H);
+      buildMasks();
+      colorCanvas.getContext("2d")!.clearRect(0, 0, W, H);
+      colorData = colorCanvas.getContext("2d")!.getImageData(0, 0, W, H);
+      for (const h of store()[key(p)] ?? []) applyFill(h.x, h.y, h.c, false);
+      composite();
+      pagenoEl.textContent = String(p);
+      busy = false;
+    }
+
+    function flipTo(p: number) {
+      if (busy || p < 1 || p > pages || p === page) return;
+      const forward = p > page;
+      const snapshot = canvas.toDataURL("image/png");
+      page = p;
+      if (reduced) {
+        loadPage(p);
+        return;
+      }
+      flipImg.src = snapshot;
+      flipImg.hidden = false;
+      flipImg.className = "mb-flip";
+      void flipImg.offsetWidth;
+      if (forward) {
+        flipImg.classList.add("out");
+        loadPage(p);
+      } else {
+        loadPage(p).then(() => {
+          const snap2 = canvas.toDataURL("image/png");
+          flipImg.src = snap2;
+          flipImg.classList.add("in");
+        });
+      }
+      flipImg.addEventListener(
+        "animationend",
+        () => {
+          flipImg.hidden = true;
+          flipImg.className = "mb-flip";
+        },
+        { once: true },
+      );
+    }
+
+    // ----- Wiring -----
+    canvas.addEventListener("pointerdown", (ev) => {
+      if (busy) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor(((ev.clientX - rect.left) / rect.width) * W);
+      const y = Math.floor(((ev.clientY - rect.top) / rect.height) * H);
+      if (applyFill(x, y, color, true)) composite();
+    });
+
+    root.querySelectorAll<HTMLButtonElement>("[data-color]").forEach((sw) => {
+      sw.addEventListener("click", () => {
+        color = sw.dataset.color!;
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-color]")
+          .forEach((s) => s.setAttribute("aria-pressed", String(s === sw)));
+        setHint(color === "eraser" ? "Eraser. Click a colored spot to clear it." : HINT_DEFAULT);
+      });
+    });
+
+    root.querySelector("[data-prev]")!.addEventListener("click", () => flipTo(page - 1));
+    root.querySelector("[data-next]")!.addEventListener("click", () => flipTo(page + 1));
+    addEventListener("keydown", (ev) => {
+      if (ev.key === "ArrowLeft") flipTo(page - 1);
+      if (ev.key === "ArrowRight") flipTo(page + 1);
+    });
+    // Swipe.
+    let swipeX: number | null = null;
+    canvas.addEventListener("pointerdown", (ev) => (swipeX = ev.clientX));
+    canvas.addEventListener("pointerup", (ev) => {
+      if (swipeX === null) return;
+      const dx = ev.clientX - swipeX;
+      if (Math.abs(dx) > 70) flipTo(dx < 0 ? page + 1 : page - 1);
+      swipeX = null;
+    });
+
+    root.querySelector("[data-undo]")!.addEventListener("click", () => {
+      const s = store();
+      const h = s[key(page)] ?? [];
+      h.pop();
+      s[key(page)] = h;
+      saveStore(s);
+      loadPage(page);
+    });
+    root.querySelector("[data-clear]")!.addEventListener("click", () => {
+      const s = store();
+      s[key(page)] = [];
+      saveStore(s);
+      loadPage(page);
+    });
+    root.querySelector("[data-save]")!.addEventListener("click", () => {
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `monster-${key(page)}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }, "image/png");
+    });
+
+    loadPage(1);
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-book]");
+  if (root) init(root);
+</script>

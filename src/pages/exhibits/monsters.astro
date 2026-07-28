@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MonsterBook from "../../components/MonsterBook.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "The Monster Book";
+const description =
+  "A coloring book in progress: 16 hand-drawn ink monsters as an interactive notebook. Flip the pages and color inside the monsters with the book's palette. The paper is locked.";
+
+const jsonLd = [
+  {
+    "@type": "CreativeWork",
+    name: title,
+    description:
+      "A coloring book of hand-drawn ink monsters, in progress. Presented as an interactive notebook that visitors can flip through and color.",
+    creator: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/exhibits/monsters/",
+  },
+  breadcrumb([
+    { name: "Exhibits", url: "https://jakeherridge.com/exhibits/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/monsters/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header class="max-w-2xl">
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+        Exhibit · Coloring book
+      </p>
+      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+        16 pages · ink on paper, drawn by hand · scanned at print resolution
+      </p>
+      <p class="mt-5 text-lg leading-relaxed text-muted">
+        A coloring book in progress: monsters drawn by hand in ink, scanned, and cleaned for
+        print. This is the notebook, opened. Flip through the pages, pick from the book's
+        palette, and color. The monsters take color. The paper around them is locked.
+      </p>
+    </header>
+
+    <div class="mt-10">
+      <MonsterBook />
+    </div>
+  </article>
+</BaseLayout>

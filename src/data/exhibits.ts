@@ -3,6 +3,7 @@ import type { ImageMetadata } from "astro";
 import gatorPoster from "../assets/gators/gator-10.jpg";
 import pocketwildPoster from "../assets/pocketwild-poster.png";
 import synapsePoster from "../assets/synapse-poster.png";
+import monstersPoster from "../assets/monsters-poster.png";
 
 export interface Exhibit {
   href: string;
@@ -15,6 +16,14 @@ export interface Exhibit {
 }
 
 export const exhibits: Exhibit[] = [
+  {
+    href: "/exhibits/monsters/",
+    title: "The Monster Book",
+    label: "Now open · Coloring book",
+    line: "16 hand-drawn ink monsters as a notebook you can flip through and color. The paper is locked; the monsters are not.",
+    image: monstersPoster,
+    alt: "A hand-drawn ink monster on warm paper",
+  },
   {
     href: "/exhibits/synapse/",
     title: "Synapse",
