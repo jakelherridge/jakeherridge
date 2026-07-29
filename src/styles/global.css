@@ -29,6 +29,11 @@
 }
 
 html {
+  /* Reserve the scrollbar's width always. Without this, a page whose height
+     changes (the gator stage, the meadow) can toggle the scrollbar, which
+     changes the viewport width, which resizes square elements, which
+     changes the height again. */
+  scrollbar-gutter: stable;
   background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);

@@ -79,9 +79,20 @@ const glitchyCount = categories.reduce(
           ))
         }
       </div>
-      <p class="gm-recipe" data-recipe aria-live="polite">
-        {initial.map((s) => s.item.name.toLowerCase()).join(" · ")}
-      </p>
+      {/* A fixed six-cell label instead of a wrapping sentence: the block
+          is the same height whatever lands, so nothing below it jumps. */}
+      <dl class="gm-spec" data-recipe aria-live="polite">
+        {
+          initial.map(({ cat, item }) => (
+            <div class="gm-spec-cell">
+              <dt>{cat.label}</dt>
+              <dd data-spec={cat.id} title={item.name}>
+                {item.name}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
       <p class="gm-odds" data-odds></p>
       <div class="gm-actions">
         <button type="button" class="gm-btn gm-btn-solid" data-spin>Pull the machine</button>
@@ -221,20 +232,54 @@ const glitchyCount = categories.reduce(
       transform: none;
     }
   }
-  .gm-recipe {
-    margin: 0.6rem 0 0;
+  /* The spec label: two columns on phones, three when there is room.
+     Values never wrap, so the block's height is constant. */
+  /* Two columns everywhere: the stage column is narrow, and three would
+     squeeze the longest trait names into an ellipsis. */
+  .gm-spec {
+    margin: 0.7rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem 0.9rem;
+  }
+  .gm-spec-cell {
+    min-width: 0;
+  }
+  .gm-spec dt {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.03em;
+    font-size: 0.5rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--color-muted);
-    min-height: 1.5em;
+    line-height: 1.4;
+  }
+  /* Values may wrap to a second line, and the two lines are always
+     reserved, so the longest trait names show in full and the block never
+     changes height. */
+  .gm-spec dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.63rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    min-height: 2.8em;
+  }
+  .gm-spec dd.is-glitchy {
+    color: var(--color-rust);
   }
   .gm-odds {
-    margin: 0.25rem 0 0;
+    margin: 0.7rem 0 0;
     font-family: var(--font-mono);
     font-size: 0.66rem;
     color: var(--color-accent);
-    min-height: 1.3em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .gm-actions {
     display: flex;
@@ -580,7 +625,13 @@ const glitchyCount = categories.reduce(
 
     function updateMeta() {
       const parts = categories.map((c) => itemOf(c.id, state.get(c.id)!)?.name ?? state.get(c.id)!);
-      recipe.textContent = parts.map((p) => p.toLowerCase()).join(" · ");
+      categories.forEach((c, i) => {
+        const cell = recipe.querySelector<HTMLElement>(`[data-spec="${c.id}"]`);
+        if (!cell) return;
+        cell.textContent = parts[i];
+        cell.title = parts[i];
+        cell.classList.toggle("is-glitchy", Boolean(itemOf(c.id, state.get(c.id)!)?.glitchy));
+      });
       stage.setAttribute("aria-label", `A gator built from: ${parts.join(", ")}`);
       let p = 1;
       for (const c of categories) {
