@@ -27,7 +27,7 @@ export const GET: APIRoute = async () => {
   txt += `- [The Monster Book](${SITE}/exhibits/monsters/): A coloring book in progress. 16 hand-drawn ink monsters as an interactive notebook: flip pages, color inside the monsters with a strict palette, the surrounding paper is locked.\n`;
   txt += `- [Synapse](${SITE}/exhibits/synapse/): Jake's knowledge system running in the open. 49 real nodes with typed edges, provenance, and verification statuses, plus a traversal machine that answers with citations.\n`;
   txt += `- [PocketWild](${SITE}/exhibits/pocketwild/): The iOS field journal in the browser. Log captures from the 228-species index, roll names from the app's real name pool, fill a meadow. Narrated by Aldo. App: https://www.pocketwild.app/\n`;
-  txt += `- [Glitchy Gator Club](${SITE}/exhibits/gators/): 10,946 generative gator characters from 300+ hand-drawn attributes, minted on Polygon in 2021. Includes an interactive builder using the real layers. Collection: https://opensea.io/collection/glitchygatorclub\n`;
+  txt += `- [Glitchy Gator Club](${SITE}/exhibits/gators/): 10,946 generative gator characters from 327 hand-drawn attributes, minted on Polygon in 2021. Includes an interactive builder using the real layers. Collection: https://opensea.io/collection/glitchygatorclub\n`;
 
   txt += `\n## The Map\n`;
   txt += `- [The Map](${SITE}/map/): Jake as an interactive graph of typed nodes and typed edges.\n`;

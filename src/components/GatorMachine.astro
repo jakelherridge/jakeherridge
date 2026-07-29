@@ -1,12 +1,16 @@
 ---
-// The gator machine: pick one of each layer, in the order the generator
-// stacked them. Layers are the real hand-drawn attributes, served from
-// /gators/. State lives in the URL hash so a gator can be shared.
+// The gator machine, as a six-reel mint machine. One reel per layer in
+// the generator's stack order. SPIN pulls every unlocked reel with the
+// collection's REAL rarity weights (parsed from the source filenames), so
+// a pull lands traits as often as the 2021 mint did. Lock a reel to keep
+// it, nudge to step one, or open a reel's drawer to pick deliberately.
 import manifest from "../data/gator-machine.json";
 
 interface Item {
   slug: string;
   name: string;
+  weight: number;
+  glitchy?: boolean;
 }
 interface Category {
   id: string;
@@ -15,44 +19,54 @@ interface Category {
 }
 const categories = manifest.categories as Category[];
 
+// A light default so first paint is cheap: plain background, no glow body.
 const DEFAULTS: Record<string, string> = {
-  background: "teal",
-  body: "green",
+  background: "green",
+  body: "green-machine",
   arms: "boxer",
-  mouth: "big-cheesin",
+  mouth: "cheesy",
   eyes: "cute",
   head: "burger",
 };
 
 const pick = (c: Category) =>
-  c.items.find((i) => i.slug === DEFAULTS[c.id]) ?? c.items[0];
+  c.items.find((i) => i.slug === DEFAULTS[c.id]) ??
+  c.items.reduce((a, b) => (b.weight > a.weight ? b : a));
 
 const initial = categories.map((c) => ({ cat: c, item: pick(c) }));
 const combos = categories.reduce((n, c) => n * c.items.length, 1);
-const comboLabel = combos.toLocaleString("en-US");
+const layerCount = categories.reduce((n, c) => n + c.items.length, 0);
+const glitchyCount = categories.reduce(
+  (n, c) => n + c.items.filter((i) => i.glitchy).length,
+  0,
+);
 ---
 
-<section id="machine" class="scroll-mt-20">
+<section id="machine" class="scroll-mt-20" data-machine data-size={manifest.size}>
   <div class="flex flex-wrap items-baseline justify-between gap-3">
     <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The gator machine</h2>
-    <p class="font-mono text-xs text-muted">{comboLabel} possible gators</p>
+    <p class="font-mono text-xs text-muted">
+      {combos.toLocaleString("en-US")} possible gators
+    </p>
   </div>
   <p class="mt-2 max-w-2xl text-muted">
-    The real layers, stacked in the generator's order: background, body, arms, mouth, eyes,
-    head. Pick one of each.
+    All {layerCount} attributes, {glitchyCount} of them glitched, stacked in the generator's order:
+    background, body, arms, mouth, eyes, head. Pull the machine and it uses the collection's real
+    rarity weights, so traits turn up as often as they did at the mint. Lock what you like, nudge
+    to browse, or open a reel to choose.
   </p>
 
-  <div class="machine mt-6" data-machine data-size={manifest.size}>
+  <div class="gm mt-6">
     <!-- Stage -->
-    <div class="machine-left">
+    <div class="gm-left">
       <div
-        class="machine-stage"
+        class="gm-stage"
         data-stage
         role="img"
         aria-label={`A gator built from: ${initial.map((s) => s.item.name).join(", ")}`}
       >
         {
-          initial.map(({ cat, item }, i) => (
+          initial.map(({ cat, item }) => (
             <img
               data-layer={cat.id}
               src={`/gators/layers/${cat.id}/${item.slug}.webp`}
@@ -60,98 +74,124 @@ const comboLabel = combos.toLocaleString("en-US");
               width={manifest.size}
               height={manifest.size}
               decoding="async"
-              loading={i === 0 ? "eager" : "eager"}
+              fetchpriority={cat.id === "background" ? "high" : "auto"}
             />
           ))
         }
       </div>
-      <p class="machine-recipe" data-recipe aria-live="polite">
+      <p class="gm-recipe" data-recipe aria-live="polite">
         {initial.map((s) => s.item.name.toLowerCase()).join(" · ")}
       </p>
-      <div class="machine-actions">
-        <button type="button" class="machine-btn machine-btn-solid" data-shuffle>
-          Shuffle
-        </button>
-        <button type="button" class="machine-btn" data-download>Download PNG</button>
+      <p class="gm-odds" data-odds></p>
+      <div class="gm-actions">
+        <button type="button" class="gm-btn gm-btn-solid" data-spin>Pull the machine</button>
+        <button type="button" class="gm-btn" data-download>Download PNG</button>
       </div>
     </div>
 
-    <!-- Controls -->
-    <div class="machine-right">
-      <div class="machine-tabs" role="tablist" aria-label="Layer categories">
-        {
-          categories.map((c, i) => (
-            <button
-              type="button"
-              role="tab"
-              id={`tab-${c.id}`}
-              aria-controls={`panel-${c.id}`}
-              aria-selected={i === 0 ? "true" : "false"}
-              tabindex={i === 0 ? 0 : -1}
-              class="machine-tab"
-              data-tab={c.id}
-            >
-              {c.label}
-              <span class="machine-tab-count">{c.items.length}</span>
-            </button>
-          ))
-        }
-      </div>
+    <!-- Reels -->
+    <div class="gm-reels" data-reels>
       {
-        categories.map((c, ci) => (
-          <div
-            id={`panel-${c.id}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${c.id}`}
-            class="machine-panel"
-            data-panel={c.id}
-            hidden={ci !== 0}
-          >
-            <div class="machine-grid">
-              {c.items.map((item) => (
+        categories.map((c) => {
+          const item = initial.find((s) => s.cat.id === c.id)!.item;
+          return (
+            <div class="gm-reel" data-reel={c.id}>
+              <div class="gm-reel-top">
+                <span class="gm-reel-label">{c.label}</span>
                 <button
                   type="button"
-                  class="machine-thumb"
-                  data-option
-                  data-cat={c.id}
-                  data-slug={item.slug}
-                  aria-pressed={initial.find((s) => s.cat.id === c.id)?.item.slug === item.slug ? "true" : "false"}
-                  aria-label={`${c.label}: ${item.name}`}
-                  title={item.name}
+                  class="gm-lock"
+                  data-lock={c.id}
+                  aria-pressed="false"
+                  aria-label={`Lock the ${c.label.toLowerCase()} reel`}
+                  title="Lock this reel"
                 >
-                  <img
-                    src={`/gators/thumbs/${c.id}/${item.slug}.webp`}
-                    alt=""
-                    width={176}
-                    height={176}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  hold
                 </button>
-              ))}
+              </div>
+              <div class="gm-window">
+                <div class="gm-strip" data-strip={c.id}>
+                  <div class="gm-cell">
+                    <img
+                      src={`/gators/thumbs/${c.id}/${item.slug}.webp`}
+                      alt=""
+                      width="144"
+                      height="144"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="gm-reel-bottom">
+                <button
+                  type="button"
+                  class="gm-nudge"
+                  data-nudge={c.id}
+                  data-dir="-1"
+                  aria-label={`Previous ${c.label.toLowerCase()}`}
+                >
+                  &#8249;
+                </button>
+                <button
+                  type="button"
+                  class="gm-name"
+                  data-browse={c.id}
+                  aria-label={`Browse all ${c.items.length} ${c.label.toLowerCase()} options`}
+                >
+                  <span data-name={c.id}>{item.name}</span>
+                  <span class="gm-rarity" data-rarity={c.id} />
+                </button>
+                <button
+                  type="button"
+                  class="gm-nudge"
+                  data-nudge={c.id}
+                  data-dir="1"
+                  aria-label={`Next ${c.label.toLowerCase()}`}
+                >
+                  &#8250;
+                </button>
+              </div>
             </div>
-          </div>
-        ))
+          );
+        })
       }
     </div>
   </div>
 
-  <script type="application/json" data-machine-data set:html={JSON.stringify(categories.map((c) => ({ id: c.id, items: c.items })))} />
+  <!-- Drawer -->
+  <div class="gm-overlay" data-drawer hidden>
+    <div class="gm-drawer" role="dialog" aria-modal="true" aria-labelledby="gm-drawer-title">
+      <div class="gm-drawer-head">
+        <h3 class="gm-drawer-title" id="gm-drawer-title" data-drawer-title></h3>
+        <button type="button" class="gm-close" data-drawer-close aria-label="Close">&times;</button>
+      </div>
+      <div class="gm-drawer-grid" data-drawer-grid></div>
+    </div>
+  </div>
+
+  <script
+    type="application/json"
+    data-machine-data
+    set:html={JSON.stringify(
+      categories.map((c) => ({ id: c.id, label: c.label, items: c.items })),
+    )}
+  />
 </section>
 
-<style>
-  .machine {
+<style is:global>
+  .gm {
     display: grid;
     gap: 1.25rem;
     align-items: start;
   }
-  @media (min-width: 768px) {
-    .machine {
+  @media (min-width: 900px) {
+    .gm {
       grid-template-columns: 5fr 7fr;
       gap: 1.5rem;
     }
   }
-  .machine-stage {
+  .gm-stage {
     position: relative;
     aspect-ratio: 1;
     overflow: hidden;
@@ -159,7 +199,7 @@ const comboLabel = combos.toLocaleString("en-US");
     border: 1px solid var(--color-faint);
     background: var(--color-surface);
   }
-  .machine-stage :global(img) {
+  .gm-stage img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -167,21 +207,21 @@ const comboLabel = combos.toLocaleString("en-US");
     display: block;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .machine-stage :global(img.swapping) {
-      animation: layer-pop 0.22s ease;
+    .gm-stage img.landing {
+      animation: gm-land 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
     }
   }
-  @keyframes layer-pop {
+  @keyframes gm-land {
     0% {
-      opacity: 0.35;
-      transform: scale(1.015);
+      opacity: 0.3;
+      transform: scale(1.02);
     }
     100% {
       opacity: 1;
-      transform: scale(1);
+      transform: none;
     }
   }
-  .machine-recipe {
+  .gm-recipe {
     margin: 0.6rem 0 0;
     font-family: var(--font-mono);
     font-size: 0.68rem;
@@ -189,12 +229,20 @@ const comboLabel = combos.toLocaleString("en-US");
     color: var(--color-muted);
     min-height: 1.5em;
   }
-  .machine-actions {
+  .gm-odds {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--color-accent);
+    min-height: 1.3em;
+  }
+  .gm-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.6rem;
     margin-top: 0.8rem;
   }
-  .machine-btn {
+  .gm-btn {
     font-size: 0.85rem;
     font-weight: 500;
     padding: 0.55rem 1rem;
@@ -208,71 +256,227 @@ const comboLabel = combos.toLocaleString("en-US");
       color 0.15s ease,
       background-color 0.15s ease;
   }
-  .machine-btn:hover {
+  .gm-btn:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
   }
-  .machine-btn-solid {
+  .gm-btn-solid {
     background: var(--color-accent);
     border-color: var(--color-accent);
     color: #fff;
   }
-  .machine-btn-solid:hover {
+  .gm-btn-solid:hover {
     background: var(--color-accent-strong);
     border-color: var(--color-accent-strong);
     color: #fff;
   }
-  .machine-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-  }
-  .machine-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.02em;
-    color: var(--color-muted);
-    background: var(--color-surface);
-    border: 1px solid var(--color-faint);
-    border-radius: 999px;
-    padding: 0.32rem 0.7rem;
-    cursor: pointer;
-  }
-  .machine-tab:hover {
-    color: var(--color-ink);
-  }
-  .machine-tab[aria-selected="true"] {
-    color: var(--color-ink);
-    border-color: var(--color-ink);
-  }
-  .machine-tab-count {
+  .gm-btn:disabled {
     opacity: 0.55;
+    cursor: default;
   }
-  .machine-panel {
-    margin-top: 0.8rem;
-  }
-  .machine-grid {
+
+  /* Reels: two rows of three on phones, six across on wide screens. */
+  .gm-reels {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.45rem;
-    max-height: 26rem;
-    overflow-y: auto;
-    padding: 2px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
   }
-  @media (min-width: 640px) {
-    .machine-grid {
-      grid-template-columns: repeat(5, 1fr);
-    }
-  }
-  @media (min-width: 1024px) {
-    .machine-grid {
+  @media (min-width: 1100px) {
+    .gm-reels {
       grid-template-columns: repeat(6, 1fr);
     }
   }
-  .machine-thumb {
+  .gm-reel {
+    border: 1px solid var(--color-faint);
+    border-radius: 8px;
+    background: var(--color-surface);
+    padding: 0.4rem 0.4rem 0.45rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .gm-reel.is-locked {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+  .gm-reel-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+  }
+  .gm-reel-label {
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .gm-lock {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    background: none;
+    border: 1px solid var(--color-faint);
+    border-radius: 3px;
+    padding: 0.1rem 0.3rem;
+    cursor: pointer;
+  }
+  .gm-lock:hover {
+    color: var(--color-ink);
+  }
+  .gm-lock[aria-pressed="true"] {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  .gm-window {
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+    background: var(--color-paper);
+    border: 1px solid var(--color-faint);
+    height: 84px;
+  }
+  /* A faint glass shine so the window reads as a machine, not a box. */
+  .gm-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgb(27 26 23 / 0.09),
+      transparent 32%,
+      transparent 68%,
+      rgb(27 26 23 / 0.09)
+    );
+  }
+  .gm-strip {
+    will-change: transform;
+  }
+  .gm-cell {
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gm-cell img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+  }
+  .gm-reel-bottom {
+    display: flex;
+    align-items: stretch;
+    gap: 0.15rem;
+  }
+  .gm-nudge {
+    flex: none;
+    width: 1.3rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .gm-nudge:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .gm-name {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    padding: 0.1rem 0.15rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+  }
+  .gm-name:hover {
+    border-color: var(--color-faint);
+  }
+  .gm-name > span:first-child {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--color-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gm-rarity {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: var(--color-muted);
+  }
+  .gm-rarity.rare {
+    color: var(--color-rust);
+  }
+
+  /* Drawer */
+  .gm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgb(27 26 23 / 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .gm-drawer {
+    width: min(46rem, 100%);
+    max-height: 84vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-paper);
+    border: 1px solid var(--color-faint);
+    border-radius: 10px;
+    box-shadow: 0 14px 44px rgb(27 26 23 / 0.18);
+  }
+  .gm-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.1rem 0.6rem;
+  }
+  .gm-drawer-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  .gm-close {
+    border: 0;
+    background: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--color-muted);
+    cursor: pointer;
+    padding: 0.2rem 0.3rem;
+  }
+  .gm-close:hover {
+    color: var(--color-ink);
+  }
+  .gm-drawer-grid {
+    overflow-y: auto;
+    padding: 0 1.1rem 1.1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+    gap: 0.45rem;
+  }
+  .gm-opt {
     padding: 0;
     border: 1.5px solid var(--color-faint);
     border-radius: 6px;
@@ -280,169 +484,319 @@ const comboLabel = combos.toLocaleString("en-US");
     background: var(--color-surface);
     cursor: pointer;
     line-height: 0;
-    transition:
-      border-color 0.12s ease,
-      translate 0.12s ease;
+    position: relative;
   }
-  .machine-thumb:hover {
+  .gm-opt:hover {
     border-color: var(--color-muted);
-    translate: 0 -1px;
   }
-  .machine-thumb[aria-pressed="true"] {
+  .gm-opt[aria-pressed="true"] {
     border-color: var(--color-accent);
     box-shadow: 0 0 0 1px var(--color-accent);
   }
-  .machine-thumb :global(img) {
+  .gm-opt img {
     width: 100%;
     height: auto;
     display: block;
   }
+  .gm-opt-tag {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    line-height: 1.3;
+    color: var(--color-muted);
+    background: rgb(255 255 255 / 0.88);
+    padding: 0.12rem 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
 
 <script>
+  interface MItem {
+    slug: string;
+    name: string;
+    weight: number;
+    glitchy?: boolean;
+  }
+  interface MCat {
+    id: string;
+    label: string;
+    items: MItem[];
+  }
+
   const root = document.querySelector<HTMLElement>("[data-machine]");
   const dataEl = document.querySelector("[data-machine-data]");
   if (root && dataEl) init(root, JSON.parse(dataEl.textContent || "[]"));
 
-  interface MItem {
-    slug: string;
-    name: string;
-  }
-  interface MCat {
-    id: string;
-    items: MItem[];
-  }
-
   function init(root: HTMLElement, categories: MCat[]) {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const stage = root.querySelector<HTMLElement>("[data-stage]")!;
     const recipe = root.querySelector<HTMLElement>("[data-recipe]")!;
+    const oddsEl = root.querySelector<HTMLElement>("[data-odds]")!;
+    const spinBtn = root.querySelector<HTMLButtonElement>("[data-spin]")!;
+    const CELL = 84;
+
     const layerImgs = new Map<string, HTMLImageElement>();
     stage.querySelectorAll<HTMLImageElement>("[data-layer]").forEach((img) => {
       layerImgs.set(img.dataset.layer!, img);
     });
 
     const state = new Map<string, string>();
+    const locked = new Set<string>();
     categories.forEach((c) => {
       const img = layerImgs.get(c.id)!;
-      const slug = img.src.split("/").pop()!.replace(".webp", "");
-      state.set(c.id, slug);
+      state.set(c.id, decodeURIComponent(img.src.split("/").pop()!.replace(".webp", "")));
     });
 
-    const nameOf = (catId: string, slug: string) =>
-      categories.find((c) => c.id === catId)?.items.find((i) => i.slug === slug)?.name ?? slug;
+    const byId = new Map(categories.map((c) => [c.id, c]));
+    const itemOf = (catId: string, slug: string) =>
+      byId.get(catId)!.items.find((i) => i.slug === slug);
+    const totalWeight = new Map(
+      categories.map((c) => [c.id, c.items.reduce((n, i) => n + i.weight, 0)]),
+    );
+
+    // Weighted pull: the collection's own distribution.
+    function rollItem(c: MCat): MItem {
+      let r = Math.random() * totalWeight.get(c.id)!;
+      for (const item of c.items) {
+        r -= item.weight;
+        if (r <= 0) return item;
+      }
+      return c.items[c.items.length - 1];
+    }
+
+    const oneIn = (p: number) => {
+      const n = 1 / p;
+      if (n >= 1e12) return `1 in ${(n / 1e12).toFixed(1)} trillion`;
+      if (n >= 1e9) return `1 in ${(n / 1e9).toFixed(1)} billion`;
+      if (n >= 1e6) return `1 in ${(n / 1e6).toFixed(1)} million`;
+      if (n >= 1e3) return `1 in ${Math.round(n / 1e3)},000`;
+      return `1 in ${Math.max(2, Math.round(n))}`;
+    };
 
     function updateMeta() {
-      const parts = categories.map((c) => nameOf(c.id, state.get(c.id)!));
+      const parts = categories.map((c) => itemOf(c.id, state.get(c.id)!)?.name ?? state.get(c.id)!);
       recipe.textContent = parts.map((p) => p.toLowerCase()).join(" · ");
       stage.setAttribute("aria-label", `A gator built from: ${parts.join(", ")}`);
-      const hash = "g=" + categories.map((c) => state.get(c.id)).join(".");
-      history.replaceState(null, "", "#" + hash);
+      let p = 1;
+      for (const c of categories) {
+        const it = itemOf(c.id, state.get(c.id)!);
+        if (it) p *= it.weight / totalWeight.get(c.id)!;
+        // Per-reel rarity chip.
+        const chip = root.querySelector<HTMLElement>(`[data-rarity="${c.id}"]`);
+        const nameEl = root.querySelector<HTMLElement>(`[data-name="${c.id}"]`);
+        if (it && chip && nameEl) {
+          nameEl.textContent = it.name;
+          const pct = it.weight / totalWeight.get(c.id)!;
+          chip.textContent = oneIn(pct).replace("1 in ", "1/");
+          chip.classList.toggle("rare", pct < 0.012);
+        }
+      }
+      oddsEl.textContent = `this exact gator: ${oneIn(p)}`;
+      history.replaceState(null, "", "#g=" + categories.map((c) => state.get(c.id)).join("."));
     }
 
-    function markPressed(catId: string) {
-      root
-        .querySelectorAll<HTMLButtonElement>(`[data-option][data-cat="${catId}"]`)
-        .forEach((b) => {
-          b.setAttribute("aria-pressed", String(b.dataset.slug === state.get(catId)));
-        });
-    }
-
-    // Preload with strong refs and a timeout: Image.decode() alone can hang
-    // forever if the detached image is garbage collected mid-decode.
-    const pending = new Set<HTMLImageElement>();
+    // Preload with a timeout race: a detached Image can stall forever.
     function preload(url: string) {
       return new Promise<void>((resolve) => {
         const im = new Image();
-        pending.add(im);
-        let settled = false;
-        const done = () => {
-          if (settled) return;
-          settled = true;
-          pending.delete(im);
-          resolve();
+        let done = false;
+        const fin = () => {
+          if (!done) {
+            done = true;
+            resolve();
+          }
         };
-        im.onload = done;
-        im.onerror = done;
-        setTimeout(done, 1200);
+        im.onload = fin;
+        im.onerror = fin;
+        setTimeout(fin, 1500);
         im.src = url;
       });
     }
 
     async function setLayer(catId: string, slug: string, animate = true) {
-      if (state.get(catId) === slug) return;
       state.set(catId, slug);
-      markPressed(catId);
-      updateMeta();
       const img = layerImgs.get(catId)!;
       const url = `/gators/layers/${catId}/${slug}.webp`;
       await preload(url);
-      if (state.get(catId) !== slug) return; // superseded by a later pick
+      if (state.get(catId) !== slug) return;
       img.src = url;
-      if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        img.classList.remove("swapping");
+      if (animate && !reduced) {
+        img.classList.remove("landing");
         void img.offsetWidth;
-        img.classList.add("swapping");
+        img.classList.add("landing");
       }
     }
 
-    // Restore a shared gator from the hash.
-    const m = location.hash.match(/g=([a-z0-9.-]+)/);
-    if (m) {
-      const slugs = m[1].split(".");
-      categories.forEach((c, i) => {
-        if (slugs[i] && c.items.some((it) => it.slug === slugs[i])) {
-          setLayer(c.id, slugs[i], false);
-        }
+    function cellHtml(catId: string, item: MItem) {
+      return `<div class="gm-cell"><img src="/gators/thumbs/${catId}/${item.slug}.webp" alt="" width="144" height="144" loading="lazy" decoding="async"></div>`;
+    }
+
+    function setReel(catId: string, item: MItem) {
+      const strip = root.querySelector<HTMLElement>(`[data-strip="${catId}"]`)!;
+      strip.style.transition = "none";
+      strip.style.transform = "translateY(0)";
+      strip.innerHTML = cellHtml(catId, item);
+    }
+
+    // Spin one reel: a sampled strip that lands on the target. Real slot
+    // machines never carry every symbol on the reel either.
+    function spinReel(catId: string, target: MItem, duration: number): Promise<void> {
+      const c = byId.get(catId)!;
+      const strip = root.querySelector<HTMLElement>(`[data-strip="${catId}"]`)!;
+      if (reduced) {
+        setReel(catId, target);
+        return Promise.resolve();
+      }
+      const runners: MItem[] = [];
+      for (let i = 0; i < 14; i++) {
+        runners.push(c.items[Math.floor(Math.random() * c.items.length)]);
+      }
+      runners.push(target);
+      strip.style.transition = "none";
+      strip.style.transform = "translateY(0)";
+      strip.innerHTML = runners.map((it) => cellHtml(catId, it)).join("");
+      void strip.offsetWidth;
+      return new Promise((resolve) => {
+        strip.style.transition = `transform ${duration}ms cubic-bezier(0.16, 0.62, 0.2, 1)`;
+        strip.style.transform = `translateY(-${(runners.length - 1) * CELL}px)`;
+        const done = () => {
+          strip.removeEventListener("transitionend", done);
+          setReel(catId, target);
+          resolve();
+        };
+        strip.addEventListener("transitionend", done);
+        setTimeout(done, duration + 400);
       });
     }
 
-    // Option clicks.
-    root.querySelectorAll<HTMLButtonElement>("[data-option]").forEach((btn) => {
-      btn.addEventListener("click", () => setLayer(btn.dataset.cat!, btn.dataset.slug!));
-    });
-
-    // Tabs.
-    const tabs = [...root.querySelectorAll<HTMLButtonElement>("[data-tab]")];
-    function selectTab(tab: HTMLButtonElement) {
-      tabs.forEach((t) => {
-        const on = t === tab;
-        t.setAttribute("aria-selected", String(on));
-        t.tabIndex = on ? 0 : -1;
-        root.querySelector<HTMLElement>(`[data-panel="${t.dataset.tab}"]`)!.hidden = !on;
-      });
-      tab.focus({ preventScroll: true });
+    let spinning = false;
+    async function spin() {
+      if (spinning) return;
+      spinning = true;
+      spinBtn.disabled = true;
+      const targets = new Map<string, MItem>();
+      for (const c of categories) {
+        if (locked.has(c.id)) continue;
+        targets.set(c.id, rollItem(c));
+      }
+      // Warm the layers while the reels are still turning.
+      const warm = [...targets.entries()].map(([id, it]) =>
+        preload(`/gators/layers/${id}/${it.slug}.webp`),
+      );
+      const spins = [...targets.entries()].map(([id, it], i) =>
+        new Promise<void>((res) => {
+          setTimeout(
+            () =>
+              spinReel(id, it, 900 + i * 260).then(() => {
+                setLayer(id, it.slug);
+                updateMeta();
+                res();
+              }),
+            reduced ? 0 : i * 90,
+          );
+        }),
+      );
+      await Promise.all([...spins, ...warm]);
+      spinning = false;
+      spinBtn.disabled = false;
     }
-    tabs.forEach((tab, i) => {
-      tab.addEventListener("click", () => selectTab(tab));
-      tab.addEventListener("keydown", (ev) => {
-        const key = ev.key;
-        if (key !== "ArrowRight" && key !== "ArrowLeft") return;
-        ev.preventDefault();
-        const next = key === "ArrowRight" ? (i + 1) % tabs.length : (i - 1 + tabs.length) % tabs.length;
-        selectTab(tabs[next]);
+
+    spinBtn.addEventListener("click", spin);
+
+    // Locks.
+    root.querySelectorAll<HTMLButtonElement>("[data-lock]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.lock!;
+        const on = !locked.has(id);
+        on ? locked.add(id) : locked.delete(id);
+        btn.setAttribute("aria-pressed", String(on));
+        btn.textContent = on ? "held" : "hold";
+        root.querySelector(`[data-reel="${id}"]`)!.classList.toggle("is-locked", on);
       });
     });
 
-    // Shuffle.
-    root.querySelector("[data-shuffle]")?.addEventListener("click", () => {
-      categories.forEach((c) => {
-        const item = c.items[Math.floor(Math.random() * c.items.length)];
-        setLayer(c.id, item.slug);
+    // Nudges.
+    root.querySelectorAll<HTMLButtonElement>("[data-nudge]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.nudge!;
+        const dir = parseInt(btn.dataset.dir!, 10);
+        const c = byId.get(id)!;
+        const idx = c.items.findIndex((i) => i.slug === state.get(id));
+        const next = c.items[(idx + dir + c.items.length) % c.items.length];
+        setReel(id, next);
+        setLayer(id, next.slug);
+        updateMeta();
       });
     });
 
-    // Download: composite the on-screen stage layers onto a canvas.
-    root.querySelector("[data-download]")?.addEventListener("click", () => {
-      const size = parseInt(root.dataset.size || "800", 10);
+    // Drawer.
+    const drawer = root.querySelector<HTMLElement>("[data-drawer]")!;
+    const drawerGrid = root.querySelector<HTMLElement>("[data-drawer-grid]")!;
+    const drawerTitle = root.querySelector<HTMLElement>("[data-drawer-title]")!;
+    let lastFocus: HTMLElement | null = null;
+
+    function openDrawer(catId: string) {
+      const c = byId.get(catId)!;
+      lastFocus = document.activeElement as HTMLElement;
+      drawerTitle.textContent = `${c.label} · ${c.items.length} options`;
+      drawerGrid.innerHTML = c.items
+        .map(
+          (it) =>
+            `<button type="button" class="gm-opt" data-opt="${it.slug}" aria-pressed="${
+              it.slug === state.get(catId)
+            }" title="${it.name}"><img src="/gators/thumbs/${catId}/${it.slug}.webp" alt="${
+              it.name
+            }" width="144" height="144" loading="lazy" decoding="async"><span class="gm-opt-tag">${
+              it.name
+            }</span></button>`,
+        )
+        .join("");
+      drawerGrid.querySelectorAll<HTMLButtonElement>("[data-opt]").forEach((b) => {
+        b.addEventListener("click", () => {
+          const slug = b.dataset.opt!;
+          const it = itemOf(catId, slug)!;
+          setReel(catId, it);
+          setLayer(catId, slug);
+          updateMeta();
+          drawerGrid
+            .querySelectorAll<HTMLButtonElement>("[data-opt]")
+            .forEach((o) => o.setAttribute("aria-pressed", String(o.dataset.opt === slug)));
+        });
+      });
+      drawer.hidden = false;
+      root.querySelector<HTMLElement>("[data-drawer-close]")!.focus();
+      document.addEventListener("keydown", onKey);
+    }
+    function closeDrawer() {
+      drawer.hidden = true;
+      document.removeEventListener("keydown", onKey);
+      lastFocus?.focus();
+    }
+    function onKey(ev: KeyboardEvent) {
+      if (ev.key === "Escape") closeDrawer();
+    }
+    root.querySelectorAll<HTMLButtonElement>("[data-browse]").forEach((b) => {
+      b.addEventListener("click", () => openDrawer(b.dataset.browse!));
+    });
+    root.querySelector("[data-drawer-close]")!.addEventListener("click", closeDrawer);
+    drawer.addEventListener("pointerdown", (ev) => {
+      if (ev.target === drawer) closeDrawer();
+    });
+
+    // Download: composite the on-screen layers.
+    root.querySelector("[data-download]")!.addEventListener("click", () => {
+      const size = parseInt(root.dataset.size || "600", 10);
       const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
+      canvas.width = canvas.height = size;
       const ctx = canvas.getContext("2d")!;
       for (const c of categories) {
         const img = layerImgs.get(c.id)!;
-        if (img.complete && img.naturalWidth > 0) {
-          ctx.drawImage(img, 0, 0, size, size);
-        }
+        if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, size, size);
       }
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -453,5 +807,19 @@ const comboLabel = combos.toLocaleString("en-US");
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       }, "image/png");
     });
+
+    // Restore a shared gator.
+    const m = location.hash.match(/g=([a-z0-9.\-]+)/i);
+    if (m) {
+      const slugs = m[1].split(".");
+      categories.forEach((c, i) => {
+        const it = slugs[i] && itemOf(c.id, slugs[i]);
+        if (it) {
+          setReel(c.id, it);
+          setLayer(c.id, it.slug, false);
+        }
+      });
+    }
+    updateMeta();
   }
 </script>

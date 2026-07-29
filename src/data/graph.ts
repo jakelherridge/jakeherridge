@@ -183,7 +183,7 @@ export const nodes: GraphNode[] = [
     id: "gators",
     label: "Glitchy Gators",
     kind: "creative",
-    summary: "10,946 generative gators built from more than 300 hand-drawn attributes.",
+    summary: "10,946 generative gators built from 327 hand-drawn attributes.",
     href: "/exhibits/gators/",
   },
   {

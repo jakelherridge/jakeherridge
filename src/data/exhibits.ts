@@ -45,7 +45,7 @@ export const exhibits: Exhibit[] = [
     href: "/exhibits/gators/",
     title: "Glitchy Gator Club",
     label: "Generative art · 2021",
-    line: "10,946 characters from 300+ hand-drawn attributes, minted on Polygon. Build your own from the real layers.",
+    line: "10,946 characters from 327 hand-drawn attributes, minted on Polygon. Build your own from the real layers.",
     image: gatorPoster,
     alt: "A gator built in the machine, on paper: green, grinning, a burger for a hat",
   },
