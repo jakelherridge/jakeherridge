@@ -4,6 +4,7 @@ import gatorPoster from "../assets/gators/gator-poster.png";
 import pocketwildPoster from "../assets/pocketwild-poster.png";
 import synapsePoster from "../assets/synapse-poster.png";
 import monstersPoster from "../assets/monsters-poster.png";
+import swordPoster from "../assets/sword-poster.png";
 
 export interface Exhibit {
   href: string;
@@ -16,6 +17,14 @@ export interface Exhibit {
 }
 
 export const exhibits: Exhibit[] = [
+  {
+    href: "/exhibits/sword/",
+    title: "The Boy and the Sword",
+    label: "Now open · A story",
+    line: "A boy loses a magic sword. Read it at walking pace and watch what he is carrying change.",
+    image: swordPoster,
+    alt: "An ink sketch: a faded sword, a stick, a fish, a fried egg, and firewood",
+  },
   {
     href: "/exhibits/monsters/",
     title: "The Monster Book",

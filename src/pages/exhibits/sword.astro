@@ -1,0 +1,381 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SwordInk from "../../components/SwordInk.astro";
+import { breadcrumb } from "../../lib/schema";
+import { beats, satchel } from "../../data/sword";
+
+const title = "The Boy and the Sword";
+const description =
+  "A short story by Jake Herridge, read at walking pace. A boy loses a magic sword and finds out what he can do without it.";
+
+const jsonLd = [
+  {
+    "@type": "ShortStory",
+    headline: title,
+    description,
+    author: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/exhibits/sword/",
+    genre: "fable",
+  },
+  breadcrumb([
+    { name: "Exhibits", url: "https://jakeherridge.com/exhibits/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/sword/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  {/* One shared hand-drawn filter for every ink sketch on the page. */}
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <filter id="ink-wobble">
+      <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="5" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" />
+    </filter>
+  </svg>
+
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header class="mx-auto max-w-2xl">
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">Exhibit · A story</p>
+      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+        by Jake Herridge · read at walking pace
+      </p>
+      <p class="mt-5 text-lg leading-relaxed text-muted">
+        A boy has a sword that does everything for him. Then it is gone. Keep reading and watch
+        what he is carrying: the sword fades, and the things he actually earns take its place.
+      </p>
+    </header>
+
+    <div class="sw-layout mt-14">
+      <div class="sw-story">
+        {
+          beats.map((b, i) => (
+            <section class="sw-beat" data-beat={i} data-id={b.id}>
+              {b.paras.map((p) => (
+                <p class="sw-p">{p}</p>
+              ))}
+              {b.pull && <p class="sw-pull">{b.pull}</p>}
+            </section>
+          ))
+        }
+      </div>
+
+      <aside class="sw-satchel" data-satchel aria-label="What the boy is carrying">
+        <p class="sw-satchel-title">He is carrying</p>
+        <ul class="sw-items">
+          {
+            satchel.map((s) => (
+              <li class="sw-item" data-item={s.id}>
+                <span class="sw-item-ink">
+                  <SwordInk name={s.id as any} size={40} />
+                </span>
+                <span class="sw-item-label">{s.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="sw-nothing" data-nothing>nothing yet</p>
+      </aside>
+    </div>
+
+    {/* Only the grant sequence goes to the client; the prose is already in
+        the HTML and does not need shipping twice. */}
+    <script
+      type="application/json"
+      data-grants
+      set:html={JSON.stringify(beats.map((b) => b.grant ?? null))}
+    />
+
+    <footer class="mx-auto mt-16 max-w-2xl border-t border-faint pt-6">
+      <a
+        href="/writing/"
+        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        &larr; More writing
+      </a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .sw-layout {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 1000px) {
+    .sw-layout {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+      gap: 3rem;
+      align-items: start;
+    }
+  }
+  .sw-story {
+    max-width: 38rem;
+    margin: 0 auto;
+    min-width: 0;
+  }
+  .sw-beat + .sw-beat {
+    margin-top: 2.2rem;
+  }
+  .sw-p {
+    font-family: var(--font-serif);
+    font-size: 1.18rem;
+    line-height: 1.85;
+    color: var(--color-ink);
+    margin: 0 0 1.25rem;
+  }
+  .sw-story .sw-beat:first-child .sw-p::first-letter {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-weight: 600;
+    font-size: 3.4em;
+    float: left;
+    line-height: 0.82;
+    padding-right: 0.09em;
+    padding-top: 0.05em;
+  }
+  .sw-pull {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-weight: 600;
+    font-size: 1.6rem;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    margin: 3.5rem 0 0;
+    text-align: center;
+  }
+  .sw-beat[data-id="ok"] .sw-pull {
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+    color: var(--color-accent);
+  }
+
+  /* Reveal each beat as it arrives, but never hide text without support. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .sw-beat {
+        animation: sw-in 1ms linear both;
+        animation-timeline: view();
+        animation-range: entry 4% entry 34%;
+      }
+    }
+  }
+  @keyframes sw-in {
+    from {
+      opacity: 0.25;
+      transform: translateY(10px);
+    }
+  }
+
+  /* The satchel: a rail on wide screens, a bar along the bottom on phones. */
+  .sw-satchel {
+    position: sticky;
+    top: 1.5rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 10px;
+    background: var(--color-surface);
+    padding: 0.9rem 1rem 1rem;
+  }
+  .sw-satchel-title {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .sw-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .sw-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--color-ink);
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transition:
+      opacity 0.45s ease,
+      height 0.35s ease;
+  }
+  .sw-item.is-held {
+    opacity: 1;
+    height: 2.6rem;
+  }
+  .sw-item.is-lost {
+    opacity: 0.28;
+    height: 2.6rem;
+    color: var(--color-muted);
+  }
+  .sw-item.is-lost .sw-item-label {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .sw-item-ink {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+  }
+  .sw-item[data-item="sword"].is-held .sw-item-ink {
+    color: var(--color-accent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sw-item[data-item="sword"].is-held .sw-item-ink {
+      animation: sw-shimmer 2.6s ease-in-out infinite;
+    }
+    .sw-item.just-got .sw-item-ink {
+      animation: sw-settle 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+  }
+  @keyframes sw-shimmer {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+  @keyframes sw-settle {
+    0% {
+      transform: translateY(-10px) rotate(-8deg);
+      opacity: 0;
+    }
+    100% {
+      transform: none;
+      opacity: 1;
+    }
+  }
+  .sw-item-label {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+  .sw-nothing {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+  }
+  .sw-satchel.has-any .sw-nothing {
+    display: none;
+  }
+
+  @media (max-width: 999px) {
+    .sw-satchel {
+      position: sticky;
+      bottom: 0;
+      top: auto;
+      z-index: 20;
+      order: 2;
+      border-radius: 10px;
+      box-shadow: 0 -4px 18px rgb(27 26 23 / 0.07);
+    }
+    .sw-items {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.1rem;
+    }
+    .sw-item {
+      height: 0;
+      gap: 0.45rem;
+    }
+    .sw-item.is-held,
+    .sw-item.is-lost {
+      height: 2.2rem;
+    }
+    .sw-item-ink {
+      width: 30px;
+      height: 30px;
+    }
+    .sw-item-ink :global(svg) {
+      width: 30px;
+      height: 30px;
+    }
+    .sw-item-label {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+
+<script>
+  type Grant = { get?: string; lose?: string } | null;
+
+  function run(satchelEl: HTMLElement, beatEls: HTMLElement[], grants: Grant[]) {
+    const items = new Map<string, HTMLElement>();
+    satchelEl.querySelectorAll<HTMLElement>("[data-item]").forEach((el) => {
+      items.set(el.dataset.item!, el);
+    });
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let lastIndex = -1;
+
+    // Derive the whole state from how far the reader has scrolled, so
+    // reading backwards puts the sword back and takes the fish away.
+    function apply(index: number) {
+      if (index === lastIndex) return;
+      const gained = new Set<string>();
+      let swordLost = false;
+      for (let i = 0; i <= index; i++) {
+        const g = grants[i];
+        if (!g) continue;
+        if (g.get) gained.add(g.get);
+        if (g.lose) swordLost = true;
+      }
+      const newlyGained = index > lastIndex;
+      for (const [id, el] of items) {
+        const held = gained.has(id);
+        const lost = id === "sword" && swordLost;
+        const wasHeld = el.classList.contains("is-held");
+        el.classList.toggle("is-held", held && !lost);
+        el.classList.toggle("is-lost", lost);
+        if (held && !lost && !wasHeld && newlyGained && !reduced) {
+          el.classList.remove("just-got");
+          void el.offsetWidth;
+          el.classList.add("just-got");
+        }
+      }
+      satchelEl.classList.toggle("has-any", gained.size > 0 || swordLost);
+      lastIndex = index;
+    }
+
+    // Measured straight through: eleven rect reads is nothing, and routing
+    // it through rAF meant nothing updated on a page that was not painting.
+    function recompute() {
+      const line = innerHeight * 0.62;
+      let idx = -1;
+      for (let i = 0; i < beatEls.length; i++) {
+        if (beatEls[i].getBoundingClientRect().top < line) idx = i;
+      }
+      apply(idx);
+    }
+
+    // IntersectionObserver rather than a scroll listener: it fires for
+    // programmatic jumps and anchor links too, not just wheel and touch.
+    const io = new IntersectionObserver(recompute, {
+      threshold: [0, 0.25, 0.5, 0.75, 1],
+      rootMargin: "-38% 0px -38% 0px",
+    });
+    beatEls.forEach((el) => io.observe(el));
+
+    addEventListener("scroll", recompute, { passive: true });
+    addEventListener("resize", recompute, { passive: true });
+    recompute();
+  }
+
+  const satchelEl = document.querySelector<HTMLElement>("[data-satchel]");
+  const beatEls = [...document.querySelectorAll<HTMLElement>("[data-beat]")];
+  const grantsEl = document.querySelector("[data-grants]");
+  if (satchelEl && beatEls.length && grantsEl) {
+    run(satchelEl, beatEls, JSON.parse(grantsEl.textContent || "[]"));
+  }
+</script>

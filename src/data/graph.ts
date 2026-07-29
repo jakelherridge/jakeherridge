@@ -170,7 +170,7 @@ export const nodes: GraphNode[] = [
     label: "The Boy and the Sword",
     kind: "creative",
     summary: "A story about a boy, a lost magic sword, and learning to fry your own egg.",
-    href: "/stories/the-boy-and-the-sword/",
+    href: "/exhibits/sword/",
   },
   {
     id: "fall-morning",

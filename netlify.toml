@@ -24,6 +24,12 @@
   status = 301
   force = true
 
+# The story graduated into its own exhibit room.
+[[redirects]]
+  from = "/stories/the-boy-and-the-sword/"
+  to = "/exhibits/sword/"
+  status = 301
+
 # Old section URLs live on in the Collection.
 [[redirects]]
   from = "/work/*"
