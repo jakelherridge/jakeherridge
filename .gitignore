@@ -25,3 +25,4 @@ _site/
 # AI working notes (local only)
 CLAUDE.md
 .claude/
+src/assets/gators/.key-proof.png

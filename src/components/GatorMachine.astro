@@ -133,11 +133,11 @@ const glitchyCount = categories.reduce(
                     />
                   </div>
                 </div>
-              </div>
-              <div class="gm-reel-bottom">
+                {/* Nudges ride the window edges so the name below gets the
+                    reel's whole width. */}
                 <button
                   type="button"
-                  class="gm-nudge"
+                  class="gm-nudge gm-nudge-prev"
                   data-nudge={c.id}
                   data-dir="-1"
                   aria-label={`Previous ${c.label.toLowerCase()}`}
@@ -146,16 +146,7 @@ const glitchyCount = categories.reduce(
                 </button>
                 <button
                   type="button"
-                  class="gm-name"
-                  data-browse={c.id}
-                  aria-label={`Browse all ${c.items.length} ${c.label.toLowerCase()} options`}
-                >
-                  <span data-name={c.id}>{item.name}</span>
-                  <span class="gm-rarity" data-rarity={c.id} />
-                </button>
-                <button
-                  type="button"
-                  class="gm-nudge"
+                  class="gm-nudge gm-nudge-next"
                   data-nudge={c.id}
                   data-dir="1"
                   aria-label={`Next ${c.label.toLowerCase()}`}
@@ -163,6 +154,15 @@ const glitchyCount = categories.reduce(
                   &#8250;
                 </button>
               </div>
+              <button
+                type="button"
+                class="gm-name"
+                data-browse={c.id}
+                aria-label={`Browse all ${c.items.length} ${c.label.toLowerCase()} options`}
+              >
+                <span data-name={c.id}>{item.name}</span>
+                <span class="gm-rarity" data-rarity={c.id} />
+              </button>
             </div>
           );
         })
@@ -201,6 +201,14 @@ const glitchyCount = categories.reduce(
       grid-template-columns: 5fr 7fr;
       gap: 1.5rem;
     }
+  }
+  /* Grid items default to min-width:auto, so a long trait name would widen
+     the reels column, squeeze the stage column, and resize the square
+     gator on every pull. Pin both tracks to the declared fractions. */
+  .gm-left,
+  .gm-reels,
+  .gm-reel {
+    min-width: 0;
   }
   .gm-stage {
     position: relative;
@@ -415,28 +423,35 @@ const glitchyCount = categories.reduce(
     height: auto;
     display: block;
   }
-  .gm-reel-bottom {
-    display: flex;
-    align-items: stretch;
-    gap: 0.15rem;
-  }
   .gm-nudge {
-    flex: none;
-    width: 1.3rem;
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    width: 1.15rem;
+    height: 1.7rem;
+    padding: 0;
     border: 1px solid var(--color-faint);
     border-radius: 4px;
-    background: var(--color-surface);
+    background: rgb(255 255 255 / 0.86);
     color: var(--color-muted);
     font-size: 0.8rem;
     line-height: 1;
     cursor: pointer;
   }
+  .gm-nudge-prev {
+    left: 2px;
+  }
+  .gm-nudge-next {
+    right: 2px;
+  }
   .gm-nudge:hover {
     color: var(--color-accent);
     border-color: var(--color-accent);
+    background: #fff;
   }
   .gm-name {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     border: 1px solid transparent;
     border-radius: 4px;
@@ -451,13 +466,19 @@ const glitchyCount = categories.reduce(
   .gm-name:hover {
     border-color: var(--color-faint);
   }
+  /* Two lines, always reserved: the reels are narrow at six across, and a
+     name that grew a line would push the row and resize everything. */
   .gm-name > span:first-child {
     font-family: var(--font-mono);
-    font-size: 0.58rem;
+    font-size: 0.56rem;
+    line-height: 1.35;
     color: var(--color-ink);
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    min-height: 2.7em;
   }
   .gm-rarity {
     font-family: var(--font-mono);
@@ -642,6 +663,7 @@ const glitchyCount = categories.reduce(
         const nameEl = root.querySelector<HTMLElement>(`[data-name="${c.id}"]`);
         if (it && chip && nameEl) {
           nameEl.textContent = it.name;
+          nameEl.title = it.name;
           const pct = it.weight / totalWeight.get(c.id)!;
           chip.textContent = oneIn(pct).replace("1 in ", "1/");
           chip.classList.toggle("rare", pct < 0.012);
