@@ -17,13 +17,13 @@ const OUT = new URL("../public/gators", import.meta.url).pathname;
 const MANIFEST = new URL("../src/data/gator-machine.json", import.meta.url).pathname;
 
 // Stack order is meaningful: background at the bottom, head on top.
-// Eyes sit above mouth, per the generator.
+// Eyes sit BELOW mouth, per the generator.
 const CATEGORIES = [
   { id: "background", label: "Background", dir: "Background" },
   { id: "body", label: "Body", dir: "Body" },
   { id: "arms", label: "Arms", dir: "Arms" },
-  { id: "mouth", label: "Mouth", dir: "Mouth" },
   { id: "eyes", label: "Eyes", dir: "Eyes" },
+  { id: "mouth", label: "Mouth", dir: "Mouth" },
   { id: "head", label: "Head", dir: "Head" },
 ];
 
