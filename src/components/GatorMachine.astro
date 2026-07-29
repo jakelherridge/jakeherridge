@@ -328,16 +328,12 @@ const glitchyCount = categories.reduce(
     cursor: default;
   }
 
-  /* Reels: two rows of three on phones, six across on wide screens. */
+  /* Two rows of three everywhere: six across left each reel too narrow to
+     read the trait or see the art. */
   .gm-reels {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-  }
-  @media (min-width: 1100px) {
-    .gm-reels {
-      grid-template-columns: repeat(6, 1fr);
-    }
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
   }
   .gm-reel {
     border: 1px solid var(--color-faint);
@@ -391,7 +387,7 @@ const glitchyCount = categories.reduce(
     border-radius: 5px;
     background: var(--color-paper);
     border: 1px solid var(--color-faint);
-    height: 84px;
+    height: 124px;
   }
   /* A faint glass shine so the window reads as a machine, not a box. */
   .gm-window::after {
@@ -411,7 +407,7 @@ const glitchyCount = categories.reduce(
     will-change: transform;
   }
   .gm-cell {
-    height: 84px;
+    height: 124px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -470,7 +466,7 @@ const glitchyCount = categories.reduce(
      name that grew a line would push the row and resize everything. */
   .gm-name > span:first-child {
     font-family: var(--font-mono);
-    font-size: 0.56rem;
+    font-size: 0.68rem;
     line-height: 1.35;
     color: var(--color-ink);
     display: -webkit-box;
@@ -482,7 +478,7 @@ const glitchyCount = categories.reduce(
   }
   .gm-rarity {
     font-family: var(--font-mono);
-    font-size: 0.5rem;
+    font-size: 0.58rem;
     color: var(--color-muted);
   }
   .gm-rarity.rare {
@@ -604,7 +600,7 @@ const glitchyCount = categories.reduce(
     const recipe = root.querySelector<HTMLElement>("[data-recipe]")!;
     const oddsEl = root.querySelector<HTMLElement>("[data-odds]")!;
     const spinBtn = root.querySelector<HTMLButtonElement>("[data-spin]")!;
-    const CELL = 84;
+    const CELL = 124; // must match .gm-window / .gm-cell height in the CSS
 
     const layerImgs = new Map<string, HTMLImageElement>();
     stage.querySelectorAll<HTMLImageElement>("[data-layer]").forEach((img) => {
