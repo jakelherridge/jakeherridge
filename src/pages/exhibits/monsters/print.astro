@@ -1,0 +1,204 @@
+---
+// The print sheet. Takes ?ids=01,04,09 and lays each monster out as one full
+// page, then opens the print dialog. No PDF library ships to the browser: the
+// page rules below are what pin orientation and size, and "Save as PDF" in the
+// dialog gives a file for anyone who wants one.
+import monsters from "../../../data/monsters.json";
+
+const title = "Print monsters";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title}</title>
+    <style>
+      @page {
+        size: letter portrait;
+        margin: 0;
+      }
+      :root {
+        --paper: #fbfaf7;
+        --ink: #1b1a17;
+        --muted: #6c6a63;
+        --faint: #e7e3da;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      .bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--faint);
+        background: #fff;
+        position: sticky;
+        top: 0;
+      }
+      .bar p {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .btn {
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.5rem 0.95rem;
+        border-radius: 5px;
+        border: 1px solid var(--faint);
+        background: #fff;
+        color: var(--ink);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .btn-strong {
+        background: #1f6b54;
+        border-color: #1f6b54;
+        color: var(--paper);
+      }
+      .sheets {
+        padding: 1.25rem;
+        display: grid;
+        gap: 1.25rem;
+        justify-items: center;
+      }
+      .sheet {
+        width: 100%;
+        max-width: 640px;
+        background: #fff;
+        border: 1px solid var(--faint);
+      }
+      .sheet img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      @media print {
+        .bar {
+          display: none;
+        }
+        /* Belt and braces: a display rule below must never resurrect a hidden
+           sheet into a printed page. */
+        [hidden] {
+          display: none !important;
+        }
+        body {
+          background: #fff;
+        }
+        .sheets {
+          padding: 0;
+          gap: 0;
+          display: block;
+        }
+        .sheet {
+          max-width: none;
+          border: 0;
+          /* One monster per sheet of paper. The image already carries its own
+             print margin, so the page gets none. */
+          width: 100%;
+          height: 100vh;
+          break-after: page;
+          page-break-after: always;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .sheet:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+        .sheet img {
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bar">
+      <button type="button" class="btn btn-strong" data-print>Print</button>
+      <a class="btn" href="/exhibits/monsters/">Back to the monsters</a>
+      <p data-summary></p>
+    </div>
+
+    <div class="sheets" data-sheets>
+      {
+        monsters.map((m) => (
+          <div class="sheet" data-sheet data-id={m.id} hidden>
+            <img
+              src={`/monsters/print/${m.id}.png`}
+              alt={`Coloring page: ${m.title}`}
+              width="2550"
+              height="3300"
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const raw = params.get("ids") || "";
+      const paper = params.get("paper") === "a4" ? "a4" : "letter";
+
+      const sheets = [...document.querySelectorAll<HTMLElement>("[data-sheet]")];
+      const wanted =
+        raw === "all" || raw === ""
+          ? sheets.map((s) => s.dataset.id!)
+          : raw.split(",").map((s) => s.trim()).filter(Boolean);
+
+      // Keep only the requested monsters, in the order they were asked for, and
+      // take the rest out of the document entirely. Hiding them is not enough:
+      // the print rules below set `display: flex` on a sheet, which beats the
+      // `hidden` attribute and silently prints all sixteen pages.
+      const box = document.querySelector<HTMLElement>("[data-sheets]")!;
+      const byId = new Map(sheets.map((s) => [s.dataset.id!, s]));
+      const keep = wanted.map((id) => byId.get(id)).filter(Boolean) as HTMLElement[];
+      for (const s of sheets) s.remove();
+      for (const el of keep) {
+        el.hidden = false;
+        box.appendChild(el);
+      }
+      const shown = keep.length;
+
+      // @page size cannot be set from a media query, so write the rule.
+      const rule = document.createElement("style");
+      rule.textContent = `@page { size: ${paper} portrait; margin: 0 }`;
+      document.head.appendChild(rule);
+
+      const summary = document.querySelector<HTMLElement>("[data-summary]")!;
+      summary.textContent = `${shown} ${shown === 1 ? "sheet" : "sheets"}, ${
+        paper === "a4" ? "A4" : "US Letter"
+      }, portrait.`;
+
+      document.querySelector("[data-print]")!.addEventListener("click", () => window.print());
+
+      // Open the dialog once the images are actually decoded. Printing before
+      // they land produces blank pages on some browsers.
+      const imgs = [...box.querySelectorAll<HTMLImageElement>("[data-sheet]:not([hidden]) img")];
+      Promise.all(
+        imgs.map((i) =>
+          i.complete ? Promise.resolve() : new Promise((r) => { i.onload = r; i.onerror = r; }),
+        ),
+      ).then(() => {
+        if (shown > 0) setTimeout(() => window.print(), 120);
+      });
+    </script>
+  </body>
+</html>

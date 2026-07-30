@@ -1,0 +1,98 @@
+[
+  {
+    "id": "01",
+    "number": 1,
+    "title": "Monster 01",
+    "aspect": 0.7571
+  },
+  {
+    "id": "02",
+    "number": 2,
+    "title": "Monster 02",
+    "aspect": 0.6931
+  },
+  {
+    "id": "03",
+    "number": 3,
+    "title": "Monster 03",
+    "aspect": 0.7444
+  },
+  {
+    "id": "04",
+    "number": 4,
+    "title": "Monster 04",
+    "aspect": 0.6767
+  },
+  {
+    "id": "05",
+    "number": 5,
+    "title": "Monster 05",
+    "aspect": 0.7253
+  },
+  {
+    "id": "06",
+    "number": 6,
+    "title": "Monster 06",
+    "aspect": 0.7247
+  },
+  {
+    "id": "07",
+    "number": 7,
+    "title": "Monster 07",
+    "aspect": 0.8181
+  },
+  {
+    "id": "08",
+    "number": 8,
+    "title": "Monster 08",
+    "aspect": 0.718
+  },
+  {
+    "id": "09",
+    "number": 9,
+    "title": "Monster 09",
+    "aspect": 0.691
+  },
+  {
+    "id": "10",
+    "number": 10,
+    "title": "Monster 10",
+    "aspect": 0.6478
+  },
+  {
+    "id": "11",
+    "number": 11,
+    "title": "Monster 11",
+    "aspect": 0.7759
+  },
+  {
+    "id": "12",
+    "number": 12,
+    "title": "Monster 12",
+    "aspect": 0.744
+  },
+  {
+    "id": "13",
+    "number": 13,
+    "title": "Monster 13",
+    "aspect": 0.7107
+  },
+  {
+    "id": "14",
+    "number": 14,
+    "title": "Monster 14",
+    "aspect": 0.774
+  },
+  {
+    "id": "15",
+    "number": 15,
+    "title": "Monster 15",
+    "aspect": 0.6642
+  },
+  {
+    "id": "16",
+    "number": 16,
+    "title": "Monster 16",
+    "aspect": 0.7319
+  }
+]

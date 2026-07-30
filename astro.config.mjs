@@ -10,7 +10,13 @@ import paperPdf from './integrations/pdf.mjs';
 // defining them here too would emit meta-refresh pages that shadow them.
 export default defineConfig({
   site: 'https://jakeherridge.com',
-  integrations: [mdx(), sitemap(), paperPdf()],
+  // The monster print sheet is a utility view driven by query params, not a
+  // page anyone should land on from search. It carries noindex too.
+  integrations: [
+    mdx(),
+    sitemap({ filter: (page) => !page.includes('/exhibits/monsters/print') }),
+    paperPdf(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

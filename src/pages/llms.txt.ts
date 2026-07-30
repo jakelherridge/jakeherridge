@@ -25,7 +25,7 @@ export const GET: APIRoute = async () => {
 
   txt += `\n## Exhibits\n`;
   txt += `- [The Boy and the Sword](${SITE}/exhibits/sword/): A short story, read at walking pace. A boy loses a magic sword and learns what he can do without it. The reading room tracks what he is carrying as you scroll: the sword fades, and the things he earns take its place.\n`;
-  txt += `- [The Monster Book](${SITE}/exhibits/monsters/): A coloring book in progress. 16 hand-drawn ink monsters as an interactive notebook: flip pages, color inside the monsters with a strict palette, the surrounding paper is locked.\n`;
+  txt += `- [The Monster Book](${SITE}/exhibits/monsters/): Free printable coloring pages. Hand-drawn ink monsters, scanned at print resolution and set on a full sheet: download one as a US Letter or A4 PDF, print five at random, or color one in the browser on a canvas where the paper around the monster is locked. New monsters get added as they are drawn.\n`;
   txt += `- [Synapse](${SITE}/exhibits/synapse/): Jake's knowledge system running in the open. 49 real nodes with typed edges, provenance, and verification statuses, plus a traversal machine that answers with citations.\n`;
   txt += `- [PocketWild](${SITE}/exhibits/pocketwild/): The iOS field journal in the browser. Log captures from the 228-species index, roll names from the app's real name pool, fill a meadow. Narrated by Aldo. App: https://www.pocketwild.app/\n`;
   txt += `- [Glitchy Gator Club](${SITE}/exhibits/gators/): 10,946 generative gator characters from 327 hand-drawn attributes, minted on Polygon in 2021. Includes an interactive builder using the real layers. Collection: https://opensea.io/collection/glitchygatorclub\n`;

@@ -28,8 +28,8 @@ export const exhibits: Exhibit[] = [
   {
     href: "/exhibits/monsters/",
     title: "The Monster Book",
-    label: "Now open · Coloring book",
-    line: "16 hand-drawn ink monsters as a notebook you can flip through and color. The paper is locked; the monsters are not.",
+    label: "Now open · Coloring pages",
+    line: "Hand-drawn ink monsters, free to print. Black on white, sized to a full sheet, Letter or A4. Or color one in the browser.",
     image: monstersPoster,
     alt: "A colored page from the book: a blue four-eyed monster with gold tusks",
   },

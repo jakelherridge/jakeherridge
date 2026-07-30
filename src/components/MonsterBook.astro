@@ -4,7 +4,11 @@
 // and the paper around each monster is locked: at load we flood from the
 // page borders to build an "outside" mask, and clicks there bounce.
 // Colors multiply over a textured warm paper so fills read like marker.
-const PAGES = 16;
+//
+// This is the room's smaller half now: the printable library above is the main
+// event. The library dispatches `monsters:color` to open a chosen page here.
+import monsters from "../data/monsters.json";
+const PAGES = monsters.length;
 
 const PALETTE = [
   "#5c7f4e",
@@ -555,6 +559,12 @@ const PALETTE = [
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       }, "image/png");
+    });
+
+    // The library above hands a monster over to be colored.
+    addEventListener("monsters:color", (ev) => {
+      const p = (ev as CustomEvent<{ page: number }>).detail?.page;
+      if (typeof p === "number") flipTo(p);
     });
 
     loadPage(1);

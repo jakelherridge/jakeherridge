@@ -1,0 +1,373 @@
+---
+// The printable library: every monster as a free coloring sheet you can take
+// away. Downloads are static files, so they work whether or not the print
+// counter is reachable. The counter only ever adds a number to a card.
+import monsters from "../data/monsters.json";
+---
+
+<section class="ml" data-library>
+  <div class="ml-bar">
+    <div class="ml-bar-actions">
+      <button type="button" class="ml-btn ml-btn-strong" data-random>Print 5 at random</button>
+      <a class="ml-btn" href="/exhibits/monsters/print/?ids=all" data-print-all>Print all 16</a>
+    </div>
+    <div class="ml-bar-opts">
+      <div class="ml-seg" role="group" aria-label="Paper size">
+        <button type="button" data-paper="letter" aria-pressed="true">Letter</button>
+        <button type="button" data-paper="a4" aria-pressed="false">A4</button>
+      </div>
+      {/* Hidden until at least one sheet has been printed, so the room never
+          shows an order control with only one order in it. */}
+      <div class="ml-seg" role="group" aria-label="Order" data-sort-group hidden>
+        <button type="button" data-sort="number" aria-pressed="true">Newest</button>
+        <button type="button" data-sort="prints" aria-pressed="false">Most printed</button>
+      </div>
+    </div>
+  </div>
+
+  <ul class="ml-grid" data-grid>
+    {
+      monsters.map((m) => (
+        <li class="ml-card" data-card data-id={m.id} data-number={m.number}>
+          <a class="ml-sheet" href={`/monsters/print/${m.id}.png`} data-open>
+            <img
+              src={`/monsters/thumbs/${m.id}.webp`}
+              alt={`Coloring page: ${m.title}, an ink monster drawn by hand`}
+              width="850"
+              height="1100"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+          <div class="ml-meta">
+            <p class="ml-no">
+              {m.title}
+              <span class="ml-count" data-count hidden />
+            </p>
+            <div class="ml-links">
+              <a
+                class="ml-btn ml-btn-sm ml-btn-strong"
+                href={`/monsters/print/${m.id}-letter.pdf`}
+                download
+                data-pdf
+                data-base={m.id}
+              >
+                Download
+              </a>
+              <a class="ml-btn ml-btn-sm" href={`/exhibits/monsters/print/?ids=${m.id}`} data-print>
+                Print
+              </a>
+              <button type="button" class="ml-btn ml-btn-sm" data-color-it>Color it here</button>
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="ml-note">
+    Sheets are US Letter or A4, portrait, black on white, sized to the page. Print
+    at 100 percent, or let the dialog fit to page. New monsters get added as they
+    are drawn.
+  </p>
+</section>
+
+<style>
+  .ml {
+    margin-top: 2rem;
+  }
+  .ml-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-faint);
+  }
+  .ml-bar-actions,
+  .ml-bar-opts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ml-btn {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 0.95rem;
+    border-radius: 5px;
+    border: 1px solid var(--color-faint);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .ml-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .ml-btn-strong {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-paper);
+  }
+  .ml-btn-strong:hover {
+    background: var(--color-accent-strong);
+    border-color: var(--color-accent-strong);
+    color: var(--color-paper);
+  }
+  .ml-btn-sm {
+    font-size: 0.76rem;
+    padding: 0.36rem 0.7rem;
+  }
+  .ml-seg {
+    display: inline-flex;
+    border: 1px solid var(--color-faint);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .ml-seg button {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.42rem 0.7rem;
+    border: 0;
+    background: var(--color-surface);
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+  .ml-seg button + button {
+    border-left: 1px solid var(--color-faint);
+  }
+  .ml-seg button[aria-pressed="true"] {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-strong);
+  }
+
+  .ml-grid {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  }
+  .ml-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  /* The sheet itself: the drawing sitting on paper, with the slight lift of a
+     real page rather than a boxed screenshot. */
+  .ml-sheet {
+    display: block;
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 3px;
+    padding: 0.9rem;
+    box-shadow: 0 1px 2px rgb(27 26 23 / 0.05);
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  /* Every card is the same sheet of paper, because every download is. Holding
+     the page ratio and centring the drawing inside it makes the grid read as a
+     stack of sheets and shows the printed result, rather than 16 crops of
+     different shapes. */
+  .ml-sheet img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 8.5 / 11;
+    object-fit: contain;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ml-card:nth-child(odd) .ml-sheet:hover {
+      transform: translateY(-3px) rotate(-0.6deg);
+    }
+    .ml-card:nth-child(even) .ml-sheet:hover {
+      transform: translateY(-3px) rotate(0.6deg);
+    }
+  }
+  .ml-sheet:hover {
+    box-shadow: 0 8px 20px rgb(27 26 23 / 0.1);
+  }
+  .ml-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .ml-no {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .ml-count {
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ml-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .ml-note {
+    margin: 2rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+</style>
+
+<script>
+  const COUNTS_URL = "/.netlify/functions/monster-prints";
+  const PAPER_KEY = "monsters:paper";
+  const SEEN_KEY = "monsters:counted";
+
+  function init(root: HTMLElement) {
+    const grid = root.querySelector<HTMLElement>("[data-grid]")!;
+    const cards = [...root.querySelectorAll<HTMLElement>("[data-card]")];
+    const ids = cards.map((c) => c.dataset.id!);
+    let paper = localStorage.getItem(PAPER_KEY) === "a4" ? "a4" : "letter";
+
+    // ----- paper size -----
+    function applyPaper() {
+      root.querySelectorAll<HTMLAnchorElement>("[data-pdf]").forEach((a) => {
+        a.href = `/monsters/print/${a.dataset.base}-${paper}.pdf`;
+      });
+      root
+        .querySelectorAll<HTMLButtonElement>("[data-paper]")
+        .forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.paper === paper)));
+    }
+    root.querySelectorAll<HTMLButtonElement>("[data-paper]").forEach((b) =>
+      b.addEventListener("click", () => {
+        paper = b.dataset.paper!;
+        localStorage.setItem(PAPER_KEY, paper);
+        applyPaper();
+      }),
+    );
+    applyPaper();
+
+    // ----- print counts -----
+    // Best effort in both directions. If the function is missing or erroring,
+    // the room quietly has no counts and every download still works, because
+    // the sheets are static files.
+    const counted = (): string[] => {
+      try {
+        return JSON.parse(sessionStorage.getItem(SEEN_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    };
+
+    function tally(id: string) {
+      const seen = counted();
+      if (seen.includes(id)) return; // one visit, one tally per monster
+      seen.push(id);
+      sessionStorage.setItem(SEEN_KEY, JSON.stringify(seen));
+      const body = JSON.stringify({ id });
+      // sendBeacon survives the navigation a download can trigger.
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(COUNTS_URL, new Blob([body], { type: "application/json" }));
+      } else {
+        fetch(COUNTS_URL, { method: "POST", body, keepalive: true }).catch(() => {});
+      }
+      const el = root.querySelector<HTMLElement>(`[data-card][data-id="${id}"] [data-count]`);
+      if (el && !el.hidden) el.textContent = `${(parseInt(el.dataset.n || "0", 10) || 0) + 1} printed`;
+    }
+
+    function paintCounts(counts: Record<string, number>) {
+      let any = false;
+      for (const card of cards) {
+        const n = counts[card.dataset.id!] ?? 0;
+        const el = card.querySelector<HTMLElement>("[data-count]")!;
+        el.dataset.n = String(n);
+        if (n > 0) {
+          el.textContent = `${n} printed`;
+          el.hidden = false;
+          any = true;
+        }
+      }
+      if (any) root.querySelector<HTMLElement>("[data-sort-group]")!.hidden = false;
+    }
+
+    fetch(COUNTS_URL)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && paintCounts(d))
+      .catch(() => {});
+
+    // ----- sort -----
+    // Reorder with the `order` property rather than moving nodes, so nothing
+    // reloads and the images never flicker.
+    root.querySelectorAll<HTMLButtonElement>("[data-sort]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const mode = b.dataset.sort;
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-sort]")
+          .forEach((s) => s.setAttribute("aria-pressed", String(s === b)));
+        const ranked = [...cards].sort((x, y) => {
+          if (mode === "prints") {
+            const dx = parseInt(y.querySelector<HTMLElement>("[data-count]")!.dataset.n || "0", 10);
+            const dy = parseInt(x.querySelector<HTMLElement>("[data-count]")!.dataset.n || "0", 10);
+            if (dx !== dy) return dx - dy;
+          }
+          return Number(x.dataset.number) - Number(y.dataset.number);
+        });
+        ranked.forEach((c, i) => (c.style.order = String(i)));
+        grid.setAttribute("data-order", mode!);
+      }),
+    );
+
+    // ----- downloads and printing -----
+    root.querySelectorAll<HTMLAnchorElement>("[data-pdf]").forEach((a) =>
+      a.addEventListener("click", () => tally(a.dataset.base!)),
+    );
+    root.querySelectorAll<HTMLElement>("[data-card]").forEach((card) => {
+      card.querySelector("[data-print]")?.addEventListener("click", () => tally(card.dataset.id!));
+      card.querySelector("[data-open]")?.addEventListener("click", () => tally(card.dataset.id!));
+    });
+
+    root.querySelector("[data-random]")!.addEventListener("click", () => {
+      const pick = [...ids].sort(() => Math.random() - 0.5).slice(0, 5);
+      pick.forEach(tally);
+      location.href = `/exhibits/monsters/print/?ids=${pick.join(",")}&paper=${paper}`;
+    });
+    root.querySelector("[data-print-all]")!.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      ids.forEach(tally);
+      location.href = `/exhibits/monsters/print/?ids=${ids.join(",")}&paper=${paper}`;
+    });
+    root.querySelectorAll<HTMLAnchorElement>("[data-print]").forEach((a) =>
+      a.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        location.href = `${a.getAttribute("href")}&paper=${paper}`;
+      }),
+    );
+
+    // ----- hand off to the coloring canvas -----
+    root.querySelectorAll<HTMLElement>("[data-color-it]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const id = b.closest<HTMLElement>("[data-card]")!.dataset.id!;
+        dispatchEvent(new CustomEvent("monsters:color", { detail: { page: parseInt(id, 10) } }));
+        document.querySelector("#color-one")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }),
+    );
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-library]");
+  if (root) init(root);
+</script>

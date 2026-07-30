@@ -1,6 +1,7 @@
 [build]
   command = "npx playwright install chromium && npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -42,7 +43,8 @@
   status = 301
 
 # Security headers. CSP keeps script-src 'unsafe-inline' for the inline
-# JSON-LD blocks; the site takes no user input, so the XSS surface is nil.
+# JSON-LD blocks. The only thing the site posts is a monster id to its own
+# function, and connect-src 'self' already covers that.
 [[headers]]
   for = "/*"
   [headers.values]
