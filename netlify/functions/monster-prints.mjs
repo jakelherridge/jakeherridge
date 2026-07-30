@@ -13,10 +13,12 @@
 // function is cold, broken, or removed, the downloads all still work and the
 // counts simply do not appear.
 import { getStore } from "@netlify/blobs";
+import monsters from "../../src/data/monsters.json" with { type: "json" };
 
-// Ids are the manifest's zero-padded numbers. Validating the shape keeps an
-// open endpoint from being used to write arbitrary keys into the store.
-const ID = /^\d{2}$/;
+// Ids are the manifest's zero-padded numbers. Validating against the manifest
+// keeps an open endpoint from being used to write arbitrary keys into the
+// store, and means a new monster needs no change here.
+const IDS = monsters.map((m) => m.id);
 const STORE = "monster-prints";
 
 const json = (body, status = 200) =>
@@ -34,13 +36,14 @@ export default async (req) => {
   const store = getStore(STORE);
 
   if (req.method === "GET") {
-    const { blobs } = await store.list();
+    // Read the manifest's ids directly rather than calling store.list().
+    // Blobs reads are strongly consistent but listings are not, so list() can
+    // return nothing for a key that was just written, which made every count
+    // read as zero no matter how many downloads had happened.
     const entries = await Promise.all(
-      blobs
-        .filter((b) => ID.test(b.key))
-        .map(async (b) => [b.key, Number(await store.get(b.key)) || 0]),
+      IDS.map(async (id) => [id, Number(await store.get(id)) || 0]),
     );
-    return json(Object.fromEntries(entries));
+    return json(Object.fromEntries(entries.filter(([, n]) => n > 0)));
   }
 
   if (req.method === "POST") {
@@ -50,7 +53,7 @@ export default async (req) => {
     } catch {
       return json({ error: "expected json" }, 400);
     }
-    if (typeof id !== "string" || !ID.test(id)) return json({ error: "bad id" }, 400);
+    if (typeof id !== "string" || !IDS.includes(id)) return json({ error: "bad id" }, 400);
 
     // Read, add one, write. Netlify Blobs has no atomic increment, so two
     // downloads landing in the same instant can cost a tally. For a count of
