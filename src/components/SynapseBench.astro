@@ -1,0 +1,882 @@
+---
+// The Synapse bench: the brain on the left, wires to a reading rig on the
+// right. The rig is Jake's rendered instrument console (background lifted
+// off); the CRT, the readout strip, and the four keys are live regions
+// positioned over it by measured percentages, same trick as the gator
+// machine. The CRT shows the whole vault swirling in 3D: every dot is a real
+// file, anonymous, and only the 49 allowlisted nodes carry names. Pressing a
+// key runs a real traversal: the trace ticks on the readout, the visited
+// nodes flare in the swirl, and the answer lands on paper with citations.
+//
+// The wires are SVG drawn at runtime between the two pieces, so pulses can
+// ride them and the bench can restack on phones.
+import { Image } from "astro:assets";
+import brainImg from "../assets/synapse-brain.png";
+import rigImg from "../assets/synapse-rig.png";
+import vault from "../../public/synapse/vault.json";
+import { demos } from "../data/synapse-demo";
+
+// Live regions, measured off the trimmed 639x733 render.
+const CRT = { x: 21.6, y: 14.7, w: 57.9, h: 38.9 };
+const STRIP = { x: 25.5, y: 63.4, w: 50.9, h: 8.5 };
+const KEYS = [26.9, 35.7, 44.6, 53.5]; // centers, % of rig width
+const KEY = { cy: 84.3, d: 9.4 };
+const PLATE = { y: 90.2, w: 10.6, h: 3.2 };
+const KEY_LABELS = ["ORIGIN", "VECTORS", "BOOKS", "CONFLICT"];
+
+// Which named dots each demo's trace visits, in order, derived from the
+// step text so the swirl walks exactly what the trace says.
+const namedSlugs = Object.keys(vault.named);
+const demoPayload = demos.map((d) => {
+  const seen = new Set();
+  const path = [];
+  for (const s of d.steps) {
+    for (const slug of namedSlugs) {
+      if (!seen.has(slug) && s.text.includes(slug)) {
+        seen.add(slug);
+        path.push(slug);
+      }
+    }
+  }
+  return { id: d.id, q: d.q, steps: d.steps, answerHtml: d.answerHtml, path };
+});
+
+const stats = {
+  n: vault.n,
+  e: vault.e,
+  v: vault.v,
+  d: vault.d,
+  named: namedSlugs.length,
+};
+---
+
+<section class="syb" data-bench>
+  <div class="syb-scene" data-scene>
+    <figure class="syb-brain" data-brain>
+      <Image
+        src={brainImg}
+        alt="A coral-pink brain drawn as a network of connected nodes"
+        widths={[380, 560, 749]}
+        sizes="(max-width: 900px) 240px, 340px"
+        format="png"
+        loading="eager"
+      />
+    </figure>
+
+    <svg class="syb-wires" data-wires aria-hidden="true"></svg>
+
+    <div class="syb-rig" data-rig>
+      <Image
+        src={rigImg}
+        alt=""
+        widths={[420, 639]}
+        sizes="(max-width: 900px) 92vw, 460px"
+        format="png"
+        loading="eager"
+        class="syb-rig-img"
+      />
+      <div
+        class="syb-crt"
+        style={`left:${CRT.x}%;top:${CRT.y}%;width:${CRT.w}%;height:${CRT.h}%`}
+      >
+        <canvas
+          data-swirl
+          aria-label={`The whole Synapse vault as a slowly turning 3D graph: ${stats.n} nodes, ${stats.e} edges. ${stats.named} named nodes can be opened.`}
+        ></canvas>
+      </div>
+      <div
+        class="syb-strip"
+        style={`left:${STRIP.x}%;top:${STRIP.y}%;width:${STRIP.w}%;height:${STRIP.h}%`}
+      >
+        <span data-strip-text></span>
+      </div>
+      {
+        demoPayload.map((d, i) => (
+          <button
+            type="button"
+            class="syb-key"
+            data-key={d.id}
+            aria-label={d.q}
+            title={d.q}
+            style={`left:${KEYS[i] - KEY.d / 2}%;top:${KEY.cy - (KEY.d * (639 / 733)) / 2}%;width:${KEY.d}%`}
+          />
+        ))
+      }
+      {
+        KEY_LABELS.map((label, i) => (
+          <span
+            class="syb-plate"
+            aria-hidden="true"
+            style={`left:${KEYS[i] - PLATE.w / 2}%;top:${PLATE.y}%;width:${PLATE.w}%;height:${PLATE.h}%`}
+          >
+            {label}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+
+  <p class="syb-hint">
+    Press a key to ask, or touch a bright node. The dim dots are real too; they
+    just stay anonymous.
+  </p>
+
+  <div class="syb-answer" data-answer hidden>
+    <p class="syb-q" data-q></p>
+    <div class="syb-a" data-a></div>
+  </div>
+
+  <aside class="syb-card" data-card hidden aria-live="polite"></aside>
+
+  <p class="syb-label">
+    {stats.n.toLocaleString("en-US")} nodes · {stats.e.toLocaleString("en-US")} typed
+    edges · {stats.v} verified · exported {stats.d}. The shape is the whole vault;
+    the {stats.named} named nodes are the public part.
+  </p>
+
+  <script
+    type="application/json"
+    data-syb-data
+    set:html={JSON.stringify({ vault, demos: demoPayload })}
+  />
+</section>
+
+<style is:global>
+  /* Global for the same reason as the machine: cards and cites are injected
+     at runtime and scoped selectors would not match them. */
+  .syb-scene {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4fr 7fr;
+    align-items: center;
+    gap: clamp(1rem, 6vw, 4rem);
+  }
+  @media (max-width: 899px) {
+    .syb-scene {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 3.2rem;
+    }
+  }
+  .syb-brain {
+    margin: 0;
+    max-width: 340px;
+    justify-self: center;
+  }
+  @media (max-width: 899px) {
+    .syb-brain {
+      max-width: 240px;
+    }
+  }
+  .syb-brain img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 22px rgb(27 26 23 / 0.18));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .syb-brain {
+      animation: syb-breathe 5.5s ease-in-out infinite;
+    }
+  }
+  @keyframes syb-breathe {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-6px) scale(1.012);
+    }
+  }
+  .syb-wires {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+  }
+  .syb-wires path {
+    fill: none;
+    stroke: #1b1a17;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    opacity: 0.75;
+    transition: stroke 0.3s ease, opacity 0.3s ease;
+  }
+  .syb-wires.firing path {
+    stroke: #1f6b54;
+    opacity: 1;
+  }
+  .syb-wires circle {
+    fill: #7ce8b6;
+  }
+
+  .syb-rig {
+    position: relative;
+    width: min(92vw, 460px);
+  }
+  .syb-rig-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 16px 28px rgb(27 26 23 / 0.2));
+  }
+  .syb-crt {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 7% / 9%;
+    background: #0d1210;
+  }
+  .syb-crt canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  .syb-strip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    padding: 0 3%;
+    background: #262a20;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.55);
+    overflow: hidden;
+  }
+  .syb-strip span {
+    font-family: var(--font-mono);
+    font-size: clamp(0.42rem, 1.55vw, 0.62rem);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: #cfe3bf;
+    text-shadow: 0 0 6px rgb(160 220 150 / 0.35);
+  }
+  .syb-key {
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 0;
+    background: radial-gradient(circle at 36% 30%, rgb(255 255 255 / 0.18), transparent 55%);
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+  }
+  .syb-key:hover {
+    box-shadow: 0 0 16px rgb(31 107 84 / 0.55);
+  }
+  .syb-key:active {
+    transform: translateY(4%) scale(0.95);
+  }
+  .syb-key:disabled {
+    cursor: default;
+    box-shadow: none;
+  }
+  .syb-key:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+  .syb-plate {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #17181c;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: clamp(0.34rem, 1.15vw, 0.46rem);
+    letter-spacing: 0.12em;
+    color: #b9bcc4;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+
+  .syb-hint {
+    margin: 1.4rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+  }
+  .syb-answer {
+    margin-top: 1.6rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 10px;
+    background: var(--color-surface);
+    padding: 1.1rem 1.25rem;
+  }
+  .syb-q {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .syb-a {
+    margin-top: 0.6rem;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--color-ink);
+  }
+  .syb-a cite {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    padding: 0.08em 0.42em;
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    color: var(--color-accent-strong);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .syb-a cite:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .syb-card {
+    margin-top: 1rem;
+    border: 1px solid var(--color-faint);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 10px;
+    background: var(--color-surface);
+    padding: 1.1rem 1.25rem;
+    position: relative;
+  }
+  .syb-card h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .syb-card-meta {
+    margin: 0.3rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .syb-card-meta .ok {
+    color: var(--color-accent-strong);
+  }
+  .syb-card-summary {
+    margin: 0.7rem 0 0;
+    font-weight: 500;
+  }
+  .syb-card-body {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--color-ink);
+  }
+  .syb-card-body h4 {
+    margin: 0.9rem 0 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .syb-card-body a[data-wiki] {
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .syb-card-body blockquote {
+    margin: 0.6rem 0;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--color-faint);
+    color: var(--color-muted);
+  }
+  .syb-locked {
+    border-bottom: 1px dashed var(--color-muted);
+    color: var(--color-muted);
+    cursor: help;
+  }
+  .syb-edges {
+    margin-top: 0.9rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: baseline;
+  }
+  .syb-edges .syb-rel {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-right: 0.15rem;
+  }
+  .syb-chip {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    padding: 0.14rem 0.5rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    background: none;
+    color: var(--color-accent-strong);
+    cursor: pointer;
+  }
+  .syb-chip:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .syb-chip-locked {
+    color: var(--color-muted);
+    cursor: default;
+    border-style: dashed;
+  }
+  .syb-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.7rem;
+    border: 0;
+    background: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+  .syb-close:hover {
+    color: var(--color-ink);
+  }
+  .syb-label {
+    margin: 1.6rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+</style>
+
+<script>
+  interface VaultData {
+    n: number;
+    e: number;
+    v: number;
+    d: string;
+    types: string[];
+    pts: [number, number, number, number, number][];
+    ed: [number, number][];
+    named: Record<string, number>;
+  }
+  interface DemoStep {
+    op: string;
+    text: string;
+  }
+  interface DemoData {
+    id: string;
+    q: string;
+    steps: DemoStep[];
+    answerHtml: string;
+    path: string[];
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-bench]");
+  const dataEl = document.querySelector("[data-syb-data]");
+  if (root && dataEl) init(root, JSON.parse(dataEl.textContent || "{}"));
+
+  function init(root: HTMLElement, data: { vault: VaultData; demos: DemoData[] }) {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const { vault, demos } = data;
+    const scene = root.querySelector<HTMLElement>("[data-scene]")!;
+    const brain = root.querySelector<HTMLElement>("[data-brain]")!;
+    const rig = root.querySelector<HTMLElement>("[data-rig]")!;
+    const wires = root.querySelector<SVGSVGElement>("[data-wires]")!;
+    const canvas = root.querySelector<HTMLCanvasElement>("[data-swirl]")!;
+    const stripText = root.querySelector<HTMLElement>("[data-strip-text]")!;
+    const answerBox = root.querySelector<HTMLElement>("[data-answer]")!;
+    const qEl = root.querySelector<HTMLElement>("[data-q]")!;
+    const aEl = root.querySelector<HTMLElement>("[data-a]")!;
+    const cardBox = root.querySelector<HTMLElement>("[data-card]")!;
+
+    const pretty = (slug: string) =>
+      slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // ---- Wires: three sagging cables, brain to sockets ----
+    // Socket centers as fractions of the rig; the brain side anchors along
+    // its right edge (or bottom edge when the bench stacks).
+    const SOCKETS = [
+      [0.117, 0.655],
+      [0.117, 0.744],
+      [0.117, 0.846],
+    ];
+    function drawWires() {
+      const s = scene.getBoundingClientRect();
+      const b = brain.getBoundingClientRect();
+      const r = rig.getBoundingClientRect();
+      const stacked = r.top > b.bottom - 10;
+      wires.setAttribute("viewBox", `0 0 ${s.width} ${s.height}`);
+      let html = "";
+      SOCKETS.forEach((sock, i) => {
+        const x2 = r.left - s.left + sock[0] * r.width;
+        const y2 = r.top - s.top + sock[1] * r.height;
+        let x1: number;
+        let y1: number;
+        if (stacked) {
+          x1 = b.left - s.left + b.width * (0.3 + i * 0.2);
+          y1 = b.bottom - s.top - b.height * 0.12;
+        } else {
+          x1 = b.right - s.left - b.width * 0.08;
+          y1 = b.top - s.top + b.height * (0.34 + i * 0.18);
+        }
+        const sag = stacked ? 30 + i * 14 : 36 + i * 20;
+        // Stacked, the cables swing around the rig's left bezel instead of
+        // draping across the glass.
+        const mx = stacked ? Math.min(x1, r.left - s.left) - 26 - i * 16 : (x1 + x2) / 2;
+        const my = stacked ? (y1 + y2) / 2 : Math.max(y1, y2) + sag;
+        const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+        html += `<path d="${d}"/>`;
+        if (!reduced) {
+          for (let k = 0; k < 2; k++) {
+            html += `<circle r="2.6" opacity="0"><animateMotion dur="${(3.4 + i * 0.5).toFixed(1)}s" begin="${(i * 0.9 + k * 1.7).toFixed(1)}s" repeatCount="indefinite" path="${d}"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="${(3.4 + i * 0.5).toFixed(1)}s" begin="${(i * 0.9 + k * 1.7).toFixed(1)}s" repeatCount="indefinite"/></circle>`;
+          }
+        }
+      });
+      wires.innerHTML = html;
+    }
+    drawWires();
+    new ResizeObserver(drawWires).observe(scene);
+
+    // ---- The swirl ----
+    const TYPE_COLORS: Record<string, string> = {
+      concept: "#e6d6a3",
+      source: "#b7c6e6",
+      person: "#e0b0c8",
+      entity: "#7ce8b6",
+      project: "#9fd6a2",
+      writing: "#d9c08f",
+      decision: "#a9b3d6",
+      finding: "#d98a7e",
+      artifact: "#8fb0a8",
+      wiki: "#c9c9b8",
+      doc: "#b8ab90",
+      index: "#b8ab90",
+      note: "#a8a89a",
+    };
+    const colors = vault.types.map((t) => TYPE_COLORS[t] || "#a8a89a");
+    const namedIdx = new Map<number, string>();
+    for (const [slug, i] of Object.entries(vault.named)) namedIdx.set(i as number, slug);
+
+    const ctx = canvas.getContext("2d")!;
+    let cw = 0;
+    let ch = 0;
+    function sizeCanvas() {
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      cw = Math.max(1, Math.round(r.width * dpr));
+      ch = Math.max(1, Math.round(r.height * dpr));
+      canvas.width = cw;
+      canvas.height = ch;
+    }
+    sizeCanvas();
+    new ResizeObserver(sizeCanvas).observe(canvas);
+
+    let rotY = 0.6;
+    let rotX = -0.18;
+    let targetY: number | null = null;
+    let zoom = 1;
+    let targetZoom = 1;
+    let lastT = 0;
+    const flare = new Map<number, number>(); // index -> intensity 0..1
+    let tracePath: number[] = [];
+    let booted = reduced; // reduced motion skips the boot
+    let bootStep = 0;
+
+    const proj = new Array(vault.pts.length);
+    function paint(t: number) {
+      const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+      lastT = t;
+      if (!reduced) {
+        if (targetY !== null) {
+          const diff = ((targetY - rotY + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+          rotY += diff * Math.min(1, dt * 3);
+          if (Math.abs(diff) < 0.02) targetY = null;
+        } else {
+          rotY += dt * 0.12;
+        }
+        zoom += (targetZoom - zoom) * Math.min(1, dt * 3);
+      }
+      ctx.clearRect(0, 0, cw, ch);
+      if (!booted) {
+        ctx.fillStyle = "#9fe0b0";
+        ctx.font = `${Math.round(ch * 0.075)}px ui-monospace, Menlo, monospace`;
+        const lines = [
+          "SYNAPSE READER",
+          `${vault.n} nodes · ${vault.e} edges`,
+          "reading" + ".".repeat(1 + (Math.floor(t / 400) % 3)),
+        ].slice(0, bootStep);
+        lines.forEach((l, i) => ctx.fillText(l, ch * 0.08, ch * (0.2 + i * 0.14)));
+        return;
+      }
+      const cy = Math.cos(rotY);
+      const sy = Math.sin(rotY);
+      const cx = Math.cos(rotX);
+      const sx = Math.sin(rotX);
+      const R = Math.min(cw, ch) * 0.56 * zoom;
+      const cxp = cw / 2;
+      const cyp = ch / 2;
+      for (let i = 0; i < vault.pts.length; i++) {
+        const [x, y, z] = vault.pts[i];
+        const x1 = x * cy + z * sy;
+        const z1 = -x * sy + z * cy;
+        const y1 = y * cx - z1 * sx;
+        const z2 = y * sx + z1 * cx;
+        const depth = (z2 + 1.2) / 2.2; // 0 back, 1 front
+        proj[i] = [cxp + x1 * R, cyp + y1 * R * 0.94, depth];
+      }
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(214, 224, 205, 0.10)";
+      ctx.beginPath();
+      for (const [a, b] of vault.ed) {
+        ctx.moveTo(proj[a][0], proj[a][1]);
+        ctx.lineTo(proj[b][0], proj[b][1]);
+      }
+      ctx.stroke();
+      // Traversal trail.
+      if (tracePath.length > 1) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(124, 232, 182, 0.85)";
+        ctx.beginPath();
+        tracePath.forEach((n, k) => {
+          if (k === 0) ctx.moveTo(proj[n][0], proj[n][1]);
+          else ctx.lineTo(proj[n][0], proj[n][1]);
+        });
+        ctx.stroke();
+      }
+      for (let i = 0; i < vault.pts.length; i++) {
+        const [px, py, depth] = proj[i];
+        const named = namedIdx.has(i);
+        const deg = vault.pts[i][4];
+        const f = flare.get(i) || 0;
+        let r = (0.9 + Math.min(2.2, deg * 0.14) + (named ? 1.4 : 0)) * (0.55 + depth * 0.75);
+        let alpha = named ? 0.5 + depth * 0.5 : 0.22 + depth * 0.5;
+        if (f > 0) {
+          r += f * 4;
+          alpha = Math.min(1, alpha + f);
+          flare.set(i, Math.max(0, f - dt * 0.7));
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = colors[vault.pts[i][3]] || "#a8a89a";
+        ctx.beginPath();
+        ctx.arc(px, py, r * (cw / 640), 0, Math.PI * 2);
+        ctx.fill();
+        if (f > 0.05) {
+          ctx.globalAlpha = f * 0.45;
+          ctx.beginPath();
+          ctx.arc(px, py, (r + 5) * (cw / 640), 0, Math.PI * 2);
+          ctx.strokeStyle = "#7ce8b6";
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Paint loop: rAF drives PIXELS ONLY. No state waits on it (the sword
+    // room taught that lesson), so a hidden tab just pauses the picture.
+    let visible = false;
+    function loop(t: number) {
+      if (visible) paint(t);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    new IntersectionObserver(
+      (es) => {
+        visible = es.some((e) => e.isIntersecting);
+        if (visible && !booted && bootStep === 0) boot();
+      },
+      { threshold: 0.2 },
+    ).observe(canvas);
+
+    function boot() {
+      bootStep = 1;
+      setTimeout(() => (bootStep = 2), 450);
+      setTimeout(() => (bootStep = 3), 900);
+      setTimeout(() => {
+        booted = true;
+      }, 2100);
+      setStrip("SYNAPSE ONLINE");
+    }
+
+    // Focus the camera so a node comes to the front.
+    function focusNode(i: number) {
+      const [x, , z] = vault.pts[i];
+      targetY = Math.atan2(-x, z) + Math.PI;
+      flare.set(i, 1);
+    }
+
+    // ---- Readout strip ----
+    let stripTimer = 0;
+    function setStrip(text: string) {
+      stripText.textContent = text;
+    }
+    const idleLines = () => {
+      const names = Object.keys(vault.named);
+      const pick = names[Math.floor(Math.random() * names.length)];
+      return [
+        `${vault.n} NODES · ${vault.e} EDGES`,
+        `${vault.v} VERIFIED`,
+        `· ${pretty(pick).toUpperCase()}`,
+      ][Math.floor(Math.random() * 3)];
+    };
+    function idleStrip() {
+      clearInterval(stripTimer);
+      stripTimer = window.setInterval(() => setStrip(idleLines()), 5200);
+    }
+    setStrip(`${vault.n} NODES · ${vault.e} EDGES`);
+    idleStrip();
+
+    // ---- Node cards ----
+    let nodesCache: Record<string, any> | null = null;
+    async function getNodes() {
+      if (nodesCache) return nodesCache;
+      const res = await fetch("/synapse/nodes.json");
+      const j = await res.json();
+      nodesCache = {};
+      for (const n of j.nodes) nodesCache[n.id] = n;
+      return nodesCache;
+    }
+
+    const REL_LABELS: Record<string, string> = {
+      supports: "supports",
+      contradicts: "contradicts",
+      depends_on: "depends on",
+      derived_from: "derived from",
+      part_of: "part of",
+      preceded_by: "preceded by",
+      followed_by: "followed by",
+      related_to: "related to",
+      restates: "restates",
+      supersedes: "supersedes",
+    };
+
+    async function openCard(slug: string) {
+      const nodes = await getNodes();
+      const n = nodes[slug];
+      if (!n) return;
+      const i = vault.named[slug];
+      if (i !== undefined) focusNode(i);
+      const ok = n.status === "verified";
+      let edges = "";
+      for (const [rel, targets] of Object.entries(n.edges || {})) {
+        if (rel.endsWith("_locked")) continue;
+        const chips = (targets as string[])
+          .map((t) => `<button type="button" class="syb-chip" data-open="${t}">${t}</button>`)
+          .join("");
+        const lockedN = (n.edges || {})[rel + "_locked"];
+        const locked = lockedN
+          ? `<span class="syb-chip syb-chip-locked" title="These stay private">+${lockedN} private</span>`
+          : "";
+        edges += `<span class="syb-rel">${REL_LABELS[rel] || rel}</span>${chips}${locked}`;
+      }
+      cardBox.innerHTML =
+        `<button type="button" class="syb-close" data-close aria-label="Close">&times;</button>` +
+        `<h3>${n.title}</h3>` +
+        `<p class="syb-card-meta">${n.kind} · <span class="${ok ? "ok" : ""}">${n.status}</span>${
+          n.provenance ? ` · ${n.provenance}` : ""
+        }</p>` +
+        (n.summary ? `<p class="syb-card-summary">${n.summary}</p>` : "") +
+        `<div class="syb-card-body">${n.bodyHtml}</div>` +
+        (edges ? `<div class="syb-edges">${edges}</div>` : "");
+      cardBox.hidden = false;
+      cardBox.querySelector("[data-close]")!.addEventListener("click", () => {
+        cardBox.hidden = true;
+      });
+      cardBox.querySelectorAll<HTMLElement>("[data-open]").forEach((b) =>
+        b.addEventListener("click", () => openCard(b.dataset.open!)),
+      );
+      cardBox.querySelectorAll<HTMLAnchorElement>("a[data-wiki]").forEach((a) =>
+        a.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          openCard(a.getAttribute("href")!.replace("#node/", ""));
+        }),
+      );
+      cardBox.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+    }
+
+    // Click a named dot in the swirl.
+    canvas.addEventListener("click", (ev) => {
+      const r = canvas.getBoundingClientRect();
+      const dpr = cw / r.width;
+      const mx = (ev.clientX - r.left) * dpr;
+      const my = (ev.clientY - r.top) * dpr;
+      let best: string | null = null;
+      let bestD = 18 * dpr;
+      for (const [i, slug] of namedIdx) {
+        const p = proj[i];
+        if (!p) continue;
+        const d = Math.hypot(p[0] - mx, p[1] - my);
+        if (d < bestD) {
+          bestD = d;
+          best = slug;
+        }
+      }
+      if (best) openCard(best);
+    });
+
+    // ---- Run a demo ----
+    let running = false;
+    async function run(demo: DemoData) {
+      if (running) return;
+      running = true;
+      root.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((k) => (k.disabled = true));
+      clearInterval(stripTimer);
+      answerBox.hidden = true;
+      cardBox.hidden = true;
+      tracePath = [];
+      wires.classList.add("firing");
+      setStrip("READING…");
+      const stepMs = reduced ? 0 : 620;
+      for (const step of demo.steps) {
+        setStrip(`${step.op.toUpperCase()} ${step.text}`.slice(0, 52));
+        for (const slug of demo.path) {
+          if (step.text.includes(slug)) {
+            const i = vault.named[slug];
+            if (i !== undefined) {
+              focusNode(i);
+              if (!tracePath.includes(i)) tracePath.push(i);
+            }
+          }
+        }
+        if (stepMs) await new Promise((r) => setTimeout(r, stepMs));
+      }
+      qEl.textContent = demo.q;
+      aEl.innerHTML = demo.answerHtml;
+      aEl.querySelectorAll("cite").forEach((c) =>
+        c.addEventListener("click", () => openCard(c.getAttribute("data-n")!)),
+      );
+      answerBox.hidden = false;
+      setStrip("DONE · CITED " + demo.path.length + " NODES");
+      wires.classList.remove("firing");
+      answerBox.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+      setTimeout(() => {
+        tracePath = [];
+        targetZoom = 1;
+        idleStrip();
+      }, 6000);
+      running = false;
+      root.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((k) => (k.disabled = false));
+    }
+
+    root.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((k) =>
+      k.addEventListener("click", () => {
+        const demo = demos.find((d) => d.id === k.dataset.key);
+        if (demo) run(demo);
+      }),
+    );
+
+    // Idle shimmer: some anonymous dot briefly wakes now and then.
+    if (!reduced) {
+      setInterval(() => {
+        if (!running && visible) flare.set(Math.floor(Math.random() * vault.pts.length), 0.55);
+      }, 2600);
+    }
+  }
+</script>

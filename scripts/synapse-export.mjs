@@ -236,6 +236,193 @@ const OUT = new URL("../public/synapse", import.meta.url).pathname;
 await mkdir(OUT, { recursive: true });
 await writeFile(path.join(OUT, "nodes.json"), JSON.stringify({ nodes }));
 
+// ---- The anonymous whole-vault export, for the bench's swirl ----
+// Every knowledge file in the vault becomes a dot: position, type, edges.
+// Zero text. The only strings in vault.json are schema keys, generic type
+// names, and the slugs of the 49 already-public nodes (so the client can
+// label and select exactly those dots). Approved by Jake 2026-07-31.
+{
+  const { readdir } = await import("node:fs/promises");
+  const SKIP = /^(_schema|CLAUDE\.md|Welcome\.md)/;
+
+  async function walk(dir) {
+    const out = [];
+    for (const ent of await readdir(dir, { withFileTypes: true })) {
+      const p = path.join(dir, ent.name);
+      const rel = path.relative(VAULT, p);
+      if (SKIP.test(rel)) continue;
+      if (ent.isDirectory()) out.push(...(await walk(p)));
+      else if (ent.name.endsWith(".md")) out.push(rel);
+    }
+    return out;
+  }
+
+  const files = await walk(VAULT);
+  const TYPES = [
+    "concept",
+    "source",
+    "person",
+    "entity",
+    "project",
+    "writing",
+    "decision",
+    "finding",
+    "artifact",
+    "wiki",
+    "doc",
+    "index",
+    "note",
+  ];
+  const typeOfFolder = (rel) => {
+    const top = rel.split("/")[0];
+    if (top === "artifacts") return "artifact";
+    if (top === "wiki") return "wiki";
+    if (top === "docs") return "doc";
+    if (top === "index") return "index";
+    return "note";
+  };
+
+  const slugOf = (rel) => path.basename(rel, ".md");
+  const idx = new Map(files.map((rel, i) => [slugOf(rel), i]));
+  const pts = [];
+  const edgeSet = new Set();
+  let verified = 0;
+
+  for (let i = 0; i < files.length; i++) {
+    const rel = files[i];
+    const text = await readFile(path.join(VAULT, rel), "utf8");
+    const [fm, body] = parseFrontmatter(text);
+    let kind = String(fm.kind || typeOfFolder(rel));
+    if (kind === "roadmap-step") kind = "decision";
+    if (!TYPES.includes(kind)) kind = "note";
+    if (String(fm.status) === "verified") verified++;
+    pts.push({ t: TYPES.indexOf(kind) });
+    const targets = new Set();
+    for (const k of EDGE_KEYS) {
+      if (Array.isArray(fm[k])) fm[k].forEach((t) => targets.add(String(t)));
+    }
+    for (const m of body.matchAll(/\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]/g)) {
+      targets.add(m[1].trim());
+    }
+    for (const t of targets) {
+      const j = idx.get(t);
+      if (j !== undefined && j !== i) {
+        edgeSet.add(i < j ? `${i},${j}` : `${j},${i}`);
+      }
+    }
+  }
+  const edges = [...edgeSet].map((s) => s.split(",").map(Number));
+
+  // 3D force layout, computed here so the client only rotates and projects.
+  // Plain springs and repulsion; a couple hundred nodes converges fast.
+  const N = pts.length;
+  const pos = [];
+  let seed = 1337;
+  const rand = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  };
+  for (let i = 0; i < N; i++) {
+    const th = rand() * Math.PI * 2;
+    const ph = Math.acos(2 * rand() - 1);
+    const r = 0.4 + rand() * 0.6;
+    pos.push([
+      r * Math.sin(ph) * Math.cos(th),
+      r * Math.sin(ph) * Math.sin(th),
+      r * Math.cos(ph),
+    ]);
+  }
+  const deg = new Array(N).fill(0);
+  for (const [a, b] of edges) {
+    deg[a]++;
+    deg[b]++;
+  }
+  for (let it = 0; it < 260; it++) {
+    const f = pos.map(() => [0, 0, 0]);
+    for (let a = 0; a < N; a++) {
+      for (let b = a + 1; b < N; b++) {
+        const dx = pos[a][0] - pos[b][0];
+        const dy = pos[a][1] - pos[b][1];
+        const dz = pos[a][2] - pos[b][2];
+        const d2 = dx * dx + dy * dy + dz * dz + 0.002;
+        const rep = 0.0022 / d2;
+        const d = Math.sqrt(d2);
+        f[a][0] += (dx / d) * rep;
+        f[a][1] += (dy / d) * rep;
+        f[a][2] += (dz / d) * rep;
+        f[b][0] -= (dx / d) * rep;
+        f[b][1] -= (dy / d) * rep;
+        f[b][2] -= (dz / d) * rep;
+      }
+    }
+    for (const [a, b] of edges) {
+      const dx = pos[b][0] - pos[a][0];
+      const dy = pos[b][1] - pos[a][1];
+      const dz = pos[b][2] - pos[a][2];
+      const d = Math.sqrt(dx * dx + dy * dy + dz * dz) + 1e-6;
+      const pull = 0.012 * (d - 0.28);
+      f[a][0] += (dx / d) * pull;
+      f[a][1] += (dy / d) * pull;
+      f[a][2] += (dz / d) * pull;
+      f[b][0] -= (dx / d) * pull;
+      f[b][1] -= (dy / d) * pull;
+      f[b][2] -= (dz / d) * pull;
+    }
+    const cool = 1 - it / 300;
+    for (let i = 0; i < N; i++) {
+      for (let c = 0; c < 3; c++) {
+        pos[i][c] += Math.max(-0.05, Math.min(0.05, f[i][c])) * cool;
+        pos[i][c] *= 0.996; // gentle gravity toward the middle
+      }
+    }
+  }
+  // Normalize into the unit ball.
+  const maxR = Math.max(...pos.map((p) => Math.hypot(...p)));
+  const round = (v) => Math.round((v / maxR) * 1000) / 1000;
+
+  const named = {};
+  for (const id of included) {
+    const j = idx.get(id);
+    if (j !== undefined) named[id] = j;
+  }
+
+  const vault = {
+    d: new Date().toISOString().slice(0, 10),
+    n: N,
+    e: edges.length,
+    v: verified,
+    types: TYPES,
+    pts: pos.map((p, i) => [round(p[0]), round(p[1]), round(p[2]), pts[i].t, deg[i]]),
+    ed: edges,
+    named,
+  };
+  await writeFile(path.join(OUT, "vault.json"), JSON.stringify(vault));
+  console.log(
+    `Vault swirl: ${N} dots, ${edges.length} edges, ${verified} verified, ${Object.keys(named).length} named`,
+  );
+
+  // Leak scan: nothing textual may exist outside schema keys, type names,
+  // and the already-public slugs.
+  const allowedWords = new Set([
+    ...TYPES,
+    ...Object.keys(named),
+    "types",
+    "named",
+    "pts",
+    "ed",
+  ]);
+  const raw = JSON.stringify(vault);
+  const words = raw.match(/[a-zA-Z][a-zA-Z-]{2,}/g) || [];
+  // A word passes if it is an allowed word or a fragment of one: slugs with
+  // digits (l8-..., q3-...) split at the digit and produce fragments.
+  const allowedList = [...allowedWords];
+  const leaks = words.filter(
+    (w) => !allowedWords.has(w) && !allowedList.some((a) => a.includes(w)),
+  );
+  if (leaks.length) throw new Error(`vault.json leak scan failed: ${leaks.slice(0, 5).join(", ")}`);
+  console.log("Vault leak scan: clean");
+}
+
 const kinds = {};
 for (const n of nodes) kinds[n.kind] = (kinds[n.kind] || 0) + 1;
 console.log(`Exported ${nodes.length} nodes:`, kinds);
