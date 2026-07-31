@@ -295,10 +295,9 @@ jobs.push(["gators", await sharp(SRC.gator).toBuffer()]);
   const PICKS = [
     { name: "lemon", box: itemAt(0, 1) },
     { name: "strawberry", box: itemAt(0, 0) },
-    { name: "carrot", box: itemAt(1, 1) },
     { name: "avocado", box: itemAt(1, 2) },
   ].filter((p) => p.box);
-  if (PICKS.length < 4) throw new Error(`fruit split found only ${PICKS.length} of the picks`);
+  if (PICKS.length < 3) throw new Error(`fruit split found only ${PICKS.length} of the picks`);
 
   const roundedSvg = (w, h, r) =>
     Buffer.from(`<svg width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${r}" fill="#fff"/></svg>`);
@@ -331,17 +330,18 @@ jobs.push(["gators", await sharp(SRC.gator).toBuffer()]);
     .png()
     .toBuffer();
 
-  // Margin around the photo so stickers can hang off its edges.
-  const M = 64;
+  // A wide margin so the stickers genuinely hang off the photo's edges;
+  // roughly half of each sticker sits outside the picture. That overhang is
+  // the 3D effect.
+  const M = 120;
   const canvasW = bm.width + M * 2;
   const canvasH = bm.height + M * 2;
   const comps = [{ input: rounded, left: M, top: M }];
-  // Four corners, two of them big. None over her face.
+  // Three fruits, all riding an edge. None over her face.
   const spots = [
-    { x: M - 36, y: M - 16, size: 340 }, // lemon, top left, big
-    { x: canvasW - 300, y: M + 90, size: 270 }, // strawberry, upper right
-    { x: canvasW - 320, y: canvasH - 380, size: 300 }, // carrot, bottom right
-    { x: M - 40, y: canvasH - 480, size: 330 }, // avocado, bottom left, big
+    { x: 4, y: 44, size: 350 }, // lemon, hanging off the top left
+    { x: canvasW - 410, y: canvasH - 700, size: 400 }, // strawberry, big, off the right
+    { x: 8, y: canvasH - 520, size: 340 }, // avocado, off the bottom left
   ];
   for (let i = 0; i < PICKS.length; i++) {
     const s = await fruitSticker(PICKS[i].box, i, spots[i].size);
