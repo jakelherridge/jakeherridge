@@ -49,7 +49,6 @@ export const builds: Build[] = [
     category: "Knowledge system",
     blurb: "Typed-node knowledge graph built for AI traversal",
     body: "A personal knowledge graph: small typed nodes joined by typed edges, each node carrying its source and a verification status. Built for an AI to traverse and answer from with citations. The Map on this site uses the same structure.",
-    href: "/exhibits/synapse/",
     linkLabel: "See it running",
   },
   {

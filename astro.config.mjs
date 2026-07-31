@@ -10,11 +10,15 @@ import paperPdf from './integrations/pdf.mjs';
 // defining them here too would emit meta-refresh pages that shadow them.
 export default defineConfig({
   site: 'https://jakeherridge.com',
-  // The monster print sheet is a utility view driven by query params, not a
-  // page anyone should land on from search. It carries noindex too.
+  // Out of the sitemap: the monster print sheet (a query-param utility view,
+  // carries noindex) and the Synapse room (live at its URL but unlisted while
+  // it waits for its overhaul).
   integrations: [
     mdx(),
-    sitemap({ filter: (page) => !page.includes('/exhibits/monsters/print') }),
+    sitemap({
+      filter: (page) =>
+        !page.includes('/exhibits/monsters/print') && !page.includes('/exhibits/synapse'),
+    }),
     paperPdf(),
   ],
   vite: {

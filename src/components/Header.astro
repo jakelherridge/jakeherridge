@@ -1,21 +1,16 @@
 ---
-const nav = [
-  { href: "/exhibits/", label: "Exhibits", match: ["/exhibits/"] },
-  { href: "/map/", label: "Map", match: ["/map/"] },
-  { href: "/collection/", label: "Collection", match: ["/collection/", "/work/", "/lab/"] },
-  { href: "/writing/", label: "Writing", match: ["/writing/", "/papers/", "/stories/"] },
-  { href: "/about/", label: "About", match: ["/about/"] },
-  { href: "/contact/", label: "Contact", match: ["/contact/"] },
-];
+// Nav is deliberately two doors: the wall of stickers (home) and the map that
+// connects them. Collection, Writing, About, and Contact are commented out
+// while the site is rethought as a pure exhibit space; their page files sit
+// underscore-prefixed in src/pages/ and their URLs 301 home.
+const nav = [{ href: "/map/", label: "Map", match: ["/map/"] }];
 
 const path = Astro.url.pathname;
 const isActive = (item: (typeof nav)[number]) => item.match.some((m) => path.startsWith(m));
 ---
 
 <header class="border-b border-faint">
-  <div
-    class="mx-auto flex max-w-5xl flex-col gap-2 px-5 py-3 sm:h-16 sm:flex-row sm:items-center sm:justify-between sm:py-0"
-  >
+  <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-5">
     <a
       href="/"
       class="wonk text-lg font-semibold tracking-tight transition-colors hover:text-accent"
@@ -23,7 +18,7 @@ const isActive = (item: (typeof nav)[number]) => item.match.some((m) => path.sta
     >
       Jake Herridge
     </a>
-    <nav aria-label="Primary" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+    <nav aria-label="Primary" class="flex gap-x-5 text-sm">
       {
         nav.map((item) => (
           <a

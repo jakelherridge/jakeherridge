@@ -94,5 +94,35 @@
     "number": 16,
     "title": "Monster 16",
     "aspect": 0.7319
+  },
+  {
+    "id": "17",
+    "number": 17,
+    "title": "Monster 17",
+    "aspect": 0.7535
+  },
+  {
+    "id": "18",
+    "number": 18,
+    "title": "Monster 18",
+    "aspect": 0.7035
+  },
+  {
+    "id": "19",
+    "number": 19,
+    "title": "Monster 19",
+    "aspect": 0.748
+  },
+  {
+    "id": "20",
+    "number": 20,
+    "title": "Monster 20",
+    "aspect": 0.6435
+  },
+  {
+    "id": "21",
+    "number": 21,
+    "title": "Monster 21",
+    "aspect": 0.5521
   }
 ]

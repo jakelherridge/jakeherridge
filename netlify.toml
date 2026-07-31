@@ -31,15 +31,50 @@
   to = "/exhibits/sword/"
   status = 301
 
-# Old section URLs live on in the Collection.
+# Sections commented out in the 2026-07-30 rewrite. The pages still exist,
+# underscore-prefixed in src/pages/, so restoring one is a rename plus
+# deleting its redirect here. Until then their URLs go home.
+[[redirects]]
+  from = "/about/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/contact/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/thanks/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/collection/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/writing/*"
+  to = "/"
+  status = 301
+
+# Old section URLs that used to land in the Collection.
 [[redirects]]
   from = "/work/*"
-  to = "/collection/"
+  to = "/"
   status = 301
 
 [[redirects]]
   from = "/lab/*"
-  to = "/collection/"
+  to = "/"
+  status = 301
+
+# The exhibits index folded into the home page; the rooms themselves stay.
+# No splat: /exhibits/gators/ and friends must not be caught.
+[[redirects]]
+  from = "/exhibits/"
+  to = "/"
   status = 301
 
 # Security headers. CSP keeps script-src 'unsafe-inline' for the inline

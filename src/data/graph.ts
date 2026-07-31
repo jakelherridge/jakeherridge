@@ -48,7 +48,7 @@ export const nodes: GraphNode[] = [
     label: "Jake Herridge",
     kind: "person",
     summary: "Father, engineer, nerd, AI guy, wannabe philosopher. Bentonville, Arkansas.",
-    href: "/about/",
+    href: "/",
   },
 
   // Builds
@@ -65,8 +65,9 @@ export const nodes: GraphNode[] = [
     label: "Synapse",
     kind: "build",
     status: "growing",
+    // Unlisted while the room waits for its overhaul; the node stays because
+    // the idea is load-bearing for the map itself.
     summary: "A knowledge graph of typed nodes and typed edges. This map uses the same structure.",
-    href: "/exhibits/synapse/",
   },
   {
     id: "synapse-capture",
@@ -74,7 +75,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shipped",
     summary: "A Claude Code plugin that saves a session's defining moments into the graph.",
-    href: "/collection/#synapse-capture",
   },
   {
     id: "apd",
@@ -98,7 +98,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shipped",
     summary: "A marketing site for a friend's mobile physical therapy practice.",
-    href: "/collection/#making-moves",
   },
   {
     id: "ai-hub",
@@ -106,7 +105,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shipped",
     summary: "A single sign-on portal for a company's internal AI tools, with usage tracking.",
-    href: "/collection/#inside",
   },
   {
     id: "perf-reviews",
@@ -114,7 +112,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shipped",
     summary: "An automated review system that writes results into the system of record.",
-    href: "/collection/#inside",
   },
   {
     id: "threed",
@@ -122,7 +119,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shelved",
     summary: "Generated 3D-effect images from flat photos. Shelved without a real use.",
-    href: "/collection/#shelved",
   },
   {
     id: "wardrobe",
@@ -130,7 +126,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shelved",
     summary: "Matched clothing colors to a personal palette. Built for myself, then shelved.",
-    href: "/collection/#shelved",
   },
   {
     id: "occ-codes",
@@ -138,7 +133,6 @@ export const nodes: GraphNode[] = [
     kind: "build",
     status: "shelved",
     summary: "Generated occupation codes and wage levels. Shelved over unreliable source data.",
-    href: "/collection/#shelved",
   },
 
   // Papers
@@ -191,14 +185,12 @@ export const nodes: GraphNode[] = [
     label: "Tiny Keycaps",
     kind: "creative",
     summary: "Keycaps sculpted by hand, molded, and cast in resin.",
-    href: "/collection/#keycaps",
   },
   {
     id: "eagle-sword",
     label: "Ornate Eagle Sword",
     kind: "creative",
     summary: "A pencil sketch where American and Japanese design meet.",
-    href: "/collection/#eagle-sword",
   },
 
   // Values

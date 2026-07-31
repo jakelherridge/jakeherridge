@@ -1,10 +1,17 @@
 ---
-// The gator machine, as a six-reel mint machine. One reel per layer in
-// the generator's stack order. SPIN pulls every unlocked reel with the
-// collection's REAL rarity weights (parsed from the source filenames), so
-// a pull lands traits as often as the 2021 mint did. Lock a reel to keep
-// it, nudge to step one, or open a reel's drawer to pick deliberately.
+// The Glitchy Gator Machine: the rendered cabinet IS the machine. The art
+// screen, the six reel windows, and the big red button are live regions
+// positioned over the render (percentages measured off the 888x1472 image;
+// see scratch overlay-proof). Press the dome and every reel pulls with the
+// collection's REAL rarity weights, so a pull lands traits as often as the
+// 2021 mint did.
+//
+// The render's own tiny labels were AI-garbled, so clean plates cover them.
+// Trait names and odds live beside the machine at readable sizes; the page is
+// white, the machine is the only object on it.
+import { Image } from "astro:assets";
 import manifest from "../data/gator-machine.json";
+import renderImg from "../assets/gators/machine-render.png";
 
 interface Item {
   slug: string;
@@ -35,149 +42,139 @@ const pick = (c: Category) =>
 
 const initial = categories.map((c) => ({ cat: c, item: pick(c) }));
 const combos = categories.reduce((n, c) => n * c.items.length, 1);
-const layerCount = categories.reduce((n, c) => n + c.items.length, 0);
-const glitchyCount = categories.reduce(
-  (n, c) => n + c.items.filter((i) => i.glitchy).length,
-  0,
-);
+
+// Live regions as percentages of the render. Measured, not eyeballed.
+const SCREEN = { x: 25.68, y: 8.97, w: 47.3, h: 24.46 };
+// Window height reaches the full glass so the art centres in it instead of
+// riding high with baked-in glass showing underneath.
+const WIN = { y: 37.3, h: 8.95, w: 9.91, xs: [13.29, 25.68, 38.06, 50.45, 62.84, 75.23] };
+const PLATE = { y: 46.2, h: 2.99, w: 11.11, dx: -0.6 };
+const BTN = { x: 40.77, y: 48.91, w: 16.89 };
 ---
 
-<section id="machine" class="scroll-mt-20" data-machine data-size={manifest.size}>
-  <div class="flex flex-wrap items-baseline justify-between gap-3">
-    <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The gator machine</h2>
-    <p class="font-mono text-xs text-muted">
-      {combos.toLocaleString("en-US")} possible gators
-    </p>
-  </div>
-  <p class="mt-2 max-w-2xl text-muted">
-    All {layerCount} attributes, {glitchyCount} of them glitched, stacked in the generator's order:
-    background, body, arms, eyes, mouth, head. Pull the machine and it uses the collection's real
-    rarity weights, so traits turn up as often as they did at the mint. Lock what you like, nudge
-    to browse, or open a reel to choose.
-  </p>
+<section id="machine" class="scroll-mt-20 gm" data-machine data-size={manifest.size}>
+  <!-- The machine -->
+  <div class="gm-scene">
+    <div class="gm-rig" data-rig>
+      <Image
+        src={renderImg}
+        alt=""
+        widths={[444, 666, 888]}
+        sizes="(max-width: 900px) 92vw, 460px"
+        format="png"
+        class="gm-render"
+        loading="eager"
+      />
 
-  <div class="gm mt-6">
-    <!-- Stage -->
-    <div class="gm-left">
+      <!-- Art screen: the composed gator, covering the render's baked one -->
       <div
-        class="gm-stage"
-        data-stage
-        role="img"
-        aria-label={`A gator built from: ${initial.map((s) => s.item.name).join(", ")}`}
+        class="gm-live"
+        style={`left:${SCREEN.x}%;top:${SCREEN.y}%;width:${SCREEN.w}%;height:${SCREEN.h}%`}
       >
-        {
-          initial.map(({ cat, item }) => (
-            <img
-              data-layer={cat.id}
-              src={`/gators/layers/${cat.id}/${item.slug}.webp`}
-              alt=""
-              width={manifest.size}
-              height={manifest.size}
-              decoding="async"
-              fetchpriority={cat.id === "background" ? "high" : "auto"}
-            />
-          ))
-        }
+        {/* The screen is a touch wider than the square art. The background
+            layer alone stretches to fill the glass (a flat colour does not
+            mind), and the gator sits on it uncropped and unmorphed. */}
+        <img
+          data-bgfill
+          class="gm-bgfill"
+          src={`/gators/layers/background/${initial[0].item.slug}.webp`}
+          alt=""
+          aria-hidden="true"
+        />
+        <div
+          class="gm-stack"
+          data-stage
+          role="img"
+          aria-label={`A gator built from: ${initial.map((s) => s.item.name).join(", ")}`}
+        >
+          {
+            initial.map(({ cat, item }) => (
+              <img
+                data-layer={cat.id}
+                src={`/gators/layers/${cat.id}/${item.slug}.webp`}
+                alt=""
+                width={manifest.size}
+                height={manifest.size}
+                decoding="async"
+                fetchpriority={cat.id === "background" ? "high" : "auto"}
+              />
+            ))
+          }
+        </div>
       </div>
-      {/* A fixed six-cell label instead of a wrapping sentence: the block
-          is the same height whatever lands, so nothing below it jumps. */}
-      <dl class="gm-spec" data-recipe aria-live="polite">
-        {
-          initial.map(({ cat, item }) => (
-            <div class="gm-spec-cell">
-              <dt>{cat.label}</dt>
-              <dd data-spec={cat.id} title={item.name}>
-                {item.name}
-              </dd>
-            </div>
-          ))
-        }
-      </dl>
-      <p class="gm-odds" data-odds></p>
-      <div class="gm-actions">
-        <button type="button" class="gm-btn gm-btn-solid" data-spin>Pull the machine</button>
-        <button type="button" class="gm-btn" data-download>Download PNG</button>
-      </div>
-    </div>
 
-    <!-- Reels -->
-    <div class="gm-reels" data-reels>
+      <!-- Six reel windows -->
       {
-        categories.map((c) => {
+        categories.map((c, i) => {
           const item = initial.find((s) => s.cat.id === c.id)!.item;
           return (
-            <div class="gm-reel" data-reel={c.id}>
-              <div class="gm-reel-top">
-                <span class="gm-reel-label">{c.label}</span>
-                <button
-                  type="button"
-                  class="gm-lock"
-                  data-lock={c.id}
-                  aria-pressed="false"
-                  aria-label={`Lock the ${c.label.toLowerCase()} reel`}
-                  title="Lock this reel"
-                >
-                  hold
-                </button>
-              </div>
-              <div class="gm-window">
-                <div class="gm-strip" data-strip={c.id}>
-                  <div class="gm-cell">
-                    <img
-                      src={`/gators/thumbs/${c.id}/${item.slug}.webp`}
-                      alt=""
-                      width="144"
-                      height="144"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
+            <div
+              class="gm-win"
+              data-win={c.id}
+              style={`left:${WIN.xs[i]}%;top:${WIN.y}%;width:${WIN.w}%;height:${WIN.h}%`}
+            >
+              <div class="gm-strip" data-strip={c.id}>
+                <div class="gm-cell">
+                  <img
+                    src={`/gators/thumbs/${c.id}/${item.slug}.webp`}
+                    alt=""
+                    width="144"
+                    height="144"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
-                {/* Nudges ride the window edges so the name below gets the
-                    reel's whole width. */}
-                <button
-                  type="button"
-                  class="gm-nudge gm-nudge-prev"
-                  data-nudge={c.id}
-                  data-dir="-1"
-                  aria-label={`Previous ${c.label.toLowerCase()}`}
-                >
-                  &#8249;
-                </button>
-                <button
-                  type="button"
-                  class="gm-nudge gm-nudge-next"
-                  data-nudge={c.id}
-                  data-dir="1"
-                  aria-label={`Next ${c.label.toLowerCase()}`}
-                >
-                  &#8250;
-                </button>
               </div>
-              <button
-                type="button"
-                class="gm-name"
-                data-browse={c.id}
-                aria-label={`Browse all ${c.items.length} ${c.label.toLowerCase()} options`}
-              >
-                <span data-name={c.id}>{item.name}</span>
-                <span class="gm-rarity" data-rarity={c.id} />
-              </button>
             </div>
           );
         })
       }
+
+      <!-- Clean label plates over the render's garbled ones -->
+      {
+        categories.map((c, i) => (
+          <span
+            class="gm-plate"
+            aria-hidden="true"
+            style={`left:${WIN.xs[i] + PLATE.dx}%;top:${PLATE.y}%;width:${PLATE.w}%;height:${PLATE.h}%`}
+          >
+            {c.id === "background" ? "BG" : c.label}
+          </span>
+        ))
+      }
+
+      <!-- The button: the render's red dome, made real -->
+      <button
+        type="button"
+        class="gm-dome"
+        data-spin
+        aria-label="Mint a gator"
+        style={`left:${BTN.x}%;top:${BTN.y}%;width:${BTN.w}%`}
+      ></button>
     </div>
   </div>
 
-  <!-- Drawer -->
-  <div class="gm-overlay" data-drawer hidden>
-    <div class="gm-drawer" role="dialog" aria-modal="true" aria-labelledby="gm-drawer-title">
-      <div class="gm-drawer-head">
-        <h3 class="gm-drawer-title" id="gm-drawer-title" data-drawer-title></h3>
-        <button type="button" class="gm-close" data-drawer-close aria-label="Close">&times;</button>
-      </div>
-      <div class="gm-drawer-grid" data-drawer-grid></div>
+  <!-- The readout, at reading size on the white page -->
+  <div class="gm-panel">
+    <p class="gm-count">
+      {combos.toLocaleString("en-US")} possible gators. Rolled with the 2021 mint's real rarity
+      weights.
+    </p>
+    <dl class="gm-spec" data-recipe aria-live="polite">
+      {
+        initial.map(({ cat, item }) => (
+          <div class="gm-spec-cell">
+            <dt>{cat.label}</dt>
+            <dd data-spec={cat.id} title={item.name}>
+              {item.name}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="gm-odds" data-odds></p>
+    <div class="gm-actions">
+      <button type="button" class="gm-btn" data-download>Download PNG</button>
     </div>
   </div>
 
@@ -190,35 +187,79 @@ const glitchyCount = categories.reduce(
   />
 </section>
 
+{/* is:global is required, not stylistic: spinReel injects .gm-cell markup at
+    runtime, and scoped selectors would not match it, which collapsed the
+    landed cells and pinned the art to the window top until this was fixed. */}
 <style is:global>
   .gm {
     display: grid;
-    gap: 1.25rem;
-    align-items: start;
+    gap: 2rem;
+    align-items: center;
   }
   @media (min-width: 900px) {
     .gm {
-      grid-template-columns: 5fr 7fr;
-      gap: 1.5rem;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: 2.5rem;
     }
   }
-  /* Grid items default to min-width:auto, so a long trait name would widen
-     the reels column, squeeze the stage column, and resize the square
-     gator on every pull. Pin both tracks to the declared fractions. */
-  .gm-left,
-  .gm-reels,
-  .gm-reel {
-    min-width: 0;
+
+  /* The machine settles into place as it enters the viewport: a small 3D
+     arrival, not a carnival. */
+  .gm-scene {
+    perspective: 1600px;
+    display: flex;
+    justify-content: center;
   }
-  .gm-stage {
+  .gm-rig {
     position: relative;
-    aspect-ratio: 1;
-    overflow: hidden;
-    border-radius: 8px;
-    border: 1px solid var(--color-faint);
-    background: var(--color-surface);
+    width: min(92vw, 460px);
   }
-  .gm-stage img {
+  @media (prefers-reduced-motion: no-preference) {
+    .gm-rig {
+      transform: rotateX(14deg) rotateY(-11deg) scale(0.93) translateY(30px);
+      opacity: 0.4;
+      transition:
+        transform 1s cubic-bezier(0.22, 0.9, 0.3, 1),
+        opacity 0.7s ease;
+    }
+    .gm-rig.is-set {
+      transform: none;
+      opacity: 1;
+    }
+  }
+  .gm-render {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 18px 30px rgb(27 26 23 / 0.22));
+  }
+
+  /* Live regions sit on the render by percentage. */
+  .gm-live {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #0c0d10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gm-bgfill {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  /* The gator fits the screen whole: full height, square, centred, nothing
+     cropped or stretched. The bgfill behind carries the leftover width. */
+  .gm-stack {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 1;
+    flex: none;
+  }
+  .gm-stack img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -226,7 +267,7 @@ const glitchyCount = categories.reduce(
     display: block;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .gm-stage img.landing {
+    .gm-stack img.landing {
       animation: gm-land 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
     }
   }
@@ -240,60 +281,173 @@ const glitchyCount = categories.reduce(
       transform: none;
     }
   }
-  /* The spec label: two columns on phones, three when there is room.
-     Values never wrap, so the block's height is constant. */
-  /* Two columns everywhere: the stage column is narrow, and three would
-     squeeze the longest trait names into an ellipsis. */
+
+  .gm-win {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 8%/4.5%;
+    background: #f5f4f0;
+  }
+  .gm-strip {
+    will-change: transform;
+  }
+  .gm-cell {
+    height: var(--cell, 100px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gm-cell img {
+    max-width: 86%;
+    max-height: 86%;
+    width: auto;
+    height: auto;
+    display: block;
+  }
+
+  .gm-plate {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #17181c;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: clamp(0.4rem, 1.9vw, 0.56rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #b9bcc4;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+  @media (min-width: 900px) {
+    .gm-plate {
+      font-size: 0.52rem;
+    }
+  }
+
+  /* The dome. The render supplies the button; this supplies the press. */
+  .gm-dome {
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 0;
+    background: radial-gradient(
+      circle at 38% 30%,
+      rgb(255 255 255 / 0.14),
+      rgb(255 60 60 / 0.05) 45%,
+      transparent 70%
+    );
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.1s ease,
+      filter 0.15s ease;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    /* The glow breathes, and every few seconds the dome gives one quick
+       wiggle: press me. The wiggle animates the standalone rotate property so
+       the :active press transform still works. */
+    .gm-dome {
+      animation:
+        gm-beckon 3.2s ease-in-out infinite,
+        gm-wiggle 5.4s ease-in-out infinite;
+    }
+  }
+  @keyframes gm-beckon {
+    0%,
+    100% {
+      box-shadow: 0 0 22px rgb(229 60 60 / 0.25);
+    }
+    50% {
+      box-shadow: 0 0 44px rgb(229 60 60 / 0.55);
+    }
+  }
+  @keyframes gm-wiggle {
+    0%,
+    86%,
+    100% {
+      rotate: 0deg;
+    }
+    88% {
+      rotate: 6deg;
+    }
+    91% {
+      rotate: -5deg;
+    }
+    94% {
+      rotate: 3deg;
+    }
+    97% {
+      rotate: -2deg;
+    }
+  }
+  .gm-dome:hover {
+    box-shadow: 0 0 54px rgb(229 60 60 / 0.65);
+    filter: brightness(1.06);
+  }
+  .gm-dome:active {
+    transform: translateY(2%) scale(0.97);
+  }
+  .gm-dome:disabled {
+    cursor: default;
+    animation: none;
+    box-shadow: none;
+  }
+  .gm-dome:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  /* The readout: normal reading sizes, ink on paper. */
+  .gm-count {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
   .gm-spec {
-    margin: 0.7rem 0 0;
+    margin: 1.1rem 0 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.4rem 0.9rem;
+    gap: 0.7rem 1.2rem;
   }
   .gm-spec-cell {
     min-width: 0;
   }
   .gm-spec dt {
     font-family: var(--font-mono);
-    font-size: 0.5rem;
+    font-size: 0.62rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-muted);
-    line-height: 1.4;
+    line-height: 1.5;
   }
-  /* Values may wrap to a second line, and the two lines are always
-     reserved, so the longest trait names show in full and the block never
-     changes height. */
   .gm-spec dd {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.63rem;
-    line-height: 1.4;
+    margin: 0.1rem 0 0;
+    font-size: 1.02rem;
+    font-weight: 500;
+    line-height: 1.35;
     color: var(--color-ink);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     overflow-wrap: anywhere;
-    min-height: 2.8em;
+    min-height: 2.7em;
   }
   .gm-spec dd.is-glitchy {
-    color: var(--color-rust);
+    color: var(--color-accent);
   }
   .gm-odds {
-    margin: 0.7rem 0 0;
+    margin: 1.1rem 0 0;
     font-family: var(--font-mono);
-    font-size: 0.66rem;
-    color: var(--color-accent);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.92rem;
+    color: var(--color-accent-strong);
+    min-height: 1.4em;
   }
   .gm-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-top: 0.8rem;
+    margin-top: 1.1rem;
   }
   .gm-btn {
     font-size: 0.85rem;
@@ -306,274 +460,11 @@ const glitchyCount = categories.reduce(
     cursor: pointer;
     transition:
       border-color 0.15s ease,
-      color 0.15s ease,
-      background-color 0.15s ease;
+      color 0.15s ease;
   }
   .gm-btn:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
-  }
-  .gm-btn-solid {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: #fff;
-  }
-  .gm-btn-solid:hover {
-    background: var(--color-accent-strong);
-    border-color: var(--color-accent-strong);
-    color: #fff;
-  }
-  .gm-btn:disabled {
-    opacity: 0.55;
-    cursor: default;
-  }
-
-  /* Two rows of three everywhere: six across left each reel too narrow to
-     read the trait or see the art. */
-  .gm-reels {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.6rem;
-  }
-  .gm-reel {
-    border: 1px solid var(--color-faint);
-    border-radius: 8px;
-    background: var(--color-surface);
-    padding: 0.4rem 0.4rem 0.45rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-  .gm-reel.is-locked {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 1px var(--color-accent);
-  }
-  .gm-reel-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.3rem;
-  }
-  .gm-reel-label {
-    font-family: var(--font-mono);
-    font-size: 0.56rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-  .gm-lock {
-    font-family: var(--font-mono);
-    font-size: 0.52rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-    background: none;
-    border: 1px solid var(--color-faint);
-    border-radius: 3px;
-    padding: 0.1rem 0.3rem;
-    cursor: pointer;
-  }
-  .gm-lock:hover {
-    color: var(--color-ink);
-  }
-  .gm-lock[aria-pressed="true"] {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: #fff;
-  }
-  .gm-window {
-    position: relative;
-    overflow: hidden;
-    border-radius: 5px;
-    background: var(--color-paper);
-    border: 1px solid var(--color-faint);
-    height: 124px;
-  }
-  /* A faint glass shine so the window reads as a machine, not a box. */
-  .gm-window::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      rgb(27 26 23 / 0.09),
-      transparent 32%,
-      transparent 68%,
-      rgb(27 26 23 / 0.09)
-    );
-  }
-  .gm-strip {
-    will-change: transform;
-  }
-  .gm-cell {
-    height: 124px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .gm-cell img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
-  }
-  .gm-nudge {
-    position: absolute;
-    top: 50%;
-    translate: 0 -50%;
-    z-index: 2;
-    width: 1.15rem;
-    height: 1.7rem;
-    padding: 0;
-    border: 1px solid var(--color-faint);
-    border-radius: 4px;
-    background: rgb(255 255 255 / 0.86);
-    color: var(--color-muted);
-    font-size: 0.8rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-  .gm-nudge-prev {
-    left: 2px;
-  }
-  .gm-nudge-next {
-    right: 2px;
-  }
-  .gm-nudge:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-    background: #fff;
-  }
-  .gm-name {
-    width: 100%;
-    min-width: 0;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background: none;
-    cursor: pointer;
-    padding: 0.1rem 0.15rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 0.05rem;
-  }
-  .gm-name:hover {
-    border-color: var(--color-faint);
-  }
-  /* Two lines, always reserved: the reels are narrow at six across, and a
-     name that grew a line would push the row and resize everything. */
-  .gm-name > span:first-child {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    line-height: 1.35;
-    color: var(--color-ink);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    overflow-wrap: anywhere;
-    min-height: 2.7em;
-  }
-  .gm-rarity {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    color: var(--color-muted);
-  }
-  .gm-rarity.rare {
-    color: var(--color-rust);
-  }
-
-  /* Drawer */
-  .gm-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    background: rgb(27 26 23 / 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-  }
-  .gm-drawer {
-    width: min(46rem, 100%);
-    max-height: 84vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--color-paper);
-    border: 1px solid var(--color-faint);
-    border-radius: 10px;
-    box-shadow: 0 14px 44px rgb(27 26 23 / 0.18);
-  }
-  .gm-drawer-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.9rem 1.1rem 0.6rem;
-  }
-  .gm-drawer-title {
-    margin: 0;
-    font-family: var(--font-display);
-    font-variation-settings: "SOFT" 0, "WONK" 1;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  .gm-close {
-    border: 0;
-    background: none;
-    font-size: 1.3rem;
-    line-height: 1;
-    color: var(--color-muted);
-    cursor: pointer;
-    padding: 0.2rem 0.3rem;
-  }
-  .gm-close:hover {
-    color: var(--color-ink);
-  }
-  .gm-drawer-grid {
-    overflow-y: auto;
-    padding: 0 1.1rem 1.1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
-    gap: 0.45rem;
-  }
-  .gm-opt {
-    padding: 0;
-    border: 1.5px solid var(--color-faint);
-    border-radius: 6px;
-    overflow: hidden;
-    background: var(--color-surface);
-    cursor: pointer;
-    line-height: 0;
-    position: relative;
-  }
-  .gm-opt:hover {
-    border-color: var(--color-muted);
-  }
-  .gm-opt[aria-pressed="true"] {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 1px var(--color-accent);
-  }
-  .gm-opt img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .gm-opt-tag {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    line-height: 1.3;
-    color: var(--color-muted);
-    background: rgb(255 255 255 / 0.88);
-    padding: 0.12rem 0.2rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 </style>
 
@@ -600,7 +491,28 @@ const glitchyCount = categories.reduce(
     const recipe = root.querySelector<HTMLElement>("[data-recipe]")!;
     const oddsEl = root.querySelector<HTMLElement>("[data-odds]")!;
     const spinBtn = root.querySelector<HTMLButtonElement>("[data-spin]")!;
-    const CELL = 124; // must match .gm-window / .gm-cell height in the CSS
+
+    // The machine arrives.
+    const rig = root.querySelector<HTMLElement>("[data-rig]")!;
+    new IntersectionObserver(
+      (entries, obs) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          rig.classList.add("is-set");
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    ).observe(rig);
+
+    // Reel cells are sized by the window they live in, because the windows
+    // scale with the render. Measured fresh whenever the machine resizes.
+    const setCell = () => {
+      root.querySelectorAll<HTMLElement>("[data-win]").forEach((w) => {
+        w.style.setProperty("--cell", `${w.clientHeight}px`);
+      });
+    };
+    setCell();
+    new ResizeObserver(setCell).observe(rig);
 
     const layerImgs = new Map<string, HTMLImageElement>();
     stage.querySelectorAll<HTMLImageElement>("[data-layer]").forEach((img) => {
@@ -608,7 +520,6 @@ const glitchyCount = categories.reduce(
     });
 
     const state = new Map<string, string>();
-    const locked = new Set<string>();
     categories.forEach((c) => {
       const img = layerImgs.get(c.id)!;
       state.set(c.id, decodeURIComponent(img.src.split("/").pop()!.replace(".webp", "")));
@@ -654,16 +565,6 @@ const glitchyCount = categories.reduce(
       for (const c of categories) {
         const it = itemOf(c.id, state.get(c.id)!);
         if (it) p *= it.weight / totalWeight.get(c.id)!;
-        // Per-reel rarity chip.
-        const chip = root.querySelector<HTMLElement>(`[data-rarity="${c.id}"]`);
-        const nameEl = root.querySelector<HTMLElement>(`[data-name="${c.id}"]`);
-        if (it && chip && nameEl) {
-          nameEl.textContent = it.name;
-          nameEl.title = it.name;
-          const pct = it.weight / totalWeight.get(c.id)!;
-          chip.textContent = oneIn(pct).replace("1 in ", "1/");
-          chip.classList.toggle("rare", pct < 0.012);
-        }
       }
       oddsEl.textContent = `this exact gator: ${oneIn(p)}`;
       history.replaceState(null, "", "#g=" + categories.map((c) => state.get(c.id)).join("."));
@@ -687,6 +588,8 @@ const glitchyCount = categories.reduce(
       });
     }
 
+    const bgFill = root.querySelector<HTMLImageElement>("[data-bgfill]");
+
     async function setLayer(catId: string, slug: string, animate = true) {
       state.set(catId, slug);
       const img = layerImgs.get(catId)!;
@@ -694,6 +597,8 @@ const glitchyCount = categories.reduce(
       await preload(url);
       if (state.get(catId) !== slug) return;
       img.src = url;
+      // The stretched fill behind the square art follows the background reel.
+      if (catId === "background" && bgFill) bgFill.src = url;
       if (animate && !reduced) {
         img.classList.remove("landing");
         void img.offsetWidth;
@@ -712,12 +617,15 @@ const glitchyCount = categories.reduce(
       strip.innerHTML = cellHtml(catId, item);
     }
 
-    // Spin one reel: a sampled strip that lands on the target. Real slot
-    // machines never carry every symbol on the reel either.
+    // Spin one reel: a sampled strip that lands on the target. The cell size
+    // comes from the live window height, since the machine scales with the
+    // viewport.
     function spinReel(catId: string, target: MItem, duration: number): Promise<void> {
       const c = byId.get(catId)!;
       const strip = root.querySelector<HTMLElement>(`[data-strip="${catId}"]`)!;
-      if (reduced) {
+      const win = root.querySelector<HTMLElement>(`[data-win="${catId}"]`)!;
+      const cell = win.clientHeight;
+      if (reduced || !cell) {
         setReel(catId, target);
         return Promise.resolve();
       }
@@ -732,7 +640,7 @@ const glitchyCount = categories.reduce(
       void strip.offsetWidth;
       return new Promise((resolve) => {
         strip.style.transition = `transform ${duration}ms cubic-bezier(0.16, 0.62, 0.2, 1)`;
-        strip.style.transform = `translateY(-${(runners.length - 1) * CELL}px)`;
+        strip.style.transform = `translateY(-${(runners.length - 1) * cell}px)`;
         const done = () => {
           strip.removeEventListener("transitionend", done);
           setReel(catId, target);
@@ -750,7 +658,6 @@ const glitchyCount = categories.reduce(
       spinBtn.disabled = true;
       const targets = new Map<string, MItem>();
       for (const c of categories) {
-        if (locked.has(c.id)) continue;
         targets.set(c.id, rollItem(c));
       }
       // Warm the layers while the reels are still turning.
@@ -776,86 +683,6 @@ const glitchyCount = categories.reduce(
     }
 
     spinBtn.addEventListener("click", spin);
-
-    // Locks.
-    root.querySelectorAll<HTMLButtonElement>("[data-lock]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = btn.dataset.lock!;
-        const on = !locked.has(id);
-        on ? locked.add(id) : locked.delete(id);
-        btn.setAttribute("aria-pressed", String(on));
-        btn.textContent = on ? "held" : "hold";
-        root.querySelector(`[data-reel="${id}"]`)!.classList.toggle("is-locked", on);
-      });
-    });
-
-    // Nudges.
-    root.querySelectorAll<HTMLButtonElement>("[data-nudge]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = btn.dataset.nudge!;
-        const dir = parseInt(btn.dataset.dir!, 10);
-        const c = byId.get(id)!;
-        const idx = c.items.findIndex((i) => i.slug === state.get(id));
-        const next = c.items[(idx + dir + c.items.length) % c.items.length];
-        setReel(id, next);
-        setLayer(id, next.slug);
-        updateMeta();
-      });
-    });
-
-    // Drawer.
-    const drawer = root.querySelector<HTMLElement>("[data-drawer]")!;
-    const drawerGrid = root.querySelector<HTMLElement>("[data-drawer-grid]")!;
-    const drawerTitle = root.querySelector<HTMLElement>("[data-drawer-title]")!;
-    let lastFocus: HTMLElement | null = null;
-
-    function openDrawer(catId: string) {
-      const c = byId.get(catId)!;
-      lastFocus = document.activeElement as HTMLElement;
-      drawerTitle.textContent = `${c.label} · ${c.items.length} options`;
-      drawerGrid.innerHTML = c.items
-        .map(
-          (it) =>
-            `<button type="button" class="gm-opt" data-opt="${it.slug}" aria-pressed="${
-              it.slug === state.get(catId)
-            }" title="${it.name}"><img src="/gators/thumbs/${catId}/${it.slug}.webp" alt="${
-              it.name
-            }" width="144" height="144" loading="lazy" decoding="async"><span class="gm-opt-tag">${
-              it.name
-            }</span></button>`,
-        )
-        .join("");
-      drawerGrid.querySelectorAll<HTMLButtonElement>("[data-opt]").forEach((b) => {
-        b.addEventListener("click", () => {
-          const slug = b.dataset.opt!;
-          const it = itemOf(catId, slug)!;
-          setReel(catId, it);
-          setLayer(catId, slug);
-          updateMeta();
-          drawerGrid
-            .querySelectorAll<HTMLButtonElement>("[data-opt]")
-            .forEach((o) => o.setAttribute("aria-pressed", String(o.dataset.opt === slug)));
-        });
-      });
-      drawer.hidden = false;
-      root.querySelector<HTMLElement>("[data-drawer-close]")!.focus();
-      document.addEventListener("keydown", onKey);
-    }
-    function closeDrawer() {
-      drawer.hidden = true;
-      document.removeEventListener("keydown", onKey);
-      lastFocus?.focus();
-    }
-    function onKey(ev: KeyboardEvent) {
-      if (ev.key === "Escape") closeDrawer();
-    }
-    root.querySelectorAll<HTMLButtonElement>("[data-browse]").forEach((b) => {
-      b.addEventListener("click", () => openDrawer(b.dataset.browse!));
-    });
-    root.querySelector("[data-drawer-close]")!.addEventListener("click", closeDrawer);
-    drawer.addEventListener("pointerdown", (ev) => {
-      if (ev.target === drawer) closeDrawer();
-    });
 
     // Download: composite the on-screen layers.
     root.querySelector("[data-download]")!.addEventListener("click", () => {

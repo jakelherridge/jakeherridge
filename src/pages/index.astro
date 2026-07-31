@@ -1,48 +1,21 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
-import GraphMap from "../components/GraphMap.astro";
-import SpecimenCard from "../components/SpecimenCard.astro";
-import { specimens } from "../data/collection";
-import { getCollection } from "astro:content";
+import { exhibits } from "../data/exhibits";
 import professional from "../assets/jake-professional.jpg";
 import candid from "../assets/jake-candid.jpg";
-import { exhibits } from "../data/exhibits";
 
 const name = "Jake Herridge";
 let letterIndex = 0;
 const words = name.split(" ").map((word) => word.split("").map((ch) => ({ ch, i: letterIndex++ })));
-
-const featured = ["pocketwild", "synapse", "apd"]
-  .map((id) => specimens.find((s) => s.id === id)!)
-  .filter(Boolean);
-
-const papers = (await getCollection("papers", (p) => p.data.status === "published")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
-
-const desk = [
-  ...papers.map((p) => ({
-    href: `/papers/${p.id}/`,
-    kind: "White paper",
-    title: p.data.title,
-    blurb: p.data.description,
-  })),
-  {
-    href: "/exhibits/sword/",
-    kind: "A story",
-    title: "The Boy and the Sword",
-    blurb: "A boy loses his magic sword and learns to fry his own egg.",
-  },
-];
 ---
 
 <BaseLayout
   title="Jake Herridge"
-  description="Jake Herridge: father, engineer, nerd, AI guy, wannabe philosopher. Bentonville, Arkansas. An iOS app, a knowledge graph, white papers on AI in real business work, stories, and art."
+  description="Jake Herridge. A gator machine, monster sketches, an iOS field journal, a short story, and my wife's kitchen. Start anywhere, or take the map."
 >
-  <!-- Front door -->
-  <section class="mx-auto max-w-5xl px-5 pt-14 pb-16 md:pt-20">
+  <!-- The front door: a name, a welcome, and the two Jakes. -->
+  <section class="mx-auto max-w-5xl px-5 pt-16 md:pt-24">
     <div class="grid items-center gap-10 md:grid-cols-[7fr_5fr]">
       <div>
         <h1
@@ -62,16 +35,18 @@ const desk = [
             ))
           }
         </h1>
-        <p class="enter mt-5 font-serif text-xl leading-snug text-ink md:text-2xl" style="--enter-step: 4">
-          Father, engineer, nerd, AI guy, wannabe philosopher.
-        </p>
-        <p class="enter mt-3 max-w-xl text-lg leading-relaxed text-muted" style="--enter-step: 6">
-          I live in Bentonville, Arkansas, and I like making things. This site is where I keep
-          them.
+        <p
+          class="enter mt-4 font-serif text-2xl italic text-muted md:text-3xl"
+          style="--enter-step: 4"
+        >
+          Welcome.
         </p>
       </div>
-      {/* Two photos, polished and real. */}
-      <div class="enter relative mx-auto w-full max-w-[280px] md:mx-0 md:max-w-none" style="--enter-step: 3">
+      {/* Two photos, polished and real. They drift with the stickers. */}
+      <div
+        class="enter drift relative mx-auto w-full max-w-[280px] md:mx-0 md:max-w-none"
+        style="--enter-step: 3; --dur: 26s"
+      >
         <Image
           src={professional}
           alt="Jake Herridge"
@@ -92,120 +67,36 @@ const desk = [
     </div>
   </section>
 
-  <!-- Exhibits -->
-  <section class="mx-auto max-w-5xl px-5 pb-16">
-    <div class="flex flex-wrap items-baseline justify-between gap-3">
-      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">Exhibits</h2>
-      <a
-        href="/exhibits/"
-        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
-      >
-        All exhibits &rarr;
-      </a>
-    </div>
-    <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <!-- The sticker wall. Each exhibit is a die-cut sticker; click one to go in. -->
+  <section class="mx-auto max-w-5xl px-5 pb-10 pt-14 md:pt-20" aria-label="Exhibits">
+    <ul class="sticker-wall">
       {
-        exhibits.map((e) => (
-          <a href={e.href} class="group reveal">
-            <div class="overflow-hidden rounded-md border border-faint">
+        exhibits.map((e, i) => (
+          <li
+            class="sticker-spot drift"
+            style={`--tilt: ${[-2.4, 1.8, -1.5, 2.6, -2][i % 5]}deg; --dur: ${[19, 23, 17, 25, 21][i % 5]}s; --phase: ${[-3, -9, -14, -6, -11][i % 5]}s; --dir: ${i % 2 ? "reverse" : "normal"}`}
+          >
+            <a
+              href={e.href}
+              class="sticker group"
+              rel={e.external ? "noopener" : undefined}
+              target={e.external ? "_blank" : undefined}
+            >
+              {/* webp keeps the die-cut alpha and carries the photo card at a
+                  fraction of PNG weight. */}
               <Image
-                src={e.image}
+                src={e.sticker}
                 alt={e.alt}
-                widths={[480, 720, 960]}
-                sizes="(max-width: 640px) 92vw, 460px"
+                widths={[320, 480, 640]}
+                sizes="(max-width: 640px) 44vw, 300px"
                 format="webp"
-                class:list={[
-                  "aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]",
-                  e.pixelated && "pixelated",
-                ]}
+                class="sticker-img"
               />
-            </div>
-            <p class="mt-3 font-mono text-[0.65rem] uppercase tracking-widest text-rust">
-              {e.label}
-            </p>
-            <h3 class="wonk mt-1 text-2xl font-semibold tracking-tight transition-colors group-hover:text-accent">
-              {e.title}
-            </h3>
-            <p class="mt-1 text-sm text-muted">{e.line}</p>
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
-  <!-- The Map -->
-  <section class="mx-auto max-w-5xl px-5 pb-16">
-    <div class="flex flex-wrap items-baseline justify-between gap-3">
-      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">The Map</h2>
-      <a
-        href="/map/"
-        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
-      >
-        Open the full map &rarr;
-      </a>
-    </div>
-    <p class="mt-2 max-w-2xl text-muted">
-      Builds, papers, values, and people, joined by typed edges.
-    </p>
-    <div class="reveal mt-6">
-      <GraphMap variant="embed" />
-    </div>
-  </section>
-
-  <!-- From the Collection -->
-  <section class="border-y border-faint bg-surface">
-    <div class="mx-auto max-w-5xl px-5 py-14">
-      <div class="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">From the Collection</h2>
-        <a
-          href="/collection/"
-          class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
-        >
-          The whole collection &rarr;
-        </a>
-      </div>
-      <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-        {
-          featured.map((s, i) => (
-            <div class="reveal">
-              <SpecimenCard specimen={s} tilt={i % 2 === 0 ? "left" : "right"} />
-            </div>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- From the desk -->
-  <section class="mx-auto max-w-5xl px-5 py-16 pb-24">
-    <div class="flex flex-wrap items-baseline justify-between gap-3">
-      <h2 class="wonk text-2xl font-semibold tracking-tight md:text-3xl">From the desk</h2>
-      <a
-        href="/writing/"
-        class="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
-      >
-        All the writing &rarr;
-      </a>
-    </div>
-    <ul class="mt-4 divide-y divide-faint">
-      {
-        desk.map((d) => (
-          <li class="reveal">
-            <a href={d.href} class="group flex items-baseline justify-between gap-6 py-5">
-              <div>
-                <p class="font-mono text-[0.62rem] uppercase tracking-widest text-muted">
-                  {d.kind}
-                </p>
-                <h3 class="mt-0.5 font-serif text-xl tracking-tight transition-colors group-hover:text-accent">
-                  {d.title}
-                </h3>
-                <p class="mt-1 text-sm text-muted">{d.blurb}</p>
-              </div>
-              <span
-                aria-hidden="true"
-                class="shrink-0 text-accent transition-transform group-hover:translate-x-1"
-              >
-                &rarr;
+              <span class="mt-3 block">
+                <span class="wonk block text-xl font-semibold tracking-tight transition-colors group-hover:text-accent md:text-2xl">
+                  {e.title}
+                </span>
+                <span class="mt-0.5 block text-sm text-muted">{e.line}</span>
               </span>
             </a>
           </li>
@@ -213,4 +104,93 @@ const desk = [
       }
     </ul>
   </section>
+
+  <!-- The other door. -->
+  <section class="mx-auto max-w-5xl px-5 pb-24">
+    <a
+      href="/map/"
+      class="group inline-flex items-baseline gap-2 font-serif text-lg text-muted transition-colors hover:text-accent"
+    >
+      Or take a look at the map, where everything connects
+      <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">&rarr;</span>
+    </a>
+  </section>
 </BaseLayout>
+
+<style>
+  .sticker-wall {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .sticker-wall {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3.5rem 2rem;
+    }
+  }
+  .sticker-spot {
+    display: flex;
+    justify-content: center;
+  }
+  .sticker {
+    display: block;
+    max-width: 300px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+  }
+  /* The sticker sits slightly askew and peels toward you on hover. The drop
+     shadow lives on the image's alpha, so it hugs the die-cut edge instead of
+     boxing the PNG. */
+  .sticker-img {
+    width: 100%;
+    height: auto;
+    transform: rotate(var(--tilt));
+    filter: drop-shadow(0 2px 3px rgb(27 26 23 / 0.18));
+    transition:
+      transform 0.22s ease,
+      filter 0.22s ease;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sticker:hover .sticker-img,
+    .sticker:focus-visible .sticker-img {
+      transform: rotate(0deg) scale(1.045);
+      filter: drop-shadow(0 10px 18px rgb(27 26 23 / 0.24));
+    }
+  }
+  .sticker:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 6px;
+    border-radius: 8px;
+  }
+
+  /* Everything on the page is adrift: each sticker and the photos trace a
+     slow small orbit, all on different clocks so nothing looks synchronized.
+     The orbit lives on the wrapper, so hover transforms underneath still
+     work, and it stops entirely for reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .drift {
+      animation: orbit var(--dur, 22s) ease-in-out infinite var(--dir, normal);
+      animation-delay: var(--phase, 0s);
+    }
+  }
+  @keyframes orbit {
+    0%,
+    100% {
+      transform: translate(0px, 0px);
+    }
+    25% {
+      transform: translate(5px, -7px);
+    }
+    50% {
+      transform: translate(0px, -12px);
+    }
+    75% {
+      transform: translate(-5px, -6px);
+    }
+  }
+</style>

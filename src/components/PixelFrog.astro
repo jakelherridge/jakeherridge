@@ -1,30 +1,7 @@
 ---
-// A small pixel frog that lives on the footer ledge. An homage to Aldo,
-// the narrator of PocketWild. Click him for a field note.
-const FROG = [
-  "..GG......GG..",
-  ".GEEG....GEEG.",
-  ".GEPG....GPEG.",
-  ".GGGGGGGGGGGG.",
-  "GGGGGGGGGGGGGG",
-  "GGGGGGGGGGGGGG",
-  "GGDLLLLLLLLDGG",
-  ".GGLLLLLLLLGG.",
-  ".GGGGGGGGGGGG.",
-  "GGG.GG..GG.GGG",
-];
-
-const INK: Record<string, string> = {
-  G: "#1f6b54",
-  D: "#164f3e",
-  E: "#ffffff",
-  P: "#1b1a17",
-  L: "#bcd8cb",
-};
-
-const pixels = FROG.flatMap((row, y) =>
-  row.split("").flatMap((ch, x) => (ch === "." ? [] : [{ x, y, fill: INK[ch] }])),
-);
+// Aldo lives on the footer ledge. The real one: PocketWild's idle-bob sprite
+// sheet (2x2 frames of 128px), animated by stepping the background position,
+// pixels kept square. Click him for a field note.
 ---
 
 <div class="frog-perch" data-frog-root>
@@ -33,19 +10,10 @@ const pixels = FROG.flatMap((row, y) =>
     type="button"
     class="frog-button"
     id="frog-button"
-    aria-label="A small pixel frog. Press for a field note."
+    aria-label="Aldo the frog. Press for a field note."
     title="ribbit"
   >
-    <svg
-      viewBox="0 0 14 10"
-      width="42"
-      height="30"
-      shape-rendering="crispEdges"
-      aria-hidden="true"
-      class="frog-sprite"
-    >
-      {pixels.map((p) => <rect x={p.x} y={p.y} width="1" height="1" fill={p.fill} />)}
-    </svg>
+    <span class="aldo-sprite" aria-hidden="true"></span>
   </button>
 </div>
 
@@ -67,25 +35,36 @@ const pixels = FROG.flatMap((row, y) =>
     cursor: pointer;
     line-height: 0;
   }
-  .frog-sprite {
+  /* One 64px frame of the 2x2 sheet; the animation walks the four frames. */
+  .aldo-sprite {
     display: block;
+    width: 64px;
+    height: 64px;
+    background-image: url("/pocketwild/aldo-sheet.png");
+    background-size: 128px 128px;
+    background-position: 0 0;
+    image-rendering: pixelated;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .frog-button {
-      transform-origin: bottom center;
-      animation: frog-breathe 4s ease-in-out infinite;
+    .aldo-sprite {
+      animation: aldo-bob 1.8s steps(1) infinite;
     }
     .frog-button.hop {
       animation: frog-hop 0.45s cubic-bezier(0.3, 0.8, 0.3, 1);
     }
   }
-  @keyframes frog-breathe {
-    0%,
-    100% {
-      transform: scaleY(1);
+  @keyframes aldo-bob {
+    0% {
+      background-position: 0 0;
+    }
+    25% {
+      background-position: -64px 0;
     }
     50% {
-      transform: scaleY(0.94);
+      background-position: 0 -64px;
+    }
+    75% {
+      background-position: -64px -64px;
     }
   }
   @keyframes frog-hop {
@@ -120,9 +99,9 @@ const pixels = FROG.flatMap((row, y) =>
 <script>
   const NOTES = [
     "ribbit.",
+    "I narrate PocketWild.",
     "Every capture gets a name.",
-    "Drawn pixel by pixel.",
-    "My cousin narrates PocketWild.",
+    "Sun on everything today.",
     "Go outside. Log what you find.",
   ];
   const button = document.getElementById("frog-button");

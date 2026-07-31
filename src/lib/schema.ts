@@ -11,7 +11,7 @@ export function siteGraph(): object[] {
       "@type": "Person",
       "@id": personId,
       name: person.name,
-      url: `${SITE}/about/`,
+      url: SITE,
       jobTitle: person.jobTitle,
       address: {
         "@type": "PostalAddress",

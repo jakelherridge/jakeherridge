@@ -9,7 +9,9 @@ import monsters from "../data/monsters.json";
   <div class="ml-bar">
     <div class="ml-bar-actions">
       <button type="button" class="ml-btn ml-btn-strong" data-random>Print 5 at random</button>
-      <a class="ml-btn" href="/exhibits/monsters/print/?ids=all" data-print-all>Print all 16</a>
+      <a class="ml-btn" href="/exhibits/monsters/print/?ids=all" data-print-all>
+        Print all {monsters.length}
+      </a>
     </div>
     <div class="ml-bar-opts">
       <div class="ml-seg" role="group" aria-label="Paper size">
@@ -29,7 +31,16 @@ import monsters from "../data/monsters.json";
     {
       monsters.map((m) => (
         <li class="ml-card" data-card data-id={m.id} data-number={m.number}>
-          <a class="ml-sheet" href={`/monsters/print/${m.id}.png`} data-open>
+          {/* Opens the sheet's PDF itself. Printing from the PDF viewer puts
+              nothing on the page but the monster; printing an HTML page lets
+              the browser stamp its URL footer on a kid's art. */}
+          <a
+            class="ml-sheet"
+            href={`/monsters/print/${m.id}-letter.pdf`}
+            target="_blank"
+            data-open
+            data-base={m.id}
+          >
             <img
               src={`/monsters/thumbs/${m.id}.webp`}
               alt={`Coloring page: ${m.title}, an ink monster drawn by hand`}
@@ -54,7 +65,13 @@ import monsters from "../data/monsters.json";
               >
                 Download
               </a>
-              <a class="ml-btn ml-btn-sm" href={`/exhibits/monsters/print/?ids=${m.id}`} data-print>
+              <a
+                class="ml-btn ml-btn-sm"
+                href={`/monsters/print/${m.id}-letter.pdf`}
+                target="_blank"
+                data-print
+                data-base={m.id}
+              >
                 Print
               </a>
               <button type="button" class="ml-btn ml-btn-sm" data-color-it>Color it here</button>
@@ -245,8 +262,10 @@ import monsters from "../data/monsters.json";
     let paper = localStorage.getItem(PAPER_KEY) === "a4" ? "a4" : "letter";
 
     // ----- paper size -----
+    // Download, Print, and the sheet image all point at the same paper-aware
+    // PDF; only the download attribute differs.
     function applyPaper() {
-      root.querySelectorAll<HTMLAnchorElement>("[data-pdf]").forEach((a) => {
+      root.querySelectorAll<HTMLAnchorElement>("[data-pdf], [data-print], [data-open]").forEach((a) => {
         a.href = `/monsters/print/${a.dataset.base}-${paper}.pdf`;
       });
       root
@@ -337,6 +356,8 @@ import monsters from "../data/monsters.json";
       a.addEventListener("click", () => tally(a.dataset.base!)),
     );
     root.querySelectorAll<HTMLElement>("[data-card]").forEach((card) => {
+      // Plain anchors now; no preventDefault. The PDF opens, the tally rides
+      // along on sendBeacon.
       card.querySelector("[data-print]")?.addEventListener("click", () => tally(card.dataset.id!));
       card.querySelector("[data-open]")?.addEventListener("click", () => tally(card.dataset.id!));
     });
@@ -351,12 +372,6 @@ import monsters from "../data/monsters.json";
       ids.forEach(tally);
       location.href = `/exhibits/monsters/print/?ids=${ids.join(",")}&paper=${paper}`;
     });
-    root.querySelectorAll<HTMLAnchorElement>("[data-print]").forEach((a) =>
-      a.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        location.href = `${a.getAttribute("href")}&paper=${paper}`;
-      }),
-    );
 
     // ----- hand off to the coloring canvas -----
     root.querySelectorAll<HTMLElement>("[data-color-it]").forEach((b) =>
