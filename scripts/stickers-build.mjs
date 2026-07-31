@@ -297,7 +297,6 @@ jobs.push(["gators", await sharp(SRC.gator).toBuffer()]);
     { name: "strawberry", box: itemAt(0, 0) },
     { name: "carrot", box: itemAt(1, 1) },
     { name: "avocado", box: itemAt(1, 2) },
-    { name: "cherries", box: itemAt(2, 0) },
   ].filter((p) => p.box);
   if (PICKS.length < 4) throw new Error(`fruit split found only ${PICKS.length} of the picks`);
 
@@ -337,13 +336,12 @@ jobs.push(["gators", await sharp(SRC.gator).toBuffer()]);
   const canvasW = bm.width + M * 2;
   const canvasH = bm.height + M * 2;
   const comps = [{ input: rounded, left: M, top: M }];
-  // Scattered around her, none over her face: corners and edges.
+  // Four corners, two of them big. None over her face.
   const spots = [
-    { x: M - 30, y: M - 10, size: 240 }, // lemon, top left
-    { x: canvasW - 250, y: M + 130, size: 230 }, // strawberry, upper right
-    { x: canvasW - 240, y: canvasH - 620, size: 250 }, // carrot, mid right
-    { x: M - 34, y: canvasH - 560, size: 240 }, // avocado, lower left
-    { x: canvasW - 300, y: canvasH - 300, size: 260 }, // cherries, bottom right
+    { x: M - 36, y: M - 16, size: 340 }, // lemon, top left, big
+    { x: canvasW - 300, y: M + 90, size: 270 }, // strawberry, upper right
+    { x: canvasW - 320, y: canvasH - 380, size: 300 }, // carrot, bottom right
+    { x: M - 40, y: canvasH - 480, size: 330 }, // avocado, bottom left, big
   ];
   for (let i = 0; i < PICKS.length; i++) {
     const s = await fruitSticker(PICKS[i].box, i, spots[i].size);
