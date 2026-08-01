@@ -65,9 +65,8 @@ export const nodes: GraphNode[] = [
     label: "Synapse",
     kind: "build",
     status: "growing",
-    // Unlisted while the room waits for its overhaul; the node stays because
-    // the idea is load-bearing for the map itself.
     summary: "A knowledge graph of typed nodes and typed edges. This map uses the same structure.",
+    href: "/exhibits/synapse/",
   },
   {
     id: "synapse-capture",

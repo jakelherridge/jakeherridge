@@ -1,13 +1,11 @@
 // The sticker wall. Every exhibit is a die-cut sticker on the home page;
 // stickers come from scripts/stickers-build.mjs, never hand-edited.
-//
-// Synapse is off the wall while it waits for its overhaul (2026-07-30). The
-// room still exists at /exhibits/synapse/, just unlisted.
 import type { ImageMetadata } from "astro";
 import gatorsSticker from "../assets/stickers/gators.png";
 import monstersSticker from "../assets/stickers/monsters.png";
 import pocketwildSticker from "../assets/stickers/pocketwild.png";
 import swordSticker from "../assets/stickers/sword.png";
+import synapseSticker from "../assets/stickers/synapse.png";
 import kitchenSticker from "../assets/stickers/kitchen.png";
 
 export interface Exhibit {
@@ -47,6 +45,13 @@ export const exhibits: Exhibit[] = [
     line: "A short story.",
     sticker: swordSticker,
     alt: "Sticker of an ink-drawn sword",
+  },
+  {
+    href: "/exhibits/synapse/",
+    title: "Synapse",
+    line: "My second brain, hooked up for reading.",
+    sticker: synapseSticker,
+    alt: "Sticker of a coral-pink brain drawn as a network of connected nodes",
   },
   {
     href: "https://kitchenhappy.club/",

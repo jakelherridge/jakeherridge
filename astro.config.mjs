@@ -11,14 +11,10 @@ import paperPdf from './integrations/pdf.mjs';
 export default defineConfig({
   site: 'https://jakeherridge.com',
   // Out of the sitemap: the monster print sheet (a query-param utility view,
-  // carries noindex) and the Synapse room (live at its URL but unlisted while
-  // it waits for its overhaul).
+  // carries noindex).
   integrations: [
     mdx(),
-    sitemap({
-      filter: (page) =>
-        !page.includes('/exhibits/monsters/print') && !page.includes('/exhibits/synapse'),
-    }),
+    sitemap({ filter: (page) => !page.includes('/exhibits/monsters/print') }),
     paperPdf(),
   ],
   vite: {
