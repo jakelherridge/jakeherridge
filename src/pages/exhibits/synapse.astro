@@ -5,7 +5,7 @@ import { breadcrumb } from "../../lib/schema";
 import vault from "../../../public/synapse/vault.json";
 
 const title = "Synapse";
-const description = `My second brain, hooked up for reading. The whole vault turning as a ${vault.n}-node graph; press a key and it answers with citations.`;
+const description = `Synapse instantly connects all of your files. A Claude Code plugin that turns a folder of notes into a typed, tagged, connected graph. This one is Jake's own, with ${vault.n} nodes and three tests you can run.`;
 
 const jsonLd = [
   {
@@ -28,14 +28,22 @@ const jsonLd = [
     <header>
       <h1 class="wonk text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
       <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
-        My second brain, hooked up for reading. Synapse is a
+        Instantly connects all of your files.
+      </p>
+      <p class="mt-5 max-w-2xl leading-relaxed text-ink">
+        Synapse is a
         <a
           href="https://github.com/jakelherridge/synapse-capture"
           rel="noopener"
           class="text-accent-strong underline underline-offset-4 hover:text-accent"
           >Claude Code plugin</a
-        >: point it at a folder of notes and it builds what the screen shows, every
-        file typed, tagged, and connected on its own.
+        > and the graph it builds. Point it at a folder of notes and it breaks what
+        it finds into small typed nodes, tags them, and connects them with typed
+        edges.
+      </p>
+      <p class="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+        This one is mine, as the example. The three scraps under the brain are
+        tests: feed one in and watch it tag and connect for real.
       </p>
     </header>
 

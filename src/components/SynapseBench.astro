@@ -10,9 +10,10 @@
 //   synapse-capture at a folder and it types, tags, and connects everything
 //   on its own.
 //   ASK — four keys on the rig, each a question about this website. The
-//   default (WHAT IS SYNAPSE) auto-runs once after boot. Traces tick on the
-//   rig's strip, hops caption on the projection, answers land on paper with
-//   citations that open real node cards.
+//   what-is-Synapse answer's short form lives in the page header; the SYNAPSE
+//   key gives the full cited version. Traces tick on the rig's strip, hops
+//   caption on the projection, answers land on paper with citations that open
+//   real node cards.
 //
 // The rig is Jake's rendered console; CRT, strip, and keys are live regions
 // over it (measured percentages, same as the gator machine). Wires are
@@ -972,18 +973,8 @@ const stats = { n: vault.n, e: vault.e, v: vault.v, d: vault.d, named: namedSlug
       setTimeout(() => (bootStep = 3), 900);
       setTimeout(() => {
         booted = true;
-        // The room explains itself: the default question runs once, unless
-        // the visitor beat it to the controls.
-        setTimeout(() => {
-          if (!userTouched && !running) runAsk(demos[0]);
-        }, 700);
       }, 2000);
       setStrip("SYNAPSE ONLINE");
-    }
-    if (reduced) {
-      setTimeout(() => {
-        if (!userTouched && !running) runAsk(demos[0]);
-      }, 400);
     }
 
     function focusNode(i: number, strength = 1) {
