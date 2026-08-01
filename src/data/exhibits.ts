@@ -49,7 +49,7 @@ export const exhibits: Exhibit[] = [
   {
     href: "/exhibits/synapse/",
     title: "Synapse",
-    line: "My second brain, hooked up for reading.",
+    line: "Instantly connects all of your files for AI context.",
     sticker: synapseSticker,
     alt: "Sticker of a coral-pink brain drawn as a network of connected nodes",
   },
