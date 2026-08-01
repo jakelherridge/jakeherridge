@@ -17,13 +17,15 @@ export interface Exhibit {
   external?: boolean;
 }
 
+// Wall order is Jake's call (2026-07-31): synapse, monsters, pocketwild,
+// gators, kitchen, sword.
 export const exhibits: Exhibit[] = [
   {
-    href: "/exhibits/gators/",
-    title: "Glitchy Gator Machine",
-    line: "A fun little NFT project that taught me blockchain and patience.",
-    sticker: gatorsSticker,
-    alt: "Sticker of a purple gator with horns and a glitching rainbow laser eye",
+    href: "/exhibits/synapse/",
+    title: "Synapse",
+    line: "Instantly connects all of your files for AI context.",
+    sticker: synapseSticker,
+    alt: "Sticker of a coral-pink brain drawn as a network of connected nodes",
   },
   {
     href: "/exhibits/monsters/",
@@ -40,18 +42,11 @@ export const exhibits: Exhibit[] = [
     alt: "Sticker of an iPhone running PocketWild's home screen",
   },
   {
-    href: "/exhibits/sword/",
-    title: "The Boy and the Sword",
-    line: "A short story.",
-    sticker: swordSticker,
-    alt: "Sticker of an ink-drawn sword",
-  },
-  {
-    href: "/exhibits/synapse/",
-    title: "Synapse",
-    line: "Instantly connects all of your files for AI context.",
-    sticker: synapseSticker,
-    alt: "Sticker of a coral-pink brain drawn as a network of connected nodes",
+    href: "/exhibits/gators/",
+    title: "Glitchy Gator Machine",
+    line: "A fun little NFT project that taught me blockchain and patience.",
+    sticker: gatorsSticker,
+    alt: "Sticker of a purple gator with horns and a glitching rainbow laser eye",
   },
   {
     href: "https://kitchenhappy.club/",
@@ -60,5 +55,12 @@ export const exhibits: Exhibit[] = [
     sticker: kitchenSticker,
     alt: "Haley in her kitchen, with photos of her recipes stickered over the picture",
     external: true,
+  },
+  {
+    href: "/exhibits/sword/",
+    title: "The Boy and the Sword",
+    line: "A short story.",
+    sticker: swordSticker,
+    alt: "Sticker of an ink-drawn sword",
   },
 ];

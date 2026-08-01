@@ -1,0 +1,488 @@
+---
+// The Map in space: the personal graph rendered with the same turning 3D
+// treatment as the Synapse projection, because it is the same idea turned on
+// its author. Every node is named on the canvas; click one and its card opens
+// below with its summary, its typed edges written out in words, and a way in
+// to the thing itself.
+//
+// The 3D layout is computed here at build time, so the client only rotates
+// and projects.
+import { nodes, edges, kindMeta, relPhrase } from "../data/graph";
+
+// Dark-panel palette per kind: kindMeta's colors are inks for paper, and
+// near-black dots would vanish on the void.
+const SPACE_COLORS: Record<string, string> = {
+  person: "#f2efe6",
+  build: "#7ce8b6",
+  paper: "#b7c6e6",
+  creative: "#e0a48c",
+  value: "#e6d6a3",
+  influence: "#b0b0a2",
+  life: "#cdb896",
+};
+
+const idx = new Map(nodes.map((n, i) => [n.id, i]));
+const ed = edges
+  .filter((e) => idx.has(e.from) && idx.has(e.to))
+  .map((e) => [idx.get(e.from), idx.get(e.to), e.rel]);
+
+// Small deterministic 3D force layout.
+const N = nodes.length;
+let seed = 4242;
+const rand = () => {
+  seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+  return seed / 0x7fffffff;
+};
+const pos: number[][] = [];
+for (let i = 0; i < N; i++) {
+  const th = rand() * Math.PI * 2;
+  const ph = Math.acos(2 * rand() - 1);
+  const r = 0.45 + rand() * 0.55;
+  pos.push([
+    r * Math.sin(ph) * Math.cos(th),
+    r * Math.sin(ph) * Math.sin(th),
+    r * Math.cos(ph),
+  ]);
+}
+for (let it = 0; it < 280; it++) {
+  const f = pos.map(() => [0, 0, 0]);
+  for (let a = 0; a < N; a++) {
+    for (let b = a + 1; b < N; b++) {
+      const dx = pos[a][0] - pos[b][0];
+      const dy = pos[a][1] - pos[b][1];
+      const dz = pos[a][2] - pos[b][2];
+      const d2 = dx * dx + dy * dy + dz * dz + 0.004;
+      const rep = 0.012 / d2;
+      const d = Math.sqrt(d2);
+      for (const [c, v] of [dx, dy, dz].entries()) {
+        f[a][c] += (v / d) * rep;
+        f[b][c] -= (v / d) * rep;
+      }
+    }
+  }
+  for (const [a, b] of ed) {
+    const dx = pos[b as number][0] - pos[a as number][0];
+    const dy = pos[b as number][1] - pos[a as number][1];
+    const dz = pos[b as number][2] - pos[a as number][2];
+    const d = Math.sqrt(dx * dx + dy * dy + dz * dz) + 1e-6;
+    const pull = 0.02 * (d - 0.42);
+    for (const [c, v] of [dx, dy, dz].entries()) {
+      f[a as number][c] += (v / d) * pull;
+      f[b as number][c] -= (v / d) * pull;
+    }
+  }
+  const cool = 1 - it / 320;
+  for (let i = 0; i < N; i++) {
+    for (let c = 0; c < 3; c++) {
+      pos[i][c] += Math.max(-0.06, Math.min(0.06, f[i][c])) * cool;
+      pos[i][c] *= 0.997;
+    }
+  }
+}
+const maxR = Math.max(...pos.map((p) => Math.hypot(p[0], p[1], p[2])));
+const posN = pos.map((p) => p.map((v) => Math.round((v / maxR) * 1000) / 1000));
+
+const payload = {
+  nodes: nodes.map((n) => ({
+    id: n.id,
+    label: n.label,
+    kind: n.kind,
+    summary: n.summary,
+    href: n.href || null,
+    status: n.status || null,
+  })),
+  pos: posN,
+  ed,
+  colors: SPACE_COLORS,
+  relPhrase,
+};
+---
+
+<div class="ms" data-mapspace>
+  <div class="ms-panel">
+    <canvas
+      data-space
+      aria-label={`Jake as a turning 3D graph: ${N} named nodes joined by typed edges. Click a node to read it.`}
+    ></canvas>
+    <div class="ms-legend" aria-hidden="true">
+      {
+        Object.entries(kindMeta).map(([kind, meta]) => (
+          <span class="ms-key">
+            <i style={`background:${SPACE_COLORS[kind]}`} />
+            {meta.label}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+
+  <aside class="ms-card" data-card hidden aria-live="polite"></aside>
+
+  <script type="application/json" data-map-data set:html={JSON.stringify(payload)} />
+</div>
+
+<style is:global>
+  .ms-panel {
+    position: relative;
+    background: #0c0d10;
+    border: 1px solid #1c1e24;
+    border-radius: 14px;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.04),
+      0 18px 44px rgb(15 16 20 / 0.25);
+    overflow: hidden;
+  }
+  .ms-panel canvas {
+    display: block;
+    width: 100%;
+    height: clamp(420px, 58vw, 620px);
+  }
+  .ms-legend {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    pointer-events: none;
+  }
+  .ms-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+  .ms-key i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .ms-card {
+    margin-top: 1rem;
+    border: 1px solid var(--color-faint);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 10px;
+    background: var(--color-surface);
+    padding: 1.1rem 1.25rem;
+    position: relative;
+  }
+  .ms-card h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .ms-kind {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .ms-kind i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid rgb(27 26 23 / 0.25);
+  }
+  .ms-summary {
+    margin: 0.7rem 0 0;
+    line-height: 1.6;
+  }
+  .ms-open {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-weight: 500;
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .ms-open:hover {
+    color: var(--color-accent);
+  }
+  .ms-rels {
+    margin-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .ms-rel {
+    text-align: left;
+    border: 0;
+    background: none;
+    padding: 0;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+  .ms-rel b {
+    font-weight: 500;
+    color: var(--color-accent-strong);
+  }
+  .ms-rel:hover b {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .ms-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.7rem;
+    border: 0;
+    background: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+  .ms-close:hover {
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  interface MapNode {
+    id: string;
+    label: string;
+    kind: string;
+    summary: string;
+    href: string | null;
+    status: string | null;
+  }
+  interface MapData {
+    nodes: MapNode[];
+    pos: number[][];
+    ed: [number, number, string][];
+    colors: Record<string, string>;
+    relPhrase: Record<string, { forward: string; reverse: string }>;
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-mapspace]");
+  const dataEl = document.querySelector("[data-map-data]");
+  if (root && dataEl) init(root, JSON.parse(dataEl.textContent || "{}"));
+
+  function init(root: HTMLElement, data: MapData) {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canvas = root.querySelector<HTMLCanvasElement>("[data-space]")!;
+    const cardBox = root.querySelector<HTMLElement>("[data-card]")!;
+    const ctx = canvas.getContext("2d")!;
+    const N = data.nodes.length;
+
+    let cw = 0;
+    let ch = 0;
+    function size() {
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      cw = Math.max(1, Math.round(r.width * dpr));
+      ch = Math.max(1, Math.round(r.height * dpr));
+      canvas.width = cw;
+      canvas.height = ch;
+    }
+    size();
+    new ResizeObserver(size).observe(canvas);
+
+    let rotY = 0.4;
+    const rotX = -0.14;
+    let targetY: number | null = null;
+    let lastT = 0;
+    let selected: number | null = null;
+    let hover: number | null = null;
+    const flare = new Map<number, number>();
+    const proj: [number, number, number][] = new Array(N);
+
+    const neighbors = new Map<number, Set<number>>();
+    for (const [a, b] of data.ed) {
+      if (!neighbors.has(a)) neighbors.set(a, new Set());
+      if (!neighbors.has(b)) neighbors.set(b, new Set());
+      neighbors.get(a)!.add(b);
+      neighbors.get(b)!.add(a);
+    }
+
+    function paint(t: number) {
+      const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+      lastT = t;
+      if (!reduced) {
+        if (targetY !== null) {
+          const diff = ((targetY - rotY + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+          rotY += diff * Math.min(1, dt * 3);
+          if (Math.abs(diff) < 0.02) targetY = null;
+        } else {
+          rotY += dt * 0.085;
+        }
+        for (const [i, f] of flare) flare.set(i, Math.max(0, f - dt * 0.8));
+      }
+      ctx.clearRect(0, 0, cw, ch);
+      const cy = Math.cos(rotY);
+      const sy = Math.sin(rotY);
+      const cx = Math.cos(rotX);
+      const sx = Math.sin(rotX);
+      const R = Math.min(cw, ch) * 0.6;
+      for (let i = 0; i < N; i++) {
+        const [x, y, z] = data.pos[i];
+        const x1 = x * cy + z * sy;
+        const z1 = -x * sy + z * cy;
+        const y1 = y * cx - z1 * sx;
+        const z2 = y * sx + z1 * cx;
+        const depth = (z2 + 1.2) / 2.2;
+        proj[i] = [cw / 2 + x1 * R, ch / 2 + y1 * R * 0.9, depth];
+      }
+      const px = cw / 900;
+      // Edges: faint; the selected node's own edges bright.
+      for (const [a, b] of data.ed) {
+        const isSel = selected !== null && (a === selected || b === selected);
+        ctx.strokeStyle = isSel
+          ? "rgba(124, 232, 182, 0.55)"
+          : "rgba(214, 224, 205, 0.12)";
+        ctx.lineWidth = isSel ? 1.8 : 1;
+        ctx.beginPath();
+        ctx.moveTo(proj[a][0], proj[a][1]);
+        ctx.lineTo(proj[b][0], proj[b][1]);
+        ctx.stroke();
+      }
+      for (let i = 0; i < N; i++) {
+        const [X, Y, depth] = proj[i];
+        const n = data.nodes[i];
+        const f = flare.get(i) || 0;
+        const isSel = selected === i;
+        const isNb = selected !== null && neighbors.get(selected)?.has(i);
+        let r = (3.4 + (n.kind === "person" ? 2.4 : 0)) * (0.6 + depth * 0.7);
+        let alpha = 0.45 + depth * 0.55;
+        if (selected !== null && !isSel && !isNb) alpha *= 0.35;
+        if (f > 0) {
+          r += f * 4;
+          alpha = Math.min(1, alpha + f);
+        }
+        if (hover === i || isSel) {
+          r += 1.6;
+          alpha = 1;
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = data.colors[n.kind] || "#a8a89a";
+        if (n.status === "shelved") {
+          // Shelved work keeps its hollow-dot honesty from the old map.
+          ctx.lineWidth = 1.6;
+          ctx.strokeStyle = data.colors[n.kind] || "#a8a89a";
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.arc(X, Y, r * px, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else {
+          ctx.beginPath();
+          ctx.arc(X, Y, r * px, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (isSel || hover === i) {
+          ctx.globalAlpha = 0.6;
+          ctx.strokeStyle = "#7ce8b6";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(X, Y, (r + 5) * px, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        // Every node is named; back-of-sphere names go ghostly.
+        const la = isSel || hover === i ? 1 : Math.max(0.16, (depth - 0.35) * 1.3);
+        ctx.globalAlpha = la * (selected !== null && !isSel && !isNb ? 0.4 : 1);
+        ctx.fillStyle = isSel || hover === i ? "#d9f5e6" : "#9aa79e";
+        ctx.font = `${Math.round(10.5 * px)}px ui-monospace, Menlo, monospace`;
+        ctx.fillText(n.label, X + (r + 6) * px, Y + 3.5 * px);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    let visible = false;
+    function loop(t: number) {
+      if (visible) paint(t);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    new IntersectionObserver(
+      (es) => (visible = es.some((e) => e.isIntersecting)),
+      { threshold: 0.1 },
+    ).observe(canvas);
+
+    function hit(ev: MouseEvent): number | null {
+      const r = canvas.getBoundingClientRect();
+      const dpr = cw / r.width;
+      const mx = (ev.clientX - r.left) * dpr;
+      const my = (ev.clientY - r.top) * dpr;
+      let best: number | null = null;
+      let bestD = 22 * dpr;
+      for (let i = 0; i < N; i++) {
+        const p = proj[i];
+        if (!p) continue;
+        const d = Math.hypot(p[0] - mx, p[1] - my);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      return best;
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      hover = hit(ev);
+      canvas.style.cursor = hover !== null ? "pointer" : "default";
+    });
+    canvas.addEventListener("mouseleave", () => (hover = null));
+    canvas.addEventListener("click", (ev) => {
+      const i = hit(ev);
+      if (i !== null) select(i);
+    });
+
+    function select(i: number) {
+      selected = i;
+      const n = data.nodes[i];
+      const [x, , z] = data.pos[i];
+      targetY = Math.atan2(-x, z) + Math.PI;
+      flare.set(i, 1);
+      // Its edges, written out in words.
+      let rels = "";
+      for (const [a, b, rel] of data.ed) {
+        const phrase = data.relPhrase[rel];
+        if (!phrase) continue;
+        if (a === i) {
+          rels += `<button type="button" class="ms-rel" data-go="${b}">${phrase.forward} <b>${data.nodes[b].label}</b></button>`;
+        } else if (b === i) {
+          rels += `<button type="button" class="ms-rel" data-go="${a}">${phrase.reverse} <b>${data.nodes[a].label}</b></button>`;
+        }
+      }
+      cardBox.innerHTML =
+        `<button type="button" class="ms-close" data-close aria-label="Close">&times;</button>` +
+        `<h3>${n.label}</h3>` +
+        `<p class="ms-kind"><i style="background:${data.colors[n.kind]}"></i>${n.kind}${
+          n.status ? ` · ${n.status}` : ""
+        }</p>` +
+        `<p class="ms-summary">${n.summary}</p>` +
+        (n.href
+          ? `<a class="ms-open" href="${n.href}"${n.href.startsWith("http") ? ' rel="noopener"' : ""}>Open &rarr;</a>`
+          : "") +
+        (rels ? `<div class="ms-rels">${rels}</div>` : "");
+      cardBox.hidden = false;
+      cardBox.querySelector("[data-close]")!.addEventListener("click", () => {
+        cardBox.hidden = true;
+        selected = null;
+      });
+      cardBox.querySelectorAll<HTMLElement>("[data-go]").forEach((b) =>
+        b.addEventListener("click", () => select(parseInt(b.dataset.go!, 10))),
+      );
+      cardBox.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+    }
+
+    // A slow shimmer so the space feels inhabited.
+    if (!reduced) {
+      setInterval(() => {
+        if (visible && selected === null) flare.set(Math.floor(Math.random() * N), 0.5);
+      }, 3000);
+    }
+  }
+</script>

@@ -151,6 +151,15 @@ const BTN = { x: 40.77, y: 48.91, w: 16.89 };
         aria-label="Mint a gator"
         style={`left:${BTN.x}%;top:${BTN.y}%;width:${BTN.w}%`}
       ></button>
+      {/* The invitation. Bounces over the dome until the first press. */}
+      <span
+        class="gm-press"
+        data-press
+        aria-hidden="true"
+        style={`left:${BTN.x + BTN.w / 2}%;top:${BTN.y - 6.2}%`}
+      >
+        press &darr;
+      </span>
     </div>
   </div>
 
@@ -344,13 +353,52 @@ const BTN = { x: 40.77, y: 48.91, w: 16.89 };
       filter 0.15s ease;
   }
   @media (prefers-reduced-motion: no-preference) {
-    /* The glow breathes, and every few seconds the dome gives one quick
-       wiggle: press me. The wiggle animates the standalone rotate property so
-       the :active press transform still works. */
+    /* The glow breathes, the dome bobs up and down, and every few seconds it
+       gives one quick wiggle: press me. Bob and wiggle ride the standalone
+       translate and rotate properties so the :active press transform still
+       works on top. */
     .gm-dome {
       animation:
         gm-beckon 3.2s ease-in-out infinite,
-        gm-wiggle 5.4s ease-in-out infinite;
+        gm-wiggle 5.4s ease-in-out infinite,
+        gm-bob 1.6s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes gm-bob {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 -7%;
+    }
+  }
+  .gm-press {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: clamp(0.5rem, 1.6vw, 0.68rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    background: #fff;
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    padding: 0.22em 0.7em;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .gm-press {
+      animation: gm-press-bounce 0.9s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes gm-press-bounce {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 -7px;
     }
   }
   @keyframes gm-beckon {
@@ -655,6 +703,8 @@ const BTN = { x: 40.77, y: 48.91, w: 16.89 };
     async function spin() {
       if (spinning) return;
       spinning = true;
+      // The invitation has done its job.
+      root.querySelector("[data-press]")?.remove();
       spinBtn.disabled = true;
       const targets = new Map<string, MItem>();
       for (const c of categories) {
