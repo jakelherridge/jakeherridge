@@ -1,31 +1,39 @@
 ---
-// The Synapse bench: the brain on the left, wires to a reading rig on the
-// right. The rig is Jake's rendered instrument console (background lifted
-// off); the CRT, the readout strip, and the four keys are live regions
-// positioned over it by measured percentages, same trick as the gator
-// machine. The CRT shows the whole vault swirling in 3D: every dot is a real
-// file, anonymous, and only the 49 allowlisted nodes carry names. Pressing a
-// key runs a real traversal: the trace ticks on the readout, the visited
-// nodes flare in the swirl, and the answer lands on paper with citations.
+// The Synapse bench, v2. The brain on the left with a tray of raw scraps
+// under it, wires to the reading rig, and below the whole scene a full-width
+// projection: the vault as a big labeled 3D graph.
 //
-// The wires are SVG drawn at runtime between the two pieces, so pulses can
-// ride them and the bench can restack on phones.
+// Two interactions, both real data:
+//   FEED — click a scrap and watch the room replay how that node actually
+//   entered the vault: the dot is born, its real tags stamp on, its real
+//   typed edges shoot to their neighbors. This is the plugin's pitch: point
+//   synapse-capture at a folder and it types, tags, and connects everything
+//   on its own.
+//   ASK — four keys on the rig, each a question about this website. The
+//   default (WHAT IS SYNAPSE) auto-runs once after boot. Traces tick on the
+//   rig's strip, hops caption on the projection, answers land on paper with
+//   citations that open real node cards.
+//
+// The rig is Jake's rendered console; CRT, strip, and keys are live regions
+// over it (measured percentages, same as the gator machine). Wires are
+// runtime SVG so pulses ride them and the bench restacks on phones.
 import { Image } from "astro:assets";
 import brainImg from "../assets/synapse-brain.png";
 import rigImg from "../assets/synapse-rig.png";
 import vault from "../../public/synapse/vault.json";
-import { demos } from "../data/synapse-demo";
+import nodesData from "../../public/synapse/nodes.json";
+import { demos, feedIds } from "../data/synapse-demo";
 
 // Live regions, measured off the trimmed 639x733 render.
 const CRT = { x: 21.6, y: 14.7, w: 57.9, h: 38.9 };
 const STRIP = { x: 25.5, y: 63.4, w: 50.9, h: 8.5 };
-const KEYS = [26.9, 35.7, 44.6, 53.5]; // centers, % of rig width
+const KEYS = [26.9, 35.7, 44.6, 53.5];
 const KEY = { cy: 84.3, d: 9.4 };
-const PLATE = { y: 90.2, w: 10.6, h: 3.2 };
-const KEY_LABELS = ["ORIGIN", "VECTORS", "BOOKS", "CONFLICT"];
+// Knobs sit 8.8% apart, so plates must stay narrower than that.
+const PLATE = { y: 90.2, w: 8.2, h: 3.2 };
 
-// Which named dots each demo's trace visits, in order, derived from the
-// step text so the swirl walks exactly what the trace says.
+// Which named dots each demo's trace visits, derived from the step text so
+// the projection walks exactly what the trace says.
 const namedSlugs = Object.keys(vault.named);
 const demoPayload = demos.map((d) => {
   const seen = new Set();
@@ -41,27 +49,56 @@ const demoPayload = demos.map((d) => {
   return { id: d.id, q: d.q, steps: d.steps, answerHtml: d.answerHtml, path };
 });
 
-const stats = {
-  n: vault.n,
-  e: vault.e,
-  v: vault.v,
-  d: vault.d,
-  named: namedSlugs.length,
-};
+// The feed replays, straight from the exported nodes: provenance becomes the
+// scrap, tags and typed edges are the node's own frontmatter.
+const byId = Object.fromEntries(nodesData.nodes.map((n) => [n.id, n]));
+const feeds = feedIds
+  .filter((id) => byId[id])
+  .map((id) => {
+    const n = byId[id];
+    const file = String(n.provenance || "").split(";")[0].trim();
+    const edges = [];
+    let locked = 0;
+    for (const [rel, targets] of Object.entries(n.edges || {})) {
+      if (rel.endsWith("_locked")) {
+        locked += targets;
+        continue;
+      }
+      for (const t of targets) {
+        if (t in vault.named) edges.push({ rel, target: t });
+      }
+    }
+    return { slug: id, title: n.title, kind: n.kind, file, tags: n.tags || [], edges, locked };
+  });
+
+const stats = { n: vault.n, e: vault.e, v: vault.v, d: vault.d, named: namedSlugs.length };
 ---
 
 <section class="syb" data-bench>
   <div class="syb-scene" data-scene>
-    <figure class="syb-brain" data-brain>
-      <Image
-        src={brainImg}
-        alt="A coral-pink brain drawn as a network of connected nodes"
-        widths={[380, 560, 749]}
-        sizes="(max-width: 900px) 240px, 340px"
-        format="png"
-        loading="eager"
-      />
-    </figure>
+    <div class="syb-left">
+      <figure class="syb-brain" data-brain>
+        <Image
+          src={brainImg}
+          alt="A coral-pink brain drawn as a network of connected nodes"
+          widths={[380, 560, 749]}
+          sizes="(max-width: 900px) 230px, 320px"
+          format="png"
+          loading="eager"
+        />
+      </figure>
+      <div class="syb-tray" aria-label="Raw scraps to feed the brain">
+        <p class="syb-tray-label">Raw · feed it a scrap</p>
+        {
+          feeds.map((f) => (
+            <button type="button" class="syb-scrap" data-feed={f.slug} title={`Replay how ${f.title} entered the vault`}>
+              <span class="syb-scrap-file">{f.file}</span>
+              <span class="syb-scrap-kind">{f.kind} · {f.tags.length} tags · {f.edges.length + f.locked} links</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
 
     <svg class="syb-wires" data-wires aria-hidden="true"></svg>
 
@@ -70,19 +107,13 @@ const stats = {
         src={rigImg}
         alt=""
         widths={[420, 639]}
-        sizes="(max-width: 900px) 92vw, 460px"
+        sizes="(max-width: 900px) 88vw, 430px"
         format="png"
         loading="eager"
         class="syb-rig-img"
       />
-      <div
-        class="syb-crt"
-        style={`left:${CRT.x}%;top:${CRT.y}%;width:${CRT.w}%;height:${CRT.h}%`}
-      >
-        <canvas
-          data-swirl
-          aria-label={`The whole Synapse vault as a slowly turning 3D graph: ${stats.n} nodes, ${stats.e} edges. ${stats.named} named nodes can be opened.`}
-        ></canvas>
+      <div class="syb-crt" style={`left:${CRT.x}%;top:${CRT.y}%;width:${CRT.w}%;height:${CRT.h}%`}>
+        <canvas data-mini aria-hidden="true"></canvas>
       </div>
       <div
         class="syb-strip"
@@ -103,22 +134,34 @@ const stats = {
         ))
       }
       {
-        KEY_LABELS.map((label, i) => (
+        demos.map((d, i) => (
           <span
             class="syb-plate"
             aria-hidden="true"
             style={`left:${KEYS[i] - PLATE.w / 2}%;top:${PLATE.y}%;width:${PLATE.w}%;height:${PLATE.h}%`}
           >
-            {label}
+            {d.key}
           </span>
         ))
       }
     </div>
   </div>
 
+  <!-- The projection: what the rig sees, at reading size -->
+  <div class="syb-projection">
+    <p class="syb-proj-title" aria-hidden="true">
+      THE VAULT · {stats.n} NODES · {stats.e} EDGES
+    </p>
+    <canvas
+      data-proj
+      aria-label={`The whole Synapse vault as a slowly turning labeled 3D graph. ${stats.named} named nodes can be opened; the rest stay anonymous.`}
+    ></canvas>
+    <p class="syb-caption" data-caption aria-live="polite"></p>
+  </div>
+
   <p class="syb-hint">
-    Press a key to ask, or touch a bright node. The dim dots are real too; they
-    just stay anonymous.
+    Feed it a scrap and watch the node get made, or press a key on the rig to
+    ask. Bright dots open; dim dots are real files that stay anonymous.
   </p>
 
   <div class="syb-answer" data-answer hidden>
@@ -131,41 +174,49 @@ const stats = {
   <p class="syb-label">
     {stats.n.toLocaleString("en-US")} nodes · {stats.e.toLocaleString("en-US")} typed
     edges · {stats.v} verified · exported {stats.d}. The shape is the whole vault;
-    the {stats.named} named nodes are the public part.
+    the {stats.named} named nodes are the public part. Built by
+    <a href="https://github.com/jakelherridge/synapse-capture" rel="noopener"
+      >synapse-capture</a
+    >, a Claude Code plugin.
   </p>
 
   <script
     type="application/json"
     data-syb-data
-    set:html={JSON.stringify({ vault, demos: demoPayload })}
+    set:html={JSON.stringify({ vault, demos: demoPayload, feeds })}
   />
 </section>
 
 <style is:global>
-  /* Global for the same reason as the machine: cards and cites are injected
-     at runtime and scoped selectors would not match them. */
+  /* Global on purpose: cards, cites, and reel content are injected at
+     runtime, and scoped selectors would not match them. */
   .syb-scene {
     position: relative;
     display: grid;
-    grid-template-columns: 4fr 7fr;
+    grid-template-columns: 4fr 6fr;
     align-items: center;
-    gap: clamp(1rem, 6vw, 4rem);
+    gap: clamp(1rem, 5vw, 3.5rem);
   }
   @media (max-width: 899px) {
     .syb-scene {
       grid-template-columns: 1fr;
       justify-items: center;
-      gap: 3.2rem;
+      gap: 3rem;
     }
+  }
+  .syb-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    align-items: center;
   }
   .syb-brain {
     margin: 0;
-    max-width: 340px;
-    justify-self: center;
+    max-width: 320px;
   }
   @media (max-width: 899px) {
     .syb-brain {
-      max-width: 240px;
+      max-width: 230px;
     }
   }
   .syb-brain img {
@@ -187,6 +238,60 @@ const stats = {
       transform: translateY(-6px) scale(1.012);
     }
   }
+
+  .syb-tray {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .syb-tray-label {
+    margin: 0 0 0.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .syb-scrap {
+    text-align: left;
+    border: 1px solid var(--color-faint);
+    border-radius: 7px;
+    background: var(--color-surface);
+    padding: 0.5rem 0.7rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .syb-scrap:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px) rotate(-0.4deg);
+    box-shadow: 0 6px 14px rgb(27 26 23 / 0.1);
+  }
+  .syb-scrap:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+  }
+  .syb-scrap-file {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    color: var(--color-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .syb-scrap-kind {
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
   .syb-wires {
     position: absolute;
     inset: 0;
@@ -214,7 +319,7 @@ const stats = {
 
   .syb-rig {
     position: relative;
-    width: min(92vw, 460px);
+    width: min(88vw, 430px);
   }
   .syb-rig-img {
     display: block;
@@ -232,7 +337,6 @@ const stats = {
     display: block;
     width: 100%;
     height: 100%;
-    cursor: pointer;
   }
   .syb-strip {
     position: absolute;
@@ -246,8 +350,8 @@ const stats = {
   }
   .syb-strip span {
     font-family: var(--font-mono);
-    font-size: clamp(0.42rem, 1.55vw, 0.62rem);
-    letter-spacing: 0.06em;
+    font-size: clamp(0.42rem, 1.5vw, 0.6rem);
+    letter-spacing: 0.05em;
     white-space: nowrap;
     color: #cfe3bf;
     text-shadow: 0 0 6px rgb(160 220 150 / 0.35);
@@ -275,6 +379,18 @@ const stats = {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
+  .syb-key.is-default {
+    animation: syb-keyglow 2.8s ease-in-out infinite;
+  }
+  @keyframes syb-keyglow {
+    0%,
+    100% {
+      box-shadow: 0 0 8px rgb(31 107 84 / 0.25);
+    }
+    50% {
+      box-shadow: 0 0 20px rgb(31 107 84 / 0.6);
+    }
+  }
   .syb-plate {
     position: absolute;
     display: flex;
@@ -283,20 +399,76 @@ const stats = {
     background: #17181c;
     border-radius: 3px;
     font-family: var(--font-mono);
-    font-size: clamp(0.34rem, 1.15vw, 0.46rem);
-    letter-spacing: 0.12em;
+    font-size: clamp(0.3rem, 1.05vw, 0.44rem);
+    letter-spacing: 0.1em;
     color: #b9bcc4;
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+    overflow: hidden;
+  }
+
+  /* The projection */
+  .syb-projection {
+    position: relative;
+    margin-top: 1.6rem;
+    background: #0c0d10;
+    border: 1px solid #1c1e24;
+    border-radius: 14px;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.04),
+      0 18px 44px rgb(15 16 20 / 0.25);
+    overflow: hidden;
+  }
+  .syb-projection canvas {
+    display: block;
+    width: 100%;
+    height: clamp(340px, 52vw, 520px);
+  }
+  .syb-proj-title {
+    position: absolute;
+    top: 0.7rem;
+    left: 1rem;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: #6b7280;
+    pointer-events: none;
+  }
+  .syb-caption {
+    position: absolute;
+    left: 50%;
+    bottom: 0.8rem;
+    transform: translateX(-50%);
+    margin: 0;
+    max-width: 92%;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    background: rgb(12 13 16 / 0.82);
+    border: 1px solid #23262e;
+    font-family: var(--font-mono);
+    font-size: clamp(0.62rem, 1.6vw, 0.78rem);
+    letter-spacing: 0.04em;
+    color: #7ce8b6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+  .syb-caption.on {
+    opacity: 1;
   }
 
   .syb-hint {
-    margin: 1.4rem 0 0;
+    margin: 1.2rem 0 0;
     font-family: var(--font-mono);
     font-size: 0.7rem;
+    line-height: 1.7;
     color: var(--color-muted);
   }
   .syb-answer {
-    margin-top: 1.6rem;
+    margin-top: 1.4rem;
     border: 1px solid var(--color-faint);
     border-radius: 10px;
     background: var(--color-surface);
@@ -316,6 +488,11 @@ const stats = {
     font-size: 1.05rem;
     line-height: 1.65;
     color: var(--color-ink);
+  }
+  .syb-a a {
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   .syb-a cite {
     font-style: normal;
@@ -360,6 +537,21 @@ const stats = {
     color: var(--color-muted);
   }
   .syb-card-meta .ok {
+    color: var(--color-accent-strong);
+  }
+  .syb-tags {
+    margin-top: 0.55rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .syb-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--color-accent-soft);
     color: var(--color-accent-strong);
   }
   .syb-card-summary {
@@ -431,6 +623,18 @@ const stats = {
     cursor: default;
     border-style: dashed;
   }
+  .syb-fresh .syb-tag,
+  .syb-fresh .syb-chip {
+    animation: syb-fresh 1.6s ease;
+  }
+  @keyframes syb-fresh {
+    0% {
+      box-shadow: 0 0 0 3px rgb(31 107 84 / 0.45);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(31 107 84 / 0);
+    }
+  }
   .syb-close {
     position: absolute;
     top: 0.6rem;
@@ -451,6 +655,11 @@ const stats = {
     font-size: 0.68rem;
     line-height: 1.7;
     color: var(--color-muted);
+  }
+  .syb-label a {
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 </style>
 
@@ -476,20 +685,34 @@ const stats = {
     answerHtml: string;
     path: string[];
   }
+  interface FeedData {
+    slug: string;
+    title: string;
+    kind: string;
+    file: string;
+    tags: string[];
+    edges: { rel: string; target: string }[];
+    locked: number;
+  }
 
   const root = document.querySelector<HTMLElement>("[data-bench]");
   const dataEl = document.querySelector("[data-syb-data]");
   if (root && dataEl) init(root, JSON.parse(dataEl.textContent || "{}"));
 
-  function init(root: HTMLElement, data: { vault: VaultData; demos: DemoData[] }) {
+  function init(
+    root: HTMLElement,
+    data: { vault: VaultData; demos: DemoData[]; feeds: FeedData[] },
+  ) {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const { vault, demos } = data;
+    const { vault, demos, feeds } = data;
     const scene = root.querySelector<HTMLElement>("[data-scene]")!;
     const brain = root.querySelector<HTMLElement>("[data-brain]")!;
     const rig = root.querySelector<HTMLElement>("[data-rig]")!;
     const wires = root.querySelector<SVGSVGElement>("[data-wires]")!;
-    const canvas = root.querySelector<HTMLCanvasElement>("[data-swirl]")!;
+    const mini = root.querySelector<HTMLCanvasElement>("[data-mini]")!;
+    const proj = root.querySelector<HTMLCanvasElement>("[data-proj]")!;
     const stripText = root.querySelector<HTMLElement>("[data-strip-text]")!;
+    const captionEl = root.querySelector<HTMLElement>("[data-caption]")!;
     const answerBox = root.querySelector<HTMLElement>("[data-answer]")!;
     const qEl = root.querySelector<HTMLElement>("[data-q]")!;
     const aEl = root.querySelector<HTMLElement>("[data-a]")!;
@@ -497,10 +720,10 @@ const stats = {
 
     const pretty = (slug: string) =>
       slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const sleep = (ms: number) =>
+      reduced ? Promise.resolve() : new Promise((r) => setTimeout(r, ms));
 
-    // ---- Wires: three sagging cables, brain to sockets ----
-    // Socket centers as fractions of the rig; the brain side anchors along
-    // its right edge (or bottom edge when the bench stacks).
+    // ---- Wires ----
     const SOCKETS = [
       [0.117, 0.655],
       [0.117, 0.744],
@@ -519,22 +742,24 @@ const stats = {
         let x1: number;
         let y1: number;
         if (stacked) {
-          x1 = b.left - s.left + b.width * (0.3 + i * 0.2);
-          y1 = b.bottom - s.top - b.height * 0.12;
+          // Exit the brain's lower left and swing around the tray and bezel.
+          x1 = b.left - s.left + b.width * (0.1 + i * 0.08);
+          y1 = b.bottom - s.top - b.height * (0.3 - i * 0.06);
         } else {
           x1 = b.right - s.left - b.width * 0.08;
           y1 = b.top - s.top + b.height * (0.34 + i * 0.18);
         }
-        const sag = stacked ? 30 + i * 14 : 36 + i * 20;
-        // Stacked, the cables swing around the rig's left bezel instead of
-        // draping across the glass.
-        const mx = stacked ? Math.min(x1, r.left - s.left) - 26 - i * 16 : (x1 + x2) / 2;
-        const my = stacked ? (y1 + y2) / 2 : Math.max(y1, y2) + sag;
+        const mx = stacked
+          ? Math.min(x1, r.left - s.left) - 30 - i * 16
+          : (x1 + x2) / 2;
+        const my = stacked ? (y1 + y2) / 2 : Math.max(y1, y2) + 36 + i * 20;
         const d = `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
         html += `<path d="${d}"/>`;
         if (!reduced) {
           for (let k = 0; k < 2; k++) {
-            html += `<circle r="2.6" opacity="0"><animateMotion dur="${(3.4 + i * 0.5).toFixed(1)}s" begin="${(i * 0.9 + k * 1.7).toFixed(1)}s" repeatCount="indefinite" path="${d}"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="${(3.4 + i * 0.5).toFixed(1)}s" begin="${(i * 0.9 + k * 1.7).toFixed(1)}s" repeatCount="indefinite"/></circle>`;
+            const dur = (3.4 + i * 0.5).toFixed(1);
+            const begin = (i * 0.9 + k * 1.7).toFixed(1);
+            html += `<circle r="2.6" opacity="0"><animateMotion dur="${dur}s" begin="${begin}s" repeatCount="indefinite" path="${d}"/><animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="${dur}s" begin="${begin}s" repeatCount="indefinite"/></circle>`;
           }
         }
       });
@@ -543,7 +768,7 @@ const stats = {
     drawWires();
     new ResizeObserver(drawWires).observe(scene);
 
-    // ---- The swirl ----
+    // ---- Shared swirl state ----
     const TYPE_COLORS: Record<string, string> = {
       concept: "#e6d6a3",
       source: "#b7c6e6",
@@ -563,47 +788,60 @@ const stats = {
     const namedIdx = new Map<number, string>();
     for (const [slug, i] of Object.entries(vault.named)) namedIdx.set(i as number, slug);
 
-    const ctx = canvas.getContext("2d")!;
-    let cw = 0;
-    let ch = 0;
-    function sizeCanvas() {
-      const r = canvas.getBoundingClientRect();
-      const dpr = Math.min(2, devicePixelRatio || 1);
-      cw = Math.max(1, Math.round(r.width * dpr));
-      ch = Math.max(1, Math.round(r.height * dpr));
-      canvas.width = cw;
-      canvas.height = ch;
-    }
-    sizeCanvas();
-    new ResizeObserver(sizeCanvas).observe(canvas);
-
     let rotY = 0.6;
-    let rotX = -0.18;
+    let rotX = -0.16;
     let targetY: number | null = null;
-    let zoom = 1;
-    let targetZoom = 1;
     let lastT = 0;
-    const flare = new Map<number, number>(); // index -> intensity 0..1
+    const flare = new Map<number, number>();
     let tracePath: number[] = [];
-    let booted = reduced; // reduced motion skips the boot
+    let activeSet: Set<number> | null = null; // during a run, only these label
+    let globalDim = 1; // 1 = normal, lower = dim the uninvolved
+    const hidden = new Set<number>(); // dots suppressed pre-birth
+    let hoverIdx: number | null = null;
+    let booted = reduced;
     let bootStep = 0;
 
-    const proj = new Array(vault.pts.length);
-    function paint(t: number) {
+    function setupCanvas(c: HTMLCanvasElement) {
+      const state = { cw: 0, ch: 0, ctx: c.getContext("2d")! };
+      const size = () => {
+        const r = c.getBoundingClientRect();
+        const dpr = Math.min(2, devicePixelRatio || 1);
+        state.cw = Math.max(1, Math.round(r.width * dpr));
+        state.ch = Math.max(1, Math.round(r.height * dpr));
+        c.width = state.cw;
+        c.height = state.ch;
+      };
+      size();
+      new ResizeObserver(size).observe(c);
+      return state;
+    }
+    const miniState = setupCanvas(mini);
+    const projState = setupCanvas(proj);
+    const projPts: [number, number, number][] = new Array(vault.pts.length);
+
+    function advance(t: number) {
       const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
       lastT = t;
-      if (!reduced) {
-        if (targetY !== null) {
-          const diff = ((targetY - rotY + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-          rotY += diff * Math.min(1, dt * 3);
-          if (Math.abs(diff) < 0.02) targetY = null;
-        } else {
-          rotY += dt * 0.12;
-        }
-        zoom += (targetZoom - zoom) * Math.min(1, dt * 3);
+      if (reduced) return;
+      if (targetY !== null) {
+        const diff = ((targetY - rotY + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+        rotY += diff * Math.min(1, dt * 3);
+        if (Math.abs(diff) < 0.02) targetY = null;
+      } else {
+        rotY += dt * 0.1;
       }
+      for (const [i, f] of flare) flare.set(i, Math.max(0, f - dt * 0.65));
+    }
+
+    function paint(
+      s: { cw: number; ch: number; ctx: CanvasRenderingContext2D },
+      labels: boolean,
+      keepProj: boolean,
+      t: number,
+    ) {
+      const { cw, ch, ctx } = s;
       ctx.clearRect(0, 0, cw, ch);
-      if (!booted) {
+      if (!booted && !labels) {
         ctx.fillStyle = "#9fe0b0";
         ctx.font = `${Math.round(ch * 0.075)}px ui-monospace, Menlo, monospace`;
         const lines = [
@@ -618,101 +856,154 @@ const stats = {
       const sy = Math.sin(rotY);
       const cx = Math.cos(rotX);
       const sx = Math.sin(rotX);
-      const R = Math.min(cw, ch) * 0.56 * zoom;
+      const R = Math.min(cw, ch) * (labels ? 0.62 : 0.56);
       const cxp = cw / 2;
       const cyp = ch / 2;
+      const local: [number, number, number][] = keepProj ? projPts : new Array(vault.pts.length);
       for (let i = 0; i < vault.pts.length; i++) {
         const [x, y, z] = vault.pts[i];
         const x1 = x * cy + z * sy;
         const z1 = -x * sy + z * cy;
         const y1 = y * cx - z1 * sx;
         const z2 = y * sx + z1 * cx;
-        const depth = (z2 + 1.2) / 2.2; // 0 back, 1 front
-        proj[i] = [cxp + x1 * R, cyp + y1 * R * 0.94, depth];
+        const depth = (z2 + 1.2) / 2.2;
+        local[i] = [cxp + x1 * R, cyp + y1 * R * 0.92, depth];
       }
       ctx.lineWidth = 1;
-      ctx.strokeStyle = "rgba(214, 224, 205, 0.10)";
+      ctx.strokeStyle = `rgba(214, 224, 205, ${0.1 * globalDim})`;
       ctx.beginPath();
       for (const [a, b] of vault.ed) {
-        ctx.moveTo(proj[a][0], proj[a][1]);
-        ctx.lineTo(proj[b][0], proj[b][1]);
+        if (hidden.has(a) || hidden.has(b)) continue;
+        ctx.moveTo(local[a][0], local[a][1]);
+        ctx.lineTo(local[b][0], local[b][1]);
       }
       ctx.stroke();
-      // Traversal trail.
       if (tracePath.length > 1) {
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "rgba(124, 232, 182, 0.85)";
+        ctx.lineWidth = labels ? 2.4 : 1.8;
+        ctx.strokeStyle = "rgba(124, 232, 182, 0.9)";
         ctx.beginPath();
         tracePath.forEach((n, k) => {
-          if (k === 0) ctx.moveTo(proj[n][0], proj[n][1]);
-          else ctx.lineTo(proj[n][0], proj[n][1]);
+          if (k === 0) ctx.moveTo(local[n][0], local[n][1]);
+          else ctx.lineTo(local[n][0], local[n][1]);
         });
         ctx.stroke();
       }
+      const px = cw / 640;
       for (let i = 0; i < vault.pts.length; i++) {
-        const [px, py, depth] = proj[i];
+        if (hidden.has(i)) continue;
+        const [X, Y, depth] = local[i];
         const named = namedIdx.has(i);
         const deg = vault.pts[i][4];
         const f = flare.get(i) || 0;
-        let r = (0.9 + Math.min(2.2, deg * 0.14) + (named ? 1.4 : 0)) * (0.55 + depth * 0.75);
-        let alpha = named ? 0.5 + depth * 0.5 : 0.22 + depth * 0.5;
+        const involved = !activeSet || activeSet.has(i) || f > 0;
+        let r = (0.9 + Math.min(2.2, deg * 0.14) + (named ? 1.6 : 0)) * (0.55 + depth * 0.75);
+        let alpha = (named ? 0.55 + depth * 0.45 : 0.22 + depth * 0.5) * (involved ? 1 : globalDim);
         if (f > 0) {
-          r += f * 4;
+          r += f * 4.5;
           alpha = Math.min(1, alpha + f);
-          flare.set(i, Math.max(0, f - dt * 0.7));
+        }
+        if (hoverIdx === i) {
+          r += 1.5;
+          alpha = 1;
         }
         ctx.globalAlpha = alpha;
         ctx.fillStyle = colors[vault.pts[i][3]] || "#a8a89a";
         ctx.beginPath();
-        ctx.arc(px, py, r * (cw / 640), 0, Math.PI * 2);
+        ctx.arc(X, Y, r * px, 0, Math.PI * 2);
         ctx.fill();
-        if (f > 0.05) {
-          ctx.globalAlpha = f * 0.45;
+        if (f > 0.05 || hoverIdx === i) {
+          ctx.globalAlpha = Math.max(f * 0.45, hoverIdx === i ? 0.5 : 0);
           ctx.beginPath();
-          ctx.arc(px, py, (r + 5) * (cw / 640), 0, Math.PI * 2);
+          ctx.arc(X, Y, (r + 5) * px, 0, Math.PI * 2);
           ctx.strokeStyle = "#7ce8b6";
           ctx.lineWidth = 1.4;
           ctx.stroke();
+        }
+        // Labels: on the projection only. Idle shows the front slice; during
+        // a run only the involved nodes keep their names.
+        if (labels && named) {
+          const show = activeSet
+            ? activeSet.has(i)
+            : depth > 0.7 || f > 0.05 || hoverIdx === i;
+          if (show) {
+            ctx.globalAlpha = Math.min(1, (activeSet ? 1 : (depth - 0.55) * 2.6) + f);
+            ctx.fillStyle = hoverIdx === i || f > 0.2 ? "#a8f0cd" : "#8fae9c";
+            ctx.font = `${Math.round(10.5 * px)}px ui-monospace, Menlo, monospace`;
+            ctx.fillText(namedIdx.get(i)!, X + (r + 7) * px, Y + 3 * px);
+          }
         }
       }
       ctx.globalAlpha = 1;
     }
 
-    // Paint loop: rAF drives PIXELS ONLY. No state waits on it (the sword
-    // room taught that lesson), so a hidden tab just pauses the picture.
-    let visible = false;
+    // rAF paints pixels only; nothing waits on it (the sword room's lesson).
+    let miniVisible = false;
+    let projVisible = false;
     function loop(t: number) {
-      if (visible) paint(t);
+      advance(t);
+      if (miniVisible) paint(miniState, false, false, t);
+      if (projVisible) paint(projState, true, true, t);
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
 
     new IntersectionObserver(
       (es) => {
-        visible = es.some((e) => e.isIntersecting);
-        if (visible && !booted && bootStep === 0) boot();
+        for (const e of es) {
+          if (e.target === mini) miniVisible = e.isIntersecting;
+          if (e.target === proj) projVisible = e.isIntersecting;
+        }
+        if ((miniVisible || projVisible) && !booted && bootStep === 0) boot();
       },
-      { threshold: 0.2 },
-    ).observe(canvas);
+      { threshold: 0.15 },
+    ).observe(mini);
+    new IntersectionObserver(
+      (es) => {
+        for (const e of es) projVisible = e.isIntersecting;
+        if (projVisible && !booted && bootStep === 0) boot();
+      },
+      { threshold: 0.15 },
+    ).observe(proj);
 
+    let userTouched = false;
     function boot() {
       bootStep = 1;
       setTimeout(() => (bootStep = 2), 450);
       setTimeout(() => (bootStep = 3), 900);
       setTimeout(() => {
         booted = true;
-      }, 2100);
+        // The room explains itself: the default question runs once, unless
+        // the visitor beat it to the controls.
+        setTimeout(() => {
+          if (!userTouched && !running) runAsk(demos[0]);
+        }, 700);
+      }, 2000);
       setStrip("SYNAPSE ONLINE");
     }
-
-    // Focus the camera so a node comes to the front.
-    function focusNode(i: number) {
-      const [x, , z] = vault.pts[i];
-      targetY = Math.atan2(-x, z) + Math.PI;
-      flare.set(i, 1);
+    if (reduced) {
+      setTimeout(() => {
+        if (!userTouched && !running) runAsk(demos[0]);
+      }, 400);
     }
 
-    // ---- Readout strip ----
+    function focusNode(i: number, strength = 1) {
+      const [x, , z] = vault.pts[i];
+      targetY = Math.atan2(-x, z) + Math.PI;
+      flare.set(i, strength);
+    }
+
+    // ---- Caption and strip ----
+    let capTimer = 0;
+    function caption(text: string, holdMs = 0) {
+      captionEl.textContent = text;
+      captionEl.classList.add("on");
+      clearTimeout(capTimer);
+      if (holdMs) capTimer = window.setTimeout(() => captionEl.classList.remove("on"), holdMs);
+    }
+    function captionOff() {
+      clearTimeout(capTimer);
+      captionEl.classList.remove("on");
+    }
     let stripTimer = 0;
     function setStrip(text: string) {
       stripText.textContent = text;
@@ -757,13 +1048,16 @@ const stats = {
       supersedes: "supersedes",
     };
 
-    async function openCard(slug: string) {
+    async function openCard(slug: string, fresh = false) {
       const nodes = await getNodes();
       const n = nodes[slug];
       if (!n) return;
       const i = vault.named[slug];
       if (i !== undefined) focusNode(i);
       const ok = n.status === "verified";
+      const tags = (n.tags || [])
+        .map((t: string) => `<span class="syb-tag">${t}</span>`)
+        .join("");
       let edges = "";
       for (const [rel, targets] of Object.entries(n.edges || {})) {
         if (rel.endsWith("_locked")) continue;
@@ -776,12 +1070,14 @@ const stats = {
           : "";
         edges += `<span class="syb-rel">${REL_LABELS[rel] || rel}</span>${chips}${locked}`;
       }
+      cardBox.classList.toggle("syb-fresh", fresh);
       cardBox.innerHTML =
         `<button type="button" class="syb-close" data-close aria-label="Close">&times;</button>` +
         `<h3>${n.title}</h3>` +
         `<p class="syb-card-meta">${n.kind} · <span class="${ok ? "ok" : ""}">${n.status}</span>${
           n.provenance ? ` · ${n.provenance}` : ""
         }</p>` +
+        (tags ? `<div class="syb-tags">${tags}</div>` : "") +
         (n.summary ? `<p class="syb-card-summary">${n.summary}</p>` : "") +
         `<div class="syb-card-body">${n.bodyHtml}</div>` +
         (edges ? `<div class="syb-edges">${edges}</div>` : "");
@@ -801,51 +1097,77 @@ const stats = {
       cardBox.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
     }
 
-    // Click a named dot in the swirl.
-    canvas.addEventListener("click", (ev) => {
-      const r = canvas.getBoundingClientRect();
-      const dpr = cw / r.width;
+    // ---- Projection interaction ----
+    function projHit(ev: MouseEvent): number | null {
+      const r = proj.getBoundingClientRect();
+      const dpr = projState.cw / r.width;
       const mx = (ev.clientX - r.left) * dpr;
       const my = (ev.clientY - r.top) * dpr;
-      let best: string | null = null;
-      let bestD = 18 * dpr;
-      for (const [i, slug] of namedIdx) {
-        const p = proj[i];
+      let best: number | null = null;
+      let bestD = 20 * dpr;
+      for (const [i] of namedIdx) {
+        const p = projPts[i];
         if (!p) continue;
         const d = Math.hypot(p[0] - mx, p[1] - my);
         if (d < bestD) {
           bestD = d;
-          best = slug;
+          best = i;
         }
       }
-      if (best) openCard(best);
+      return best;
+    }
+    proj.addEventListener("mousemove", (ev) => {
+      hoverIdx = projHit(ev);
+      proj.style.cursor = hoverIdx !== null ? "pointer" : "default";
+    });
+    proj.addEventListener("mouseleave", () => (hoverIdx = null));
+    proj.addEventListener("click", (ev) => {
+      userTouched = true;
+      const i = projHit(ev);
+      if (i !== null) openCard(namedIdx.get(i)!);
     });
 
-    // ---- Run a demo ----
+    // ---- ASK ----
     let running = false;
-    async function run(demo: DemoData) {
+    function setControls(disabled: boolean) {
+      root
+        .querySelectorAll<HTMLButtonElement>("[data-key], [data-feed]")
+        .forEach((k) => (k.disabled = disabled));
+    }
+    async function runAsk(demo: DemoData) {
       if (running) return;
       running = true;
-      root.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((k) => (k.disabled = true));
+      setControls(true);
       clearInterval(stripTimer);
       answerBox.hidden = true;
       cardBox.hidden = true;
       tracePath = [];
+      activeSet = new Set(demo.path.map((s) => vault.named[s]).filter((i) => i !== undefined));
+      globalDim = 0.28;
       wires.classList.add("firing");
+      caption(demo.q.toUpperCase());
       setStrip("READING…");
-      const stepMs = reduced ? 0 : 620;
+      await sleep(650);
       for (const step of demo.steps) {
         setStrip(`${step.op.toUpperCase()} ${step.text}`.slice(0, 52));
+        let hopped = false;
         for (const slug of demo.path) {
           if (step.text.includes(slug)) {
             const i = vault.named[slug];
             if (i !== undefined) {
-              focusNode(i);
+              focusNode(i, 1.2);
               if (!tracePath.includes(i)) tracePath.push(i);
+              if (step.op === "hop" || step.op === "open" || step.op === "match") {
+                caption(step.op === "hop" ? step.text : slug);
+                hopped = true;
+              }
             }
           }
         }
-        if (stepMs) await new Promise((r) => setTimeout(r, stepMs));
+        if (!hopped && (step.op === "scan" || step.op === "check" || step.op === "write")) {
+          caption(step.op.toUpperCase() + " · " + step.text.split("·")[0].trim());
+        }
+        await sleep(760);
       }
       qEl.textContent = demo.q;
       aEl.innerHTML = demo.answerHtml;
@@ -853,29 +1175,127 @@ const stats = {
         c.addEventListener("click", () => openCard(c.getAttribute("data-n")!)),
       );
       answerBox.hidden = false;
-      setStrip("DONE · CITED " + demo.path.length + " NODES");
+      setStrip(`DONE · CITED ${demo.path.length} NODES`);
+      caption(`ANSWERED · ${demo.path.length} CITATIONS`, 3600);
       wires.classList.remove("firing");
       answerBox.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
       setTimeout(() => {
         tracePath = [];
-        targetZoom = 1;
+        activeSet = null;
+        globalDim = 1;
         idleStrip();
-      }, 6000);
+      }, 5200);
       running = false;
-      root.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((k) => (k.disabled = false));
+      setControls(false);
     }
 
+    // ---- FEED ----
+    async function runFeed(feed: FeedData, scrapEl: HTMLElement) {
+      if (running) return;
+      running = true;
+      setControls(true);
+      clearInterval(stripTimer);
+      answerBox.hidden = true;
+      cardBox.hidden = true;
+      const i = vault.named[feed.slug];
+      // The scrap flies into the brain.
+      if (!reduced) {
+        const from = scrapEl.getBoundingClientRect();
+        const to = brain.getBoundingClientRect();
+        const ghost = scrapEl.cloneNode(true) as HTMLElement;
+        Object.assign(ghost.style, {
+          position: "fixed",
+          left: `${from.left}px`,
+          top: `${from.top}px`,
+          width: `${from.width}px`,
+          margin: "0",
+          zIndex: "50",
+          pointerEvents: "none",
+        });
+        document.body.appendChild(ghost);
+        const dx = to.left + to.width * 0.5 - from.left - from.width * 0.5;
+        const dy = to.top + to.height * 0.55 - from.top;
+        ghost.animate(
+          [
+            { transform: "translate(0,0) scale(1) rotate(0deg)", opacity: 1 },
+            { transform: `translate(${dx}px,${dy}px) scale(0.15) rotate(-8deg)`, opacity: 0 },
+          ],
+          { duration: 700, easing: "cubic-bezier(0.4, 0, 0.7, 1)" },
+        ).onfinish = () => ghost.remove();
+      }
+      setStrip(`CAPTURE ${feed.file}`.slice(0, 52));
+      await sleep(720);
+      wires.classList.add("firing");
+      globalDim = 0.15;
+      activeSet = new Set(i !== undefined ? [i] : []);
+      if (i !== undefined) {
+        hidden.add(i);
+        await sleep(420);
+        hidden.delete(i);
+        focusNode(i, 1.7);
+        caption(`NEW NODE · ${feed.title}`);
+        setStrip(`WRITE nodes/${feed.slug}.md`.slice(0, 52));
+      }
+      await sleep(1100);
+      for (const tag of feed.tags) {
+        caption(`tagged: ${tag}`);
+        setStrip(`TAG ${tag}`);
+        await sleep(720);
+      }
+      for (const e of feed.edges) {
+        const j = vault.named[e.target];
+        caption(`${e.rel} → ${e.target}`);
+        setStrip(`LINK ${e.rel} → ${e.target}`.slice(0, 52));
+        if (j !== undefined && i !== undefined) {
+          activeSet.add(j);
+          tracePath = [i, j];
+          focusNode(j, 1);
+        }
+        await sleep(940);
+      }
+      if (feed.locked) {
+        caption(`+${feed.locked} private connections`);
+        await sleep(820);
+      }
+      caption(`FILED · ${feed.title}`, 3600);
+      setStrip("CAPTURED · AUTO-TAGGED · LINKED");
+      wires.classList.remove("firing");
+      await openCard(feed.slug, true);
+      setTimeout(() => {
+        tracePath = [];
+        activeSet = null;
+        globalDim = 1;
+        idleStrip();
+      }, 5200);
+      running = false;
+      setControls(false);
+    }
+
+    // ---- Controls ----
+    const defaultKey = root.querySelector<HTMLButtonElement>(`[data-key="${demos[0].id}"]`);
+    defaultKey?.classList.add("is-default");
     root.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((k) =>
       k.addEventListener("click", () => {
+        userTouched = true;
+        defaultKey?.classList.remove("is-default");
         const demo = demos.find((d) => d.id === k.dataset.key);
-        if (demo) run(demo);
+        if (demo) runAsk(demo);
+      }),
+    );
+    root.querySelectorAll<HTMLButtonElement>("[data-feed]").forEach((s) =>
+      s.addEventListener("click", () => {
+        userTouched = true;
+        const feed = feeds.find((f) => f.slug === s.dataset.feed);
+        if (feed) runFeed(feed, s);
       }),
     );
 
-    // Idle shimmer: some anonymous dot briefly wakes now and then.
+    // Idle shimmer.
     if (!reduced) {
       setInterval(() => {
-        if (!running && visible) flare.set(Math.floor(Math.random() * vault.pts.length), 0.55);
+        if (!running && (miniVisible || projVisible)) {
+          flare.set(Math.floor(Math.random() * vault.pts.length), 0.5);
+        }
       }, 2600);
     }
   }
