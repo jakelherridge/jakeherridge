@@ -124,5 +124,71 @@
     "number": 21,
     "title": "Monster 21",
     "aspect": 0.5521
+  },
+  {
+    "id": "22",
+    "number": 22,
+    "title": "Monster 22",
+    "aspect": 0.7371
+  },
+  {
+    "id": "23",
+    "number": 23,
+    "title": "Monster 23",
+    "aspect": 0.6914
+  },
+  {
+    "id": "24",
+    "number": 24,
+    "title": "Monster 24",
+    "aspect": 0.6661
+  },
+  {
+    "id": "25",
+    "number": 25,
+    "title": "Monster 25",
+    "aspect": 0.7053
+  },
+  {
+    "id": "26",
+    "number": 26,
+    "title": "Monster 26",
+    "aspect": 0.707
+  },
+  {
+    "id": "27",
+    "number": 27,
+    "title": "Monster 27",
+    "aspect": 0.7559
+  },
+  {
+    "id": "28",
+    "number": 28,
+    "title": "Monster 28",
+    "aspect": 0.7272
+  },
+  {
+    "id": "29",
+    "number": 29,
+    "title": "Monster 29",
+    "aspect": 0.6786
+  },
+  {
+    "id": "30",
+    "number": 30,
+    "title": "Monster 30",
+    "aspect": 0.7099
+  },
+  {
+    "id": "31",
+    "number": 31,
+    "title": "Monster 31",
+    "aspect": 0.7081
+  },
+  {
+    "id": "32",
+    "number": 32,
+    "title": "Monster 32",
+    "aspect": 0.7197
   }
 ]
