@@ -13,10 +13,9 @@
   <section class="pr-station" aria-labelledby="pr-h-ladder">
     <h2 id="pr-h-ladder" class="wonk pr-h2">One shape, every view</h2>
     <p class="pr-lead">
-      Pick a shape. Every panel below watches the same object at the same
-      moment. The first panel projects it down to this page. The second is its
-      shadow, cast straight down. The third is what a one-dimensional eye
-      would get. The fourth is for completeness.
+      Pick a shape. All four boxes below watch the same shape at the same
+      moment. Box one draws it flat on this page. Box two is its shadow. Box
+      three is only how wide the shadow is. Box four is a dot.
     </p>
 
     <div class="pr-controls">
@@ -43,7 +42,7 @@
       <label class="pr-sliderrow">
         <span class="pr-slabel">Spin</span>
         <input type="range" id="pr-speed" min="0" max="0.6" step="0.01" value="0.15" />
-        <span class="pr-mono" id="pr-speedval">0.15 rev/s</span>
+        <span class="pr-mono" id="pr-speedval">0.15 turns/s</span>
       </label>
       <p class="pr-fact pr-mono" id="pr-fact"></p>
     </div>
@@ -52,20 +51,20 @@
       <figure class="pr-card">
         <div class="pr-cwrap pr-sq"><canvas id="pr-cA" aria-hidden="true"></canvas></div>
         <figcaption class="pr-cap" id="pr-capA">
-          The tesseract, two projections deep. 4D &rarr; 3D &rarr; this page.
+          The tesseract, flattened twice to fit this page. 4D &rarr; 3D &rarr; 2D.
         </figcaption>
       </figure>
       <figure class="pr-card">
         <div class="pr-cwrap pr-sq"><canvas id="pr-cB" aria-hidden="true"></canvas></div>
         <figcaption class="pr-cap" id="pr-capB">
-          Its shadow, cast straight down. A shadow of a shadow. 4D &rarr; 2D.
+          Its shadow, straight down. A shadow of a shadow. 4D &rarr; 2D.
         </figcaption>
       </figure>
       <div class="pr-col3">
         <figure class="pr-card">
           <div class="pr-cwrap pr-wide"><canvas id="pr-cC" aria-hidden="true"></canvas></div>
           <figcaption class="pr-cap" id="pr-capC">
-            The shadow's width. What a 1D eye gets. 4D &rarr; 1D.
+            The shadow's width. All a 1D eye would see. 4D &rarr; 1D.
           </figcaption>
         </figure>
         <figure class="pr-card">
@@ -80,11 +79,12 @@
   <section class="pr-station" aria-labelledby="pr-h-shutter">
     <h2 id="pr-h-shutter" class="wonk pr-h2">The shutter</h2>
     <p class="pr-lead">
-      The spin belongs to the shape. The looking belongs to you. A camera, a
-      zoetrope, and a strobe light all see motion as samples, not flow. Match
-      your sampling to the shape's symmetry and the spin freezes. Sample just
-      past it and the spin runs backwards. The object never changes speed.
-      One shutter covers this whole room, the slices and the game included.
+      The shape spins at one speed. You watch at your own speed. A camera does
+      not see motion as a flow. It takes quick peeks, one after another. Time
+      the peeks just right and the spin looks frozen. Peek a little faster and
+      it seems to run backwards. The shape never changes speed. Only the
+      looking changes. This one shutter runs the whole room, slices and game
+      included. Wagon wheels in old western movies do this same trick.
     </p>
     <div class="pr-controls">
       <div class="pr-chiprow" role="group" aria-label="Shutter mode">
@@ -95,7 +95,7 @@
       <label class="pr-sliderrow">
         <span class="pr-slabel">Shutter</span>
         <input type="range" id="pr-sh-rate" min="0.25" max="6" step="0.05" value="1" />
-        <span class="pr-mono" id="pr-sh-rateval">1.00 /s</span>
+        <span class="pr-mono" id="pr-sh-rateval">1.00 peeks/s</span>
       </label>
       <p class="pr-fact pr-mono" id="pr-sh-fact"></p>
     </div>
@@ -105,10 +105,11 @@
   <section class="pr-station" aria-labelledby="pr-h-slice">
     <h2 id="pr-h-slice" class="wonk pr-h2">Through the paper</h2>
     <p class="pr-lead">
-      A flat world sees a solid only as the slice of it passing through.
-      This paper is that world. Then the same thing happens to us, one floor
-      up: a 4D solid passing through our space reads as a 3D shape that
-      grows, morphs, and vanishes.
+      Picture a world as flat as paper. It cannot see a whole cube. It only
+      sees the thin slice passing through it. This page is that flat world.
+      The same trick works on us, one floor up. When a 4D shape passes
+      through our world, all we see is a 3D slice that grows, changes, and
+      disappears.
     </p>
 
     <div class="pr-slicegrid">
@@ -131,19 +132,20 @@
           </label>
         </div>
         <figcaption class="pr-cap">
-          A cube through the paper. Left, what we see. Right, all the paper
-          gets. Corner first, the middle slice is a regular hexagon.
+          A cube sinking through the paper. Left: what we see. Right: all the
+          flat world gets. Corner first, the middle slice is a perfect
+          hexagon.
         </figcaption>
       </figure>
 
       <figure class="pr-card">
         <div class="pr-cwrap pr-sq pr-trel">
           <canvas id="pr-t3" aria-hidden="true"></canvas>
-          <span class="pr-empty pr-mono pr-hide" id="pr-t-empty">Nothing of it is in our space right now.</span>
+          <span class="pr-empty pr-mono pr-hide" id="pr-t-empty">It is not in our world right now.</span>
         </div>
         <div class="pr-controls pr-controls-tight">
           <div class="pr-chiprow" role="group" aria-label="Tesseract orientation">
-            <button class="pr-chip" data-tmode="cell">Cell first</button>
+            <button class="pr-chip" data-tmode="cell">Cube first</button>
             <button class="pr-chip is-on" data-tmode="corner">Corner first</button>
             <button class="pr-chip is-on" id="pr-t-loop" aria-pressed="true">Loop</button>
           </div>
@@ -154,9 +156,10 @@
           </label>
         </div>
         <figcaption class="pr-cap">
-          A tesseract through our space. This is every view we get. Cell
-          first, it is a cube the whole way through, then gone. Corner first,
-          the middle slice is a regular octahedron.
+          A tesseract sinking through our world. This is all we ever get to
+          see of it. Cube first, it looks like a plain cube the whole way,
+          then it is gone. Corner first, the middle slice is a perfect
+          octahedron: eight triangle faces.
         </figcaption>
       </figure>
     </div>
@@ -166,9 +169,9 @@
   <section class="pr-station" aria-labelledby="pr-h-game">
     <h2 id="pr-h-game" class="wonk pr-h2">From one angle</h2>
     <p class="pr-lead">
-      Five objects, one at a time, each seen from a single angle. Say what
-      each one is. A second observer stands ninety degrees away and will tell
-      you what they see, if you ask.
+      Five hidden shapes, one at a time. You get one view of each. Guess what
+      it is. Another person stands off to the side, ninety degrees away. Ask,
+      and they will tell you what they see.
     </p>
 
     <div class="pr-card pr-gamecard" id="pr-game">
@@ -201,7 +204,7 @@
             <button class="pr-gopt" data-opt="2"></button>
             <button class="pr-gopt" data-opt="3"></button>
           </div>
-          <button class="pr-chip pr-obs" id="pr-g-obs">Ask the second observer</button>
+          <button class="pr-chip pr-obs" id="pr-g-obs">Ask the other person</button>
           <p class="pr-gfact pr-hide" id="pr-g-fact"></p>
           <button class="pr-chip pr-next pr-hide" id="pr-g-next">Next round</button>
         </div>
@@ -688,7 +691,7 @@
       if (Math.abs(dot(c24v[i], c24v[j]) - 1) < 1e-9) c24e.push([i, j]);
     S.cell24 = {
       name: "24-cell", d: 4, verts: normalized(c24v), edges: c24e, viewScale: 0.28, sym: 4,
-      note: "The only regular polytope with no relative in any other dimension.",
+      note: "No shape in any other dimension is like it.",
     };
     return S;
   }
@@ -852,10 +855,10 @@
   }
 
   const CAP_A: Record<number, string> = {
-    2: "The square, flat on the page. No projection needed.",
-    3: "The cube, one projection deep. 3D → this page.",
-    4: "{N}, two projections deep. 4D → 3D → this page.",
-    5: "The 5-cube, three projections deep. 5D → 4D → 3D → this page.",
+    2: "The square. It is already flat, so no flattening is needed.",
+    3: "The cube, flattened once to fit this page. 3D → 2D.",
+    4: "{N}, flattened twice to fit this page. 4D → 3D → 2D.",
+    5: "The 5-cube, flattened three times to fit this page. 5D → 4D → 3D → 2D.",
   };
 
   function updateLadderText() {
@@ -863,15 +866,15 @@
     $("pr-capA").textContent = CAP_A[sh.d].replace("{N}", "The " + sh.name.toLowerCase());
     $("pr-capB").textContent =
       sh.d === 2
-        ? "Its shadow. A flat thing lit face on casts itself."
-        : `Its shadow, cast straight down.${sh.d >= 4 ? " A shadow of a shadow." : ""} ${sh.d}D → 2D.`;
-    $("pr-capC").textContent = `The shadow's width. What a 1D eye gets. ${sh.d}D → 1D.`;
+        ? "Its shadow. A flat shape's shadow is just itself."
+        : `Its shadow, straight down.${sh.d >= 4 ? " A shadow of a shadow." : ""} ${sh.d}D → 2D.`;
+    $("pr-capC").textContent = `The shadow's width. All a 1D eye would see. ${sh.d}D → 1D.`;
     const planeTxt =
       state.planeId === "DOUBLE"
-        ? "turning in two planes at once, XY and ZW. This motion has no 3D version"
-        : `turning in the ${state.planeId} plane`;
+        ? "spinning two ways at once, XY and ZW. Nothing in 3D can move like this"
+        : `spinning the ${state.planeId} way`;
     $("pr-fact").textContent =
-      `${sh.name}: ${sh.verts.length} vertices, ${sh.edges.length} edges, ${planeTxt}.` +
+      `${sh.name}: ${sh.verts.length} corners, ${sh.edges.length} edges, ${planeTxt}.` +
       (sh.note ? ` ${sh.note}` : "");
   }
 
@@ -881,25 +884,25 @@
     const sym = shape().sym;
     let apparent: string;
     if (state.shMode === "live") {
-      apparent = "shutter open, every frame shown";
+      apparent = "shutter open, you see everything";
     } else {
       const phi = (sym * state.omega) / f;
       const app = ((phi - Math.round(phi)) * f) / sym;
       apparent =
         state.omega < 0.005
-          ? "the shape is not turning"
+          ? "the shape is not spinning"
           : Math.abs(app) < 0.004
-            ? "appears frozen"
-            : `appears ${Math.abs(app).toFixed(3)} rev/s ${app < 0 ? "backwards" : "forwards"}`;
+            ? "looks frozen"
+            : `looks like ${Math.abs(app).toFixed(3)} turns per second, ${app < 0 ? "backwards" : "forwards"}`;
     }
     const line =
       state.shMode === "live"
-        ? `spin ${state.omega.toFixed(2)} rev/s · ${apparent}`
-        : `spin ${state.omega.toFixed(2)} rev/s · shutter ${f.toFixed(2)} samples/s · ${apparent}`;
+        ? `spin ${state.omega.toFixed(2)} turns per second · ${apparent}`
+        : `spin ${state.omega.toFixed(2)} turns per second · ${f.toFixed(2)} peeks per second · ${apparent}`;
     const el = $("pr-sh-fact");
     if (el.textContent !== line) el.textContent = line;
     const rv = $("pr-sh-rateval");
-    const rtxt = `${f.toFixed(2)} /s`;
+    const rtxt = `${f.toFixed(2)} peeks/s`;
     if (rv.textContent !== rtxt) rv.textContent = rtxt;
     // presets track the spin; keep the slider honest about where they sit
     if (state.shMode === "frozen" || state.shMode === "back") {
@@ -1221,7 +1224,7 @@
       answer: 1,
       name: "A cylinder",
       fact:
-        "A sphere, a cone point-on, and a cylinder end-on all cast this same circle. The second view is the tell: flat top, flat bottom, straight sides. A square shadow plus a circle shadow means cylinder.",
+        "A ball, a cone seen point first, and a cylinder seen end first all make this same circle. The side view gives it away: flat top, flat bottom, straight sides. A circle shadow plus a square shadow means cylinder.",
     },
     {
       hidden: { kind: "cone", r: 0.68, h: 1.3 },
@@ -1231,7 +1234,7 @@
       answer: 0,
       name: "A cone",
       fact:
-        "All four suspects read as a triangle from the side. From above, only the cone is a circle. The pyramid shows a square, the tetrahedron a triangle, the prism a rectangle.",
+        "From the side, all four choices look like a triangle. From the top, only the cone is a circle. The pyramid would show a square, the tetrahedron a triangle, and the prism a rectangle.",
     },
     {
       hidden: CUBE_G,
@@ -1241,7 +1244,7 @@
       answer: 1,
       name: "A cube",
       fact:
-        "Corner first, a cube casts a regular hexagon. So does a hexagonal prism end-on, and an octahedron face-on. The square from ninety degrees away settles it.",
+        "Corner first, a cube's shadow is a perfect hexagon. A hexagonal prism and an octahedron can make one too. The square from the side settles it: cube.",
     },
     {
       hidden: "tesseract",
@@ -1251,7 +1254,7 @@
       answer: 1,
       name: "A tesseract",
       fact:
-        "Looked at straight on, a tesseract projects to a plain cube: its eight edges along the fourth axis collapse to points. The second observer keeps that axis, and the second cube appears.",
+        "Seen straight on, a tesseract's shadow is a plain cube. Its eight edges that point the 4D way squish down to dots. The other person's view keeps that direction, so the second cube shows up.",
     },
     {
       hidden: "cell24",
@@ -1261,7 +1264,7 @@
       answer: 2,
       name: "A 24-cell",
       fact:
-        "The 24-cell: twenty-four vertices, ninety-six edges, and no relative in any other dimension. Straight on it flattens to a cuboctahedron wrapped around an octahedron.",
+        "The 24-cell has 24 corners and 96 edges. No shape in any other dimension is like it. Seen straight on, it flattens into two nested shapes, one inside the other.",
     },
   ];
 
@@ -1383,7 +1386,7 @@
     fact.textContent = (pick === r.answer ? `${r.name}. ` : `${r.name}, not ${r.lineup[pick].toLowerCase()}. `) + r.fact;
     fact.classList.remove("pr-hide");
     $("pr-g-revfig").classList.remove("pr-hide");
-    $("pr-g-revcap").textContent = `${r.name}, the whole object.`;
+    $("pr-g-revcap").textContent = `${r.name}, the whole shape.`;
     ($("pr-g-obs") as HTMLButtonElement).disabled = true;
     const next = $("pr-g-next");
     next.textContent = game.i === 4 ? "Finish" : "Next round";
@@ -1397,7 +1400,7 @@
       $("pr-g-body").classList.add("pr-hide");
       $("pr-g-end").classList.remove("pr-hide");
       $("pr-g-endstats").textContent =
-        `Five rounds. You asked the second observer ${game.asked} of 5 times.`;
+        `Five rounds. You asked the other person ${game.asked} of 5 times.`;
       const dots = $("pr-g-dots").children;
       for (let i = 0; i < 5; i++) dots[i].className = "is-done";
       return;
@@ -1444,7 +1447,7 @@
 
   ($("pr-speed") as HTMLInputElement).addEventListener("input", (e) => {
     state.omega = parseFloat((e.target as HTMLInputElement).value);
-    $("pr-speedval").textContent = `${state.omega.toFixed(2)} rev/s`;
+    $("pr-speedval").textContent = `${state.omega.toFixed(2)} turns/s`;
   });
 
   function setShutter(mode: typeof state.shMode) {
