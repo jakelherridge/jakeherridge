@@ -30,6 +30,9 @@ const SRC = {
   monster: path.join(ROOT, "src/assets/monsters-header.png"),
   // The scanned magic sword, separated from the sheet by sword-ink-build.mjs.
   sword: path.join(ROOT, "src/assets/sword-ink/sword.png"),
+  // From Where You Stand: Jake's Gemini ink render, one cylinder casting a
+  // circle shadow on the floor and a square shadow on the wall (2026-08-15).
+  perspective: "/Users/jake/Downloads/Gemini_Generated_Image_ns2cwhns2cwhns2c.jpeg",
 };
 
 const exists = (p) => access(p).then(() => true, () => false);
@@ -437,6 +440,28 @@ jobs.push(["gators", await sharp(SRC.gator).toBuffer()]);
 
 // Sword: the real drawing.
 jobs.push(["sword", await sharp(SRC.sword).toBuffer()]);
+
+// From Where You Stand: Vision lifts the cylinder and both of its shadows as
+// one piece. The render's drawn horizon line rides along as a thin whisker
+// off the square shadow's left edge; erase that corner of the lift (nothing
+// else lives there) and let the die cut swallow the stub.
+{
+  const cut = await lift(SRC.perspective, "perspective-cut.png");
+  const trimmed = await sharp(cut).trim({ threshold: 8 }).toBuffer();
+  const { data, info } = await sharp(trimmed)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const W = info.width;
+  const H = info.height;
+  for (let y = 0; y < Math.round(H * 0.72); y++)
+    for (let x = 0; x < Math.round(W * 0.26); x++) data[(y * W + x) * 4 + 3] = 0;
+  const art = await sharp(data, { raw: { width: W, height: H, channels: 4 } })
+    .trim({ threshold: 8 })
+    .png()
+    .toBuffer();
+  jobs.push(["perspective", art]);
+}
 
 for (const [name, art, opts] of jobs) {
   // raw skips the die cut: the kitchen card is a photo with stickers ON it,

@@ -7,6 +7,7 @@ import pocketwildSticker from "../assets/stickers/pocketwild.png";
 import swordSticker from "../assets/stickers/sword.png";
 import synapseSticker from "../assets/stickers/synapse.png";
 import kitchenSticker from "../assets/stickers/kitchen.png";
+import perspectiveSticker from "../assets/stickers/perspective.png";
 
 export interface Exhibit {
   href: string;
@@ -62,5 +63,12 @@ export const exhibits: Exhibit[] = [
     line: "A short story.",
     sticker: swordSticker,
     alt: "Sticker of an ink-drawn sword",
+  },
+  {
+    href: "/exhibits/from-where-you-stand/",
+    title: "From Where You Stand",
+    line: "Every view is true. None is complete.",
+    sticker: perspectiveSticker,
+    alt: "Sticker of an ink cylinder casting a circle shadow on the floor and a square shadow on the wall",
   },
 ];
