@@ -191,6 +191,15 @@ export const nodes: GraphNode[] = [
     kind: "creative",
     summary: "A pencil sketch where American and Japanese design meet.",
   },
+  {
+    id: "from-where-you-stand",
+    label: "From Where You Stand",
+    kind: "creative",
+    status: "shipped",
+    summary:
+      "An interactive room on perspective. One shape, every view at once: projections, shadows, slices, and a strobe shutter.",
+    href: "/exhibits/from-where-you-stand/",
+  },
 
   // Values
   {
@@ -316,6 +325,7 @@ export const edges: GraphEdge[] = [
   { from: "jake", to: "dashboards-to-decisions", rel: "wrote" },
   { from: "jake", to: "boy-sword", rel: "wrote" },
   { from: "jake", to: "fall-morning", rel: "wrote" },
+  { from: "jake", to: "from-where-you-stand", rel: "made" },
 
   // Influences shape values and builds
   { from: "frankl", to: "why-first", rel: "shaped" },
@@ -345,6 +355,7 @@ export const edges: GraphEdge[] = [
 
   // Creative threads
   { from: "boy-sword", to: "curiosity", rel: "related" },
+  { from: "curiosity", to: "from-where-you-stand", rel: "shaped" },
   { from: "gators", to: "pocketwild", rel: "related" },
   { from: "moments", to: "fall-morning", rel: "shaped" },
   { from: "infinite-game", to: "honest-flops", rel: "related" },

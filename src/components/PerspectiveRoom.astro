@@ -1,0 +1,1589 @@
+---
+// From Where You Stand: one shape, one clock, every view at once.
+// Everything on screen is computed live from the shape itself: real plane
+// rotations in n dimensions, real projection chains (perspective for the
+// object panes, orthographic for shadows), real cross-sections (edge x plane
+// intersections chained through 2-faces), and a strobe shutter that samples
+// the whole room's clock, which is how the wagon-wheel effect appears
+// honestly instead of being faked.
+---
+
+<div class="pr-root" id="pr-root">
+  <!-- Station: the ladder -->
+  <section class="pr-station" aria-labelledby="pr-h-ladder">
+    <h2 id="pr-h-ladder" class="wonk pr-h2">One shape, every view</h2>
+    <p class="pr-lead">
+      Pick a shape. Every panel below watches the same object at the same
+      moment. The first panel projects it down to this page. The second is its
+      shadow, cast straight down. The third is what a one-dimensional eye
+      would get. The fourth is for completeness.
+    </p>
+
+    <div class="pr-controls">
+      <div class="pr-chiprow" id="pr-shapes" role="group" aria-label="Shape">
+        <button class="pr-chip" data-shape="square">Square</button>
+        <button class="pr-chip" data-shape="cube">Cube</button>
+        <button class="pr-chip is-on" data-shape="tesseract">Tesseract</button>
+        <button class="pr-chip" data-shape="penteract">5-cube</button>
+        <button class="pr-chip" data-shape="cell5">5-cell</button>
+        <button class="pr-chip" data-shape="cell16">16-cell</button>
+        <button class="pr-chip" data-shape="cell24">24-cell</button>
+      </div>
+      <div class="pr-chiprow" id="pr-planes" role="group" aria-label="Rotation plane">
+        <button class="pr-chip pr-plane" data-plane="XY">XY</button>
+        <button class="pr-chip pr-plane" data-plane="XZ">XZ</button>
+        <button class="pr-chip pr-plane" data-plane="YZ">YZ</button>
+        <button class="pr-chip pr-plane is-on" data-plane="XW">XW</button>
+        <button class="pr-chip pr-plane" data-plane="YW">YW</button>
+        <button class="pr-chip pr-plane" data-plane="ZW">ZW</button>
+        <button class="pr-chip pr-plane" data-plane="XV">XV</button>
+        <button class="pr-chip pr-plane" data-plane="WV">WV</button>
+        <button class="pr-chip pr-plane" data-plane="DOUBLE">XY + ZW</button>
+      </div>
+      <label class="pr-sliderrow">
+        <span class="pr-slabel">Spin</span>
+        <input type="range" id="pr-speed" min="0" max="0.6" step="0.01" value="0.15" />
+        <span class="pr-mono" id="pr-speedval">0.15 rev/s</span>
+      </label>
+      <p class="pr-fact pr-mono" id="pr-fact"></p>
+    </div>
+
+    <div class="pr-grid">
+      <figure class="pr-card">
+        <div class="pr-cwrap pr-sq"><canvas id="pr-cA" aria-hidden="true"></canvas></div>
+        <figcaption class="pr-cap" id="pr-capA">
+          The tesseract, two projections deep. 4D &rarr; 3D &rarr; this page.
+        </figcaption>
+      </figure>
+      <figure class="pr-card">
+        <div class="pr-cwrap pr-sq"><canvas id="pr-cB" aria-hidden="true"></canvas></div>
+        <figcaption class="pr-cap" id="pr-capB">
+          Its shadow, cast straight down. A shadow of a shadow. 4D &rarr; 2D.
+        </figcaption>
+      </figure>
+      <div class="pr-col3">
+        <figure class="pr-card">
+          <div class="pr-cwrap pr-wide"><canvas id="pr-cC" aria-hidden="true"></canvas></div>
+          <figcaption class="pr-cap" id="pr-capC">
+            The shadow's width. What a 1D eye gets. 4D &rarr; 1D.
+          </figcaption>
+        </figure>
+        <figure class="pr-card">
+          <div class="pr-cwrap pr-wide pr-zerowrap" aria-hidden="true"><span class="pr-zerodot"></span></div>
+          <figcaption class="pr-cap">0D. It is here.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Station: the shutter -->
+  <section class="pr-station" aria-labelledby="pr-h-shutter">
+    <h2 id="pr-h-shutter" class="wonk pr-h2">The shutter</h2>
+    <p class="pr-lead">
+      The spin belongs to the shape. The looking belongs to you. A camera, a
+      zoetrope, and a strobe light all see motion as samples, not flow. Match
+      your sampling to the shape's symmetry and the spin freezes. Sample just
+      past it and the spin runs backwards. The object never changes speed.
+      One shutter covers this whole room, the slices and the game included.
+    </p>
+    <div class="pr-controls">
+      <div class="pr-chiprow" role="group" aria-label="Shutter mode">
+        <button class="pr-chip is-on" id="pr-sh-live">Live</button>
+        <button class="pr-chip" id="pr-sh-frozen">Frozen</button>
+        <button class="pr-chip" id="pr-sh-back">Backwards</button>
+      </div>
+      <label class="pr-sliderrow">
+        <span class="pr-slabel">Shutter</span>
+        <input type="range" id="pr-sh-rate" min="0.25" max="6" step="0.05" value="1" />
+        <span class="pr-mono" id="pr-sh-rateval">1.00 /s</span>
+      </label>
+      <p class="pr-fact pr-mono" id="pr-sh-fact"></p>
+    </div>
+  </section>
+
+  <!-- Station: through the paper -->
+  <section class="pr-station" aria-labelledby="pr-h-slice">
+    <h2 id="pr-h-slice" class="wonk pr-h2">Through the paper</h2>
+    <p class="pr-lead">
+      A flat world sees a solid only as the slice of it passing through.
+      This paper is that world. Then the same thing happens to us, one floor
+      up: a 4D solid passing through our space reads as a 3D shape that
+      grows, morphs, and vanishes.
+    </p>
+
+    <div class="pr-slicegrid">
+      <figure class="pr-card">
+        <div class="pr-slicecanvases">
+          <div class="pr-cwrap pr-sq"><canvas id="pr-sl3" aria-hidden="true"></canvas></div>
+          <div class="pr-cwrap pr-sq"><canvas id="pr-sl2" aria-hidden="true"></canvas></div>
+        </div>
+        <div class="pr-controls pr-controls-tight">
+          <div class="pr-chiprow" role="group" aria-label="Cube orientation">
+            <button class="pr-chip" data-cmode="face">Face first</button>
+            <button class="pr-chip" data-cmode="edge">Edge first</button>
+            <button class="pr-chip is-on" data-cmode="corner">Corner first</button>
+            <button class="pr-chip is-on" id="pr-sl-loop" aria-pressed="true">Loop</button>
+          </div>
+          <label class="pr-sliderrow">
+            <span class="pr-slabel">Depth</span>
+            <input type="range" id="pr-sl-range" min="-1.95" max="1.95" step="0.01" value="0" />
+            <span class="pr-mono" id="pr-sl-read">0.00</span>
+          </label>
+        </div>
+        <figcaption class="pr-cap">
+          A cube through the paper. Left, what we see. Right, all the paper
+          gets. Corner first, the middle slice is a regular hexagon.
+        </figcaption>
+      </figure>
+
+      <figure class="pr-card">
+        <div class="pr-cwrap pr-sq pr-trel">
+          <canvas id="pr-t3" aria-hidden="true"></canvas>
+          <span class="pr-empty pr-mono pr-hide" id="pr-t-empty">Nothing of it is in our space right now.</span>
+        </div>
+        <div class="pr-controls pr-controls-tight">
+          <div class="pr-chiprow" role="group" aria-label="Tesseract orientation">
+            <button class="pr-chip" data-tmode="cell">Cell first</button>
+            <button class="pr-chip is-on" data-tmode="corner">Corner first</button>
+            <button class="pr-chip is-on" id="pr-t-loop" aria-pressed="true">Loop</button>
+          </div>
+          <label class="pr-sliderrow">
+            <span class="pr-slabel">Depth</span>
+            <input type="range" id="pr-t-range" min="-2.2" max="2.2" step="0.01" value="0" />
+            <span class="pr-mono" id="pr-t-read">0.00</span>
+          </label>
+        </div>
+        <figcaption class="pr-cap">
+          A tesseract through our space. This is every view we get. Cell
+          first, it is a cube the whole way through, then gone. Corner first,
+          the middle slice is a regular octahedron.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Station: the game -->
+  <section class="pr-station" aria-labelledby="pr-h-game">
+    <h2 id="pr-h-game" class="wonk pr-h2">From one angle</h2>
+    <p class="pr-lead">
+      Five objects, one at a time, each seen from a single angle. Say what
+      each one is. A second observer stands ninety degrees away and will tell
+      you what they see, if you ask.
+    </p>
+
+    <div class="pr-card pr-gamecard" id="pr-game">
+      <div class="pr-ghead">
+        <span class="pr-mono" id="pr-g-round">Round 1 of 5</span>
+        <span class="pr-gdots" id="pr-g-dots" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </span>
+      </div>
+
+      <div class="pr-gbody" id="pr-g-body">
+        <div class="pr-gviews">
+          <figure class="pr-gview">
+            <div class="pr-cwrap pr-sq"><canvas id="pr-g-v1" aria-hidden="true"></canvas></div>
+            <figcaption class="pr-cap">From where you stand.</figcaption>
+          </figure>
+          <figure class="pr-gview pr-hide" id="pr-g-v2fig">
+            <div class="pr-cwrap pr-sq"><canvas id="pr-g-v2" aria-hidden="true"></canvas></div>
+            <figcaption class="pr-cap">From where they stand.</figcaption>
+          </figure>
+          <figure class="pr-gview pr-greveal pr-hide" id="pr-g-revfig">
+            <div class="pr-cwrap pr-sq"><canvas id="pr-g-rev" aria-hidden="true"></canvas></div>
+            <figcaption class="pr-cap" id="pr-g-revcap">The object, both views attached.</figcaption>
+          </figure>
+        </div>
+        <div class="pr-gside">
+          <div class="pr-gopts" id="pr-g-opts">
+            <button class="pr-gopt" data-opt="0"></button>
+            <button class="pr-gopt" data-opt="1"></button>
+            <button class="pr-gopt" data-opt="2"></button>
+            <button class="pr-gopt" data-opt="3"></button>
+          </div>
+          <button class="pr-chip pr-obs" id="pr-g-obs">Ask the second observer</button>
+          <p class="pr-gfact pr-hide" id="pr-g-fact"></p>
+          <button class="pr-chip pr-next pr-hide" id="pr-g-next">Next round</button>
+        </div>
+      </div>
+
+      <div class="pr-gend pr-hide" id="pr-g-end">
+        <p class="pr-gendline" id="pr-g-endstats"></p>
+        <p class="pr-gendline pr-gendrule">Every view was true. None was complete.</p>
+        <button class="pr-chip" id="pr-g-again">Run it again</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .pr-root {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+  .pr-h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .pr-lead {
+    margin-top: 0.6rem;
+    max-width: 42rem;
+    color: var(--color-muted);
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+  .pr-mono {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    letter-spacing: 0.01em;
+  }
+  .pr-hide {
+    display: none !important;
+  }
+
+  /* Controls */
+  .pr-controls {
+    margin-top: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .pr-controls-tight {
+    margin-top: 0.75rem;
+    gap: 0.5rem;
+  }
+  .pr-chiprow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .pr-chip {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.32rem 0.7rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+  }
+  .pr-chip:hover {
+    border-color: var(--color-muted);
+  }
+  .pr-chip.is-on {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .pr-sliderrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 26rem;
+  }
+  .pr-sliderrow input[type="range"] {
+    flex: 1;
+    accent-color: var(--color-accent);
+    min-width: 0;
+  }
+  .pr-slabel {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    width: 3.4rem;
+    flex: none;
+  }
+  .pr-sliderrow .pr-mono {
+    width: 6.5rem;
+    flex: none;
+    text-align: right;
+  }
+  .pr-fact {
+    min-height: 1.1em;
+  }
+
+  /* Cards and canvases */
+  .pr-grid {
+    margin-top: 1.4rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .pr-col3 {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    min-width: 0;
+  }
+  @media (min-width: 900px) {
+    .pr-grid {
+      grid-template-columns: 1.25fr 1.25fr 1fr;
+      align-items: start;
+    }
+    .pr-col3 {
+      grid-column: 3;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  .pr-card {
+    margin: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-faint);
+    border-radius: 0.9rem;
+    padding: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-width: 0;
+  }
+  .pr-cwrap {
+    position: relative;
+    background: var(--color-paper);
+    border: 1px solid var(--color-faint);
+    border-radius: 0.55rem;
+    overflow: hidden;
+  }
+  .pr-sq {
+    aspect-ratio: 1 / 1;
+  }
+  .pr-wide {
+    aspect-ratio: 5 / 2;
+  }
+  .pr-cwrap canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .pr-cap {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+  .pr-zerowrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pr-zerodot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-ink);
+  }
+
+  /* Slices */
+  .pr-slicegrid {
+    margin-top: 1.4rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 900px) {
+    .pr-slicegrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .pr-slicecanvases {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+  .pr-trel {
+    position: relative;
+  }
+  .pr-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  /* Game */
+  .pr-gamecard {
+    margin-top: 1.4rem;
+    padding: 1rem;
+  }
+  .pr-ghead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .pr-gdots {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .pr-gdots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-faint);
+  }
+  .pr-gdots i.is-done {
+    background: var(--color-accent);
+  }
+  .pr-gdots i.is-now {
+    background: var(--color-ink);
+  }
+  .pr-gbody {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 760px) {
+    .pr-gbody {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .pr-gviews {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+  .pr-gview {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+  .pr-greveal {
+    grid-column: 1 / -1;
+  }
+  .pr-greveal .pr-sq {
+    aspect-ratio: 16 / 9;
+  }
+  .pr-gside {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .pr-gopts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+  .pr-gopt {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid var(--color-faint);
+    border-radius: 0.6rem;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 120ms ease;
+  }
+  .pr-gopt:hover:not(:disabled) {
+    border-color: var(--color-muted);
+  }
+  .pr-gopt:disabled {
+    cursor: default;
+  }
+  .pr-gopt.is-right {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .pr-gopt.is-wrong {
+    border-color: var(--color-rust);
+    background: var(--color-rust-soft);
+  }
+  .pr-obs {
+    align-self: flex-start;
+  }
+  .pr-next {
+    align-self: flex-start;
+  }
+  .pr-gfact {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--color-ink);
+    border-left: 2px solid var(--color-accent);
+    padding-left: 0.7rem;
+  }
+  .pr-gend {
+    margin-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+  .pr-gendline {
+    font-size: 0.9rem;
+    color: var(--color-ink);
+  }
+  .pr-gendrule {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+</style>
+
+<script>
+  // ---------- palette ----------
+  const INK = "#1b1a17";
+  const FAINT = "#e7e3da";
+  const ACCENT = "#1f6b54";
+
+  const $ = (id: string) => document.getElementById(id)!;
+
+  // ---------- tiny vector helpers ----------
+  type V = number[];
+  const sub = (a: V, b: V) => a.map((x, i) => x - b[i]);
+  const dot = (a: V, b: V) => a.reduce((s, x, i) => s + x * b[i], 0);
+  const norm = (a: V) => Math.sqrt(dot(a, a));
+  const scale = (a: V, s: number) => a.map((x) => x * s);
+
+  // Rotation in a coordinate plane of R^d. 4D has six of these; a double
+  // rotation runs two orthogonal planes at once, which no 3D motion can do.
+  function rotPlanes(v: V, planes: number[][], th: number): V {
+    const p = v.slice();
+    for (const [i, j] of planes) {
+      const c = Math.cos(th), s = Math.sin(th);
+      const a = p[i], b = p[j];
+      p[i] = a * c - b * s;
+      p[j] = a * s + b * c;
+    }
+    return p;
+  }
+
+  // Perspective projection chain: repeatedly divide away the highest axis
+  // until three remain. The camera sits at +cam on each axis it removes.
+  function chainTo3(v: V): V {
+    let p = v.slice();
+    while (p.length > 3) {
+      const w = p.pop()!;
+      const cam = 3.1;
+      const s = cam / (cam - w);
+      p = p.map((x) => x * s);
+    }
+    while (p.length < 3) p.push(0);
+    return p;
+  }
+
+  // Orthographic drop to 2D: a shadow of a shadow of a shadow, as needed.
+  const ortho2 = (v: V): V => [v[0], v[1]];
+
+  // 3D view: fixed tilt plus a slow orbit, then perspective to the page.
+  function view3(p: V, orbit: number): { x: number; y: number; z: number } {
+    const ct = Math.cos(orbit), st = Math.sin(orbit);
+    let x = p[0] * ct + p[2] * st;
+    let z = -p[0] * st + p[2] * ct;
+    const tilt = -0.42;
+    const cp = Math.cos(tilt), sp = Math.sin(tilt);
+    let y = p[1] * cp - z * sp;
+    z = p[1] * sp + z * cp;
+    const F = 6;
+    const s = F / (F - z);
+    return { x: x * s, y: y * s, z };
+  }
+
+  // Convex hull (monotone chain). Every shape in this room is convex, so an
+  // orthographic silhouette is exactly the hull of the projected vertices.
+  function hull2(pts: V[]): V[] {
+    const P = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    if (P.length < 3) return P;
+    const cr = (o: V, a: V, b: V) =>
+      (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo: V[] = [];
+    for (const p of P) {
+      while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop();
+      lo.push(p);
+    }
+    const hi: V[] = [];
+    for (let i = P.length - 1; i >= 0; i--) {
+      const p = P[i];
+      while (hi.length >= 2 && cr(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop();
+      hi.push(p);
+    }
+    lo.pop(); hi.pop();
+    return lo.concat(hi);
+  }
+
+  // ---------- shapes ----------
+  interface Shape {
+    name: string;
+    d: number;
+    verts: V[];
+    edges: number[][];
+    viewScale: number;
+    sym: number; // rotational symmetry order in a single coordinate plane
+    note?: string;
+  }
+
+  function ncube(d: number): { verts: V[]; edges: number[][] } {
+    const verts: V[] = [];
+    for (let i = 0; i < 1 << d; i++) {
+      const v: V = [];
+      for (let a = 0; a < d; a++) v.push(i & (1 << a) ? 1 : -1);
+      verts.push(v);
+    }
+    const edges: number[][] = [];
+    for (let i = 0; i < verts.length; i++)
+      for (let j = i + 1; j < verts.length; j++) {
+        let x = i ^ j, bits = 0;
+        while (x) { bits += x & 1; x >>= 1; }
+        if (bits === 1) edges.push([i, j]);
+      }
+    return { verts, edges };
+  }
+
+  function normalized(verts: V[]): V[] {
+    const m = Math.max(...verts.map(norm));
+    return verts.map((v) => scale(v, 1 / m));
+  }
+
+  function makeShapes(): Record<string, Shape> {
+    const S: Record<string, Shape> = {};
+    const sq = ncube(2);
+    S.square = { name: "Square", d: 2, verts: normalized(sq.verts), edges: sq.edges, viewScale: 0.34, sym: 4 };
+    const cu = ncube(3);
+    S.cube = { name: "Cube", d: 3, verts: normalized(cu.verts), edges: cu.edges, viewScale: 0.3, sym: 4 };
+    const te = ncube(4);
+    S.tesseract = { name: "Tesseract", d: 4, verts: normalized(te.verts), edges: te.edges, viewScale: 0.26, sym: 4 };
+    const pe = ncube(5);
+    S.penteract = { name: "5-cube", d: 5, verts: normalized(pe.verts), edges: pe.edges, viewScale: 0.2, sym: 4 };
+
+    const r5 = Math.sqrt(5);
+    const c5v: V[] = [
+      [1, 1, 1, -1 / r5], [1, -1, -1, -1 / r5], [-1, 1, -1, -1 / r5],
+      [-1, -1, 1, -1 / r5], [0, 0, 0, 4 / r5],
+    ];
+    const c5e: number[][] = [];
+    for (let i = 0; i < 5; i++) for (let j = i + 1; j < 5; j++) c5e.push([i, j]);
+    S.cell5 = { name: "5-cell", d: 4, verts: normalized(c5v), edges: c5e, viewScale: 0.3, sym: 1 };
+
+    const c16v: V[] = [];
+    for (let a = 0; a < 4; a++) for (const s of [1, -1]) {
+      const v = [0, 0, 0, 0]; v[a] = s; c16v.push(v);
+    }
+    const c16e: number[][] = [];
+    for (let i = 0; i < 8; i++) for (let j = i + 1; j < 8; j++)
+      if (dot(c16v[i], c16v[j]) === 0) c16e.push([i, j]);
+    S.cell16 = { name: "16-cell", d: 4, verts: normalized(c16v), edges: c16e, viewScale: 0.32, sym: 4 };
+
+    const c24v: V[] = [];
+    for (let a = 0; a < 4; a++) for (let b = a + 1; b < 4; b++)
+      for (const s1 of [1, -1]) for (const s2 of [1, -1]) {
+        const v = [0, 0, 0, 0]; v[a] = s1; v[b] = s2; c24v.push(v);
+      }
+    const c24e: number[][] = [];
+    for (let i = 0; i < 24; i++) for (let j = i + 1; j < 24; j++)
+      if (Math.abs(dot(c24v[i], c24v[j]) - 1) < 1e-9) c24e.push([i, j]);
+    S.cell24 = {
+      name: "24-cell", d: 4, verts: normalized(c24v), edges: c24e, viewScale: 0.28, sym: 4,
+      note: "The only regular polytope with no relative in any other dimension.",
+    };
+    return S;
+  }
+  const SHAPES = makeShapes();
+
+  const PLANE_AXES: Record<string, number[][]> = {
+    XY: [[0, 1]], XZ: [[0, 2]], YZ: [[1, 2]], XW: [[0, 3]], YW: [[1, 3]],
+    ZW: [[2, 3]], XV: [[0, 4]], WV: [[3, 4]], DOUBLE: [[0, 1], [2, 3]],
+  };
+  const PLANES_FOR_D: Record<number, string[]> = {
+    2: ["XY"],
+    3: ["XY", "XZ", "YZ"],
+    4: ["XY", "XZ", "YZ", "XW", "YW", "ZW", "DOUBLE"],
+    5: ["XY", "XZ", "XW", "ZW", "XV", "WV", "DOUBLE"],
+  };
+
+  // ---------- room state and the one clock ----------
+  const PRM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const state = {
+    shapeId: "tesseract",
+    planeId: "XW",
+    omega: PRM ? 0 : 0.15, // rev/s
+    shMode: "live" as "live" | "frozen" | "back" | "custom",
+    shRate: 1,
+    trueClock: 0,
+    trueAngle: 0,
+    sampClock: 0,
+    sampAngle: 0,
+    lastSample: -1,
+  };
+
+  function shape(): Shape { return SHAPES[state.shapeId]; }
+  function planes(): number[][] { return PLANE_AXES[state.planeId]; }
+
+  // The shutter's actual rate right now. Frozen and Backwards track the spin
+  // so they stay honest when the speed slider moves.
+  function shutterRate(): number {
+    const sym = state.planeId === "DOUBLE" && shape().sym === 1 ? 1 : shape().sym;
+    const spokes = Math.max(sym * state.omega, 0.02);
+    if (state.shMode === "frozen") return spokes;
+    if (state.shMode === "back") return spokes / 0.94;
+    return state.shRate;
+  }
+
+  function dispClock(): number { return state.shMode === "live" ? state.trueClock : state.sampClock; }
+  function dispAngle(): number { return state.shMode === "live" ? state.trueAngle : state.sampAngle; }
+
+  // ---------- canvas plumbing ----------
+  interface Cv { el: HTMLCanvasElement; ctx: CanvasRenderingContext2D; w: number; h: number }
+  function cv(id: string): Cv {
+    const el = $(id) as HTMLCanvasElement;
+    return { el, ctx: el.getContext("2d")!, w: 0, h: 0 };
+  }
+  const cA = cv("pr-cA"), cB = cv("pr-cB"), cC = cv("pr-cC");
+  const sl3 = cv("pr-sl3"), sl2 = cv("pr-sl2"), t3 = cv("pr-t3");
+  const gv1 = cv("pr-g-v1"), gv2 = cv("pr-g-v2"), grev = cv("pr-g-rev");
+  const ALL_CV = [cA, cB, cC, sl3, sl2, t3, gv1, gv2, grev];
+
+  function sizeCanvases() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    for (const c of ALL_CV) {
+      const r = c.el.parentElement!.getBoundingClientRect();
+      if (r.width < 2) continue;
+      c.w = r.width; c.h = r.height;
+      c.el.width = Math.round(r.width * dpr);
+      c.el.height = Math.round(r.height * dpr);
+      c.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+  }
+
+  function clear(c: Cv) { c.ctx.clearRect(0, 0, c.w, c.h); }
+
+  function depthAlpha(z: number): number {
+    return Math.max(0.18, Math.min(0.95, 0.62 - z * 0.28));
+  }
+
+  // Wireframe in the house style: ink dots and edges, depth carried by alpha.
+  function drawWire(c: Cv, pts: { x: number; y: number; z: number }[], edges: number[][], sc: number, color = INK) {
+    const { ctx, w, h } = c;
+    const cx = w / 2, cy = h / 2, k = Math.min(w, h) * sc;
+    for (const [i, j] of edges) {
+      const a = pts[i], b = pts[j];
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = Math.min(depthAlpha(a.z), depthAlpha(b.z));
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.moveTo(cx + a.x * k, cy - a.y * k);
+      ctx.lineTo(cx + b.x * k, cy - b.y * k);
+      ctx.stroke();
+    }
+    for (const p of pts) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = depthAlpha(p.z) + 0.05;
+      const r = 2.4 * (1 - p.z * 0.12);
+      ctx.beginPath();
+      ctx.arc(cx + p.x * k, cy - p.y * k, Math.max(r, 1.2), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function fillPoly(c: Cv, poly: V[], sc: number, fill: string, alpha: number) {
+    if (poly.length < 3) return;
+    const { ctx, w, h } = c;
+    const cx = w / 2, cy = h / 2, k = Math.min(w, h) * sc;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.moveTo(cx + poly[0][0] * k, cy - poly[0][1] * k);
+    for (let i = 1; i < poly.length; i++) ctx.lineTo(cx + poly[i][0] * k, cy - poly[i][1] * k);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- station: the ladder ----------
+  function rotatedVerts(): V[] {
+    const th = dispAngle() * Math.PI * 2;
+    return shape().verts.map((v) => rotPlanes(v, planes(), th));
+  }
+
+  function drawLadder() {
+    const sh = shape();
+    const rv = rotatedVerts();
+    const orbit = 0.5 + dispClock() * 0.05 * Math.PI * 2;
+
+    // Pane A: the object, projected down to the page.
+    clear(cA);
+    const pts = rv.map((v) => view3(chainTo3(v), sh.d >= 3 ? orbit : 0));
+    drawWire(cA, pts, sh.edges, sh.viewScale);
+
+    // Pane B: the shadow. Orthographic, straight down, fixed light.
+    clear(cB);
+    const sh2 = hull2(rv.map(ortho2));
+    fillPoly(cB, sh2, 0.36, INK, 0.12);
+    fillPoly(cB, sh2.map((p) => [p[0], p[1]]), 0.355, INK, 0.78);
+
+    // Pane C: the shadow's width, the 1D view.
+    clear(cC);
+    {
+      const { ctx, w, h } = cC;
+      const k = Math.min(w, h * 2.5) * 0.36;
+      const xs = rv.map((v) => v[0]);
+      const lo = Math.min(...xs), hi = Math.max(...xs);
+      const cy = h / 2, cx = w / 2;
+      ctx.strokeStyle = FAINT;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.06, cy);
+      ctx.lineTo(w * 0.94, cy);
+      ctx.stroke();
+      ctx.strokeStyle = INK;
+      ctx.lineCap = "round";
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.moveTo(cx + lo * k, cy);
+      ctx.lineTo(cx + hi * k, cy);
+      ctx.stroke();
+      ctx.lineCap = "butt";
+    }
+  }
+
+  const CAP_A: Record<number, string> = {
+    2: "The square, flat on the page. No projection needed.",
+    3: "The cube, one projection deep. 3D → this page.",
+    4: "{N}, two projections deep. 4D → 3D → this page.",
+    5: "The 5-cube, three projections deep. 5D → 4D → 3D → this page.",
+  };
+
+  function updateLadderText() {
+    const sh = shape();
+    $("pr-capA").textContent = CAP_A[sh.d].replace("{N}", "The " + sh.name.toLowerCase());
+    $("pr-capB").textContent =
+      sh.d === 2
+        ? "Its shadow. A flat thing lit face on casts itself."
+        : `Its shadow, cast straight down.${sh.d >= 4 ? " A shadow of a shadow." : ""} ${sh.d}D → 2D.`;
+    $("pr-capC").textContent = `The shadow's width. What a 1D eye gets. ${sh.d}D → 1D.`;
+    const planeTxt =
+      state.planeId === "DOUBLE"
+        ? "turning in two planes at once, XY and ZW. This motion has no 3D version"
+        : `turning in the ${state.planeId} plane`;
+    $("pr-fact").textContent =
+      `${sh.name}: ${sh.verts.length} vertices, ${sh.edges.length} edges, ${planeTxt}.` +
+      (sh.note ? ` ${sh.note}` : "");
+  }
+
+  // ---------- station: the shutter ----------
+  function updateShutterText() {
+    const f = shutterRate();
+    const sym = shape().sym;
+    let apparent: string;
+    if (state.shMode === "live") {
+      apparent = "shutter open, every frame shown";
+    } else {
+      const phi = (sym * state.omega) / f;
+      const app = ((phi - Math.round(phi)) * f) / sym;
+      apparent =
+        state.omega < 0.005
+          ? "the shape is not turning"
+          : Math.abs(app) < 0.004
+            ? "appears frozen"
+            : `appears ${Math.abs(app).toFixed(3)} rev/s ${app < 0 ? "backwards" : "forwards"}`;
+    }
+    const line =
+      state.shMode === "live"
+        ? `spin ${state.omega.toFixed(2)} rev/s · ${apparent}`
+        : `spin ${state.omega.toFixed(2)} rev/s · shutter ${f.toFixed(2)} samples/s · ${apparent}`;
+    const el = $("pr-sh-fact");
+    if (el.textContent !== line) el.textContent = line;
+    const rv = $("pr-sh-rateval");
+    const rtxt = `${f.toFixed(2)} /s`;
+    if (rv.textContent !== rtxt) rv.textContent = rtxt;
+    // presets track the spin; keep the slider honest about where they sit
+    if (state.shMode === "frozen" || state.shMode === "back") {
+      ($("pr-sh-rate") as HTMLInputElement).value = String(Math.min(Math.max(f, 0.25), 6));
+    }
+  }
+
+  // ---------- station: through the paper ----------
+  // 2-faces of the n-cube: pick two free axes, fix the rest. Each face meets
+  // a cutting plane in at most one segment; chaining segments through faces
+  // is what turns edge crossings into honest polygons.
+  function cubeFaces(d: number): { cycle: number[] }[] {
+    const faces: { cycle: number[] }[] = [];
+    const n = 1 << d;
+    for (let i = 0; i < d; i++) for (let j = i + 1; j < d; j++) {
+      for (let fixed = 0; fixed < n; fixed++) {
+        if (fixed & (1 << i) || fixed & (1 << j)) continue;
+        const others = fixed;
+        const v00 = others, v01 = others | (1 << i), v11 = others | (1 << i) | (1 << j), v10 = others | (1 << j);
+        faces.push({ cycle: [v00, v01, v11, v10] });
+      }
+    }
+    return faces;
+  }
+  const CUBE4_FACES = cubeFaces(4);
+
+  // Orientation matrices, built once: align a diagonal with the slicing axis.
+  function alignTo(u: V, dim: number): (v: V) => V {
+    // Rotate unit u onto the last axis via two-vector rotation in their plane.
+    const e = new Array(dim).fill(0); e[dim - 1] = 1;
+    const c = dot(u, e);
+    if (c > 0.9999) return (v) => v.slice();
+    const w = sub(e, scale(u, c));
+    const wn = scale(w, 1 / norm(w));
+    const s = Math.sqrt(1 - c * c);
+    return (v) => {
+      const a = dot(v, u), b = dot(v, wn);
+      const a2 = a * c - b * s, b2 = a * s + b * c;
+      return v.map((x, i) => x + (a2 - a) * u[i] + (b2 - b) * wn[i]);
+    };
+  }
+  const CUBE_ORIENT: Record<string, (v: V) => V> = {
+    face: (v) => v.slice(),
+    edge: alignTo(scale([0, 1, 1], 1 / Math.sqrt(2)), 3),
+    corner: alignTo(scale([1, 1, 1], 1 / Math.sqrt(3)), 3),
+  };
+  const TESS_ORIENT: Record<string, (v: V) => V> = {
+    cell: (v) => v.slice(),
+    corner: alignTo([0.5, 0.5, 0.5, 0.5], 4),
+  };
+
+  const sliceState = {
+    cubeMode: "corner", cubeAuto: true, cubeH: 0,
+    tessMode: "corner", tessAuto: true, tessH: 0,
+  };
+
+  // Cut the last coordinate at 0 after lifting by h. Returns crossing points
+  // per edge, in the remaining coordinates.
+  function sectionPoints(
+    verts: V[], edges: number[][], orient: (v: V) => V, h: number,
+  ): { pts: Map<string, V>; lifted: V[] } {
+    let hh = h;
+    const lifted = verts.map((v) => {
+      const o = orient(v); o[o.length - 1] += hh; return o;
+    });
+    // A vertex exactly on the plane makes the crossing test lie; nudge.
+    if (lifted.some((v) => Math.abs(v[v.length - 1]) < 1e-6)) {
+      hh += 1e-4;
+      for (const v of lifted) v[v.length - 1] += 1e-4;
+    }
+    const pts = new Map<string, V>();
+    const last = lifted[0].length - 1;
+    for (const [i, j] of edges) {
+      const a = lifted[i], b = lifted[j];
+      if (a[last] * b[last] < 0) {
+        const t = a[last] / (a[last] - b[last]);
+        const p: V = [];
+        for (let k = 0; k < last; k++) p.push(a[k] + (b[k] - a[k]) * t);
+        pts.set(`${i}_${j}`, p);
+      }
+    }
+    return { pts, lifted };
+  }
+
+  function faceSegments(faces: { cycle: number[] }[], pts: Map<string, V>): V[][] {
+    const segs: V[][] = [];
+    for (const f of faces) {
+      const hit: V[] = [];
+      for (let k = 0; k < 4; k++) {
+        const a = f.cycle[k], b = f.cycle[(k + 1) % 4];
+        const key = a < b ? `${a}_${b}` : `${b}_${a}`;
+        const p = pts.get(key);
+        if (p) hit.push(p);
+      }
+      if (hit.length === 2) segs.push(hit);
+    }
+    return segs;
+  }
+
+  function angularSort2(pts: V[]): V[] {
+    if (pts.length < 3) return pts;
+    const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length;
+    const cy = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+    return pts.slice().sort(
+      (a, b) => Math.atan2(a[1] - cy, a[0] - cx) - Math.atan2(b[1] - cy, b[0] - cx),
+    );
+  }
+
+  function drawCubeSlice() {
+    const orient = CUBE_ORIENT[sliceState.cubeMode];
+    const amp = sliceState.cubeMode === "corner" ? 1.9 : 1.55;
+    if (sliceState.cubeAuto) {
+      sliceState.cubeH = amp * Math.cos(2 * Math.PI * 0.06 * dispClock());
+      ($("pr-sl-range") as HTMLInputElement).value = String(sliceState.cubeH);
+    }
+    $("pr-sl-read").textContent = sliceState.cubeH.toFixed(2);
+    const base = ncubeCache3.verts;
+    const { pts, lifted } = sectionPoints(base, ncubeCache3.edges, orient, sliceState.cubeH);
+    const poly = angularSort2(
+      [...pts.values()].map((p) => [p[0], p[1]]),
+    );
+
+    // Left: the 3D scene, plane fixed at z = 0.
+    clear(sl3);
+    {
+      const c = sl3, { ctx, w, h } = c;
+      const orbit = 0.7 + dispClock() * 0.02 * Math.PI * 2;
+      const k = Math.min(w, h) * 0.2;
+      const cx = w / 2, cy = h / 2;
+      // the paper plane, drawn as a faint grid
+      ctx.strokeStyle = FAINT;
+      ctx.lineWidth = 1;
+      for (let g = -2; g <= 2; g++) {
+        for (const dir of [0, 1]) {
+          const a = view3(dir ? [g, 0, -2] : [-2, 0, g], orbit);
+          const b = view3(dir ? [g, 0, 2] : [2, 0, g], orbit);
+          ctx.globalAlpha = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(cx + a.x * k, cy - a.y * k);
+          ctx.lineTo(cx + b.x * k, cy - b.y * k);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+      // cube edges; the part that has passed through fades
+      for (const [i, j] of ncubeCache3.edges) {
+        const a = lifted[i], b = lifted[j];
+        const pa = view3([a[0], a[2], a[1]], orbit);
+        const pb = view3([b[0], b[2], b[1]], orbit);
+        const below = a[2] < 0 && b[2] < 0;
+        ctx.strokeStyle = INK;
+        ctx.globalAlpha = below ? 0.15 : 0.65;
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.moveTo(cx + pa.x * k, cy - pa.y * k);
+        ctx.lineTo(cx + pb.x * k, cy - pb.y * k);
+        ctx.stroke();
+      }
+      // the section, on the plane
+      if (poly.length >= 3) {
+        ctx.globalAlpha = 0.85;
+        ctx.strokeStyle = ACCENT;
+        ctx.fillStyle = ACCENT;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        const sp = poly.map((p) => view3([p[0], 0, p[1]], orbit));
+        ctx.moveTo(cx + sp[0].x * k, cy - sp[0].y * k);
+        for (let i = 1; i < sp.length; i++) ctx.lineTo(cx + sp[i].x * k, cy - sp[i].y * k);
+        ctx.closePath();
+        ctx.globalAlpha = 0.16;
+        ctx.fill();
+        ctx.globalAlpha = 0.9;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Right: all the paper gets.
+    clear(sl2);
+    fillPoly(sl2, poly, 0.2, INK, 0.82);
+  }
+
+  const ncubeCache3 = ncube(3);
+  const ncubeCache4 = ncube(4);
+
+  function drawTessSlice() {
+    const orient = TESS_ORIENT[sliceState.tessMode];
+    const amp = sliceState.tessMode === "corner" ? 2.15 : 1.45;
+    if (sliceState.tessAuto) {
+      sliceState.tessH = amp * Math.cos(2 * Math.PI * 0.05 * dispClock() + 1.3);
+      ($("pr-t-range") as HTMLInputElement).value = String(sliceState.tessH);
+    }
+    $("pr-t-read").textContent = sliceState.tessH.toFixed(2);
+    const { pts } = sectionPoints(ncubeCache4.verts, ncubeCache4.edges, orient, sliceState.tessH);
+    clear(t3);
+    $("pr-t-empty").classList.toggle("pr-hide", pts.size > 0);
+    if (pts.size === 0) return;
+
+    // Each cubic cell of the tesseract contributes one polygon of the
+    // section solid. Cells are "coordinate a is fixed at s".
+    const orbit = 0.4 + dispClock() * 0.025 * Math.PI * 2;
+    const polys: { pts3: V[]; z: number }[] = [];
+    for (let a = 0; a < 4; a++) for (const s of [1, -1]) {
+      const faces = CUBE4_FACES.filter((f) =>
+        f.cycle.every((vi) => (ncubeCache4.verts[vi][a] === s)),
+      );
+      const segs = faceSegments(faces, pts);
+      if (segs.length < 3) continue;
+      // order the segment endpoints into a ring
+      const ring: V[] = [segs[0][0], segs[0][1]];
+      const used = new Set([0]);
+      while (used.size < segs.length) {
+        const tail = ring[ring.length - 1];
+        let found = false;
+        for (let i = 0; i < segs.length; i++) {
+          if (used.has(i)) continue;
+          for (const e of [0, 1]) {
+            if (norm(sub(segs[i][e], tail)) < 1e-5) {
+              ring.push(segs[i][1 - e]);
+              used.add(i);
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+        if (!found) break;
+      }
+      ring.pop();
+      const proj = ring.map((p) => view3(p, orbit));
+      polys.push({
+        pts3: proj.map((p) => [p.x, p.y, p.z]),
+        z: proj.reduce((s2, p) => s2 + p.z, 0) / proj.length,
+      });
+    }
+    polys.sort((p, q) => p.z - q.z);
+    const { ctx, w, h } = t3;
+    const k = Math.min(w, h) * 0.19;
+    const cx = w / 2, cy = h / 2;
+    for (const poly of polys) {
+      ctx.beginPath();
+      ctx.moveTo(cx + poly.pts3[0][0] * k, cy - poly.pts3[0][1] * k);
+      for (let i = 1; i < poly.pts3.length; i++)
+        ctx.lineTo(cx + poly.pts3[i][0] * k, cy - poly.pts3[i][1] * k);
+      ctx.closePath();
+      ctx.fillStyle = ACCENT;
+      ctx.globalAlpha = 0.1;
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.globalAlpha = depthAlpha(poly.z / 1.5);
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // ---------- station: the game ----------
+  type Solid =
+    | { kind: "poly"; verts: V[]; edges: number[][] }
+    | { kind: "cyl"; r: number; h: number }
+    | { kind: "cone"; r: number; h: number }
+    | { kind: "sphere"; r: number };
+
+  function ring(r: number, z: number, n = 40): V[] {
+    const out: V[] = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      out.push([r * Math.cos(a), r * Math.sin(a), z]);
+    }
+    return out;
+  }
+
+  function solidPoints(s: Solid): V[] {
+    if (s.kind === "poly") return s.verts;
+    if (s.kind === "cyl") return [...ring(s.r, -s.h / 2), ...ring(s.r, s.h / 2)];
+    if (s.kind === "cone") return [...ring(s.r, -s.h / 2), [0, 0, s.h / 2]];
+    return ring(s.r, 0);
+  }
+
+  function rotX(deg: number): (v: V) => V {
+    const a = (deg * Math.PI) / 180, c = Math.cos(a), s = Math.sin(a);
+    return (v) => [v[0], v[1] * c - v[2] * s, v[1] * s + v[2] * c];
+  }
+  const IDENT = (v: V) => v.slice();
+
+  const CUBE_G: Solid = { kind: "poly", verts: ncubeCache3.verts.map((v) => scale(v, 0.62)), edges: ncubeCache3.edges };
+  function prism(sides: number, r: number, h: number): Solid {
+    const verts: V[] = [];
+    for (const z of [-h / 2, h / 2])
+      for (let i = 0; i < sides; i++) {
+        const a = (i / sides) * Math.PI * 2 + Math.PI / sides;
+        verts.push([r * Math.cos(a), r * Math.sin(a), z]);
+      }
+    const edges: number[][] = [];
+    for (let i = 0; i < sides; i++) {
+      edges.push([i, (i + 1) % sides]);
+      edges.push([sides + i, sides + ((i + 1) % sides)]);
+      edges.push([i, sides + i]);
+    }
+    return { kind: "poly", verts, edges };
+  }
+
+  interface Round {
+    hidden: Solid | "tesseract" | "cell24";
+    v1: { orient: (v: V) => V; mode: "sil" | "ortho4" | "persp4" };
+    v2: { orient: (v: V) => V; mode: "sil" | "ortho4" | "persp4" };
+    lineup: string[];
+    answer: number;
+    fact: string;
+    name: string;
+  }
+
+  const ROUNDS: Round[] = [
+    {
+      hidden: { kind: "cyl", r: 0.62, h: 1.24 },
+      v1: { orient: IDENT, mode: "sil" },
+      v2: { orient: rotX(90), mode: "sil" },
+      lineup: ["A sphere", "A cylinder", "A cone", "A cube"],
+      answer: 1,
+      name: "A cylinder",
+      fact:
+        "A sphere, a cone point-on, and a cylinder end-on all cast this same circle. The second view is the tell: flat top, flat bottom, straight sides. A square shadow plus a circle shadow means cylinder.",
+    },
+    {
+      hidden: { kind: "cone", r: 0.68, h: 1.3 },
+      v1: { orient: rotX(90), mode: "sil" },
+      v2: { orient: IDENT, mode: "sil" },
+      lineup: ["A cone", "A square pyramid", "A tetrahedron", "A triangular prism"],
+      answer: 0,
+      name: "A cone",
+      fact:
+        "All four suspects read as a triangle from the side. From above, only the cone is a circle. The pyramid shows a square, the tetrahedron a triangle, the prism a rectangle.",
+    },
+    {
+      hidden: CUBE_G,
+      v1: { orient: alignTo(scale([1, 1, 1], 1 / Math.sqrt(3)), 3), mode: "sil" },
+      v2: { orient: IDENT, mode: "sil" },
+      lineup: ["A hexagonal prism", "A cube", "An octahedron", "A cylinder"],
+      answer: 1,
+      name: "A cube",
+      fact:
+        "Corner first, a cube casts a regular hexagon. So does a hexagonal prism end-on, and an octahedron face-on. The square from ninety degrees away settles it.",
+    },
+    {
+      hidden: "tesseract",
+      v1: { orient: IDENT, mode: "ortho4" },
+      v2: { orient: IDENT, mode: "persp4" },
+      lineup: ["A cube", "A tesseract", "A 16-cell", "An octahedron"],
+      answer: 1,
+      name: "A tesseract",
+      fact:
+        "Looked at straight on, a tesseract projects to a plain cube: its eight edges along the fourth axis collapse to points. The second observer keeps that axis, and the second cube appears.",
+    },
+    {
+      hidden: "cell24",
+      v1: { orient: IDENT, mode: "ortho4" },
+      v2: { orient: IDENT, mode: "persp4" },
+      lineup: ["A tesseract", "A 16-cell", "A 24-cell", "A 5-cell"],
+      answer: 2,
+      name: "A 24-cell",
+      fact:
+        "The 24-cell: twenty-four vertices, ninety-six edges, and no relative in any other dimension. Straight on it flattens to a cuboctahedron wrapped around an octahedron.",
+    },
+  ];
+
+  const game = { i: 0, asked: 0, askedThis: false, answered: false, done: false };
+
+  function roundShape4(r: Round): Shape {
+    return r.hidden === "tesseract" ? SHAPES.tesseract : SHAPES.cell24;
+  }
+
+  function drawGameView(c: Cv, r: Round, which: "v1" | "v2") {
+    clear(c);
+    const view = r[which];
+    if (r.hidden === "tesseract" || r.hidden === "cell24") {
+      const sh = roundShape4(r);
+      const th = dispClock() * 0.06 * Math.PI * 2;
+      const rv = sh.verts.map((v) => rotPlanes(v, [[0, 1]], th));
+      const orbit = 0.5;
+      let pts;
+      if (view.mode === "ortho4") {
+        // straight-on: drop the fourth axis entirely
+        pts = rv.map((v) => view3([v[0], v[1], v[2]], orbit));
+      } else {
+        pts = rv.map((v) => view3(chainTo3(v), orbit));
+      }
+      drawWire(c, pts, sh.edges, view.mode === "ortho4" ? 0.3 : 0.27);
+      return;
+    }
+    const pts2 = hull2(solidPoints(r.hidden).map(view.orient).map(ortho2));
+    fillPoly(c, pts2, 0.34, INK, 0.82);
+  }
+
+  function drawGameReveal(r: Round) {
+    clear(grev);
+    const { w, h } = grev;
+    const orbit = 0.6 + dispClock() * 0.04 * Math.PI * 2;
+    if (r.hidden === "tesseract" || r.hidden === "cell24") {
+      const sh = roundShape4(r);
+      const th = dispClock() * 0.06 * Math.PI * 2;
+      const rv = sh.verts.map((v) => rotPlanes(v, [[0, 1]], th));
+      const pts = rv.map((v) => view3(chainTo3(v), orbit));
+      drawWire(grev, pts, sh.edges, 0.24);
+      return;
+    }
+    // wire model of the solid, slowly turning
+    const s = r.hidden;
+    const { ctx } = grev;
+    const k = Math.min(w, h) * 0.3;
+    const cx = w / 2, cy = h / 2;
+    const stroke = (a: V, b: V, alpha: number) => {
+      const pa = view3(a, orbit), pb = view3(b, orbit);
+      ctx.strokeStyle = INK;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx + pa.x * k, cy - pa.y * k);
+      ctx.lineTo(cx + pb.x * k, cy - pb.y * k);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+    if (s.kind === "poly") {
+      const pts = s.verts.map((v) => view3(v, orbit));
+      drawWire(grev, pts, s.edges, 0.3);
+    } else if (s.kind === "sphere") {
+      for (const ax of [0, 1, 2]) {
+        const circ = ring(s.r, 0).map((p) =>
+          ax === 0 ? p : ax === 1 ? [p[0], p[2], p[1]] : [p[2], p[0], p[1]],
+        );
+        for (let i = 0; i < circ.length; i++)
+          stroke(circ[i], circ[(i + 1) % circ.length], 0.5);
+      }
+    } else {
+      const bot = ring(s.r, -s.h / 2, 36);
+      for (let i = 0; i < bot.length; i++) stroke(bot[i], bot[(i + 1) % bot.length], 0.6);
+      if (s.kind === "cyl") {
+        const top = ring(s.r, s.h / 2, 36);
+        for (let i = 0; i < top.length; i++) stroke(top[i], top[(i + 1) % top.length], 0.6);
+        for (let i = 0; i < 36; i += 6) stroke(bot[i], top[i], 0.45);
+      } else {
+        const apex: V = [0, 0, s.h / 2];
+        for (let i = 0; i < 36; i += 6) stroke(bot[i], apex, 0.45);
+      }
+    }
+  }
+
+  function renderGameRound() {
+    const r = ROUNDS[game.i];
+    $("pr-g-round").textContent = `Round ${game.i + 1} of 5`;
+    const dots = $("pr-g-dots").children;
+    for (let i = 0; i < 5; i++) {
+      dots[i].className = i < game.i ? "is-done" : i === game.i ? "is-now" : "";
+    }
+    const opts = $("pr-g-opts").querySelectorAll<HTMLButtonElement>(".pr-gopt");
+    opts.forEach((b, i) => {
+      b.textContent = r.lineup[i];
+      b.disabled = false;
+      b.classList.remove("is-right", "is-wrong");
+    });
+    $("pr-g-v2fig").classList.add("pr-hide");
+    $("pr-g-revfig").classList.add("pr-hide");
+    $("pr-g-fact").classList.add("pr-hide");
+    $("pr-g-next").classList.add("pr-hide");
+    ($("pr-g-obs") as HTMLButtonElement).disabled = false;
+    $("pr-g-obs").classList.remove("pr-hide");
+    game.askedThis = false;
+    game.answered = false;
+  }
+
+  function answerGame(pick: number) {
+    if (game.answered || game.done) return;
+    game.answered = true;
+    const r = ROUNDS[game.i];
+    const opts = $("pr-g-opts").querySelectorAll<HTMLButtonElement>(".pr-gopt");
+    opts.forEach((b, i) => {
+      b.disabled = true;
+      if (i === r.answer) b.classList.add("is-right");
+      else if (i === pick) b.classList.add("is-wrong");
+    });
+    const fact = $("pr-g-fact");
+    fact.textContent = (pick === r.answer ? `${r.name}. ` : `${r.name}, not ${r.lineup[pick].toLowerCase()}. `) + r.fact;
+    fact.classList.remove("pr-hide");
+    $("pr-g-revfig").classList.remove("pr-hide");
+    $("pr-g-revcap").textContent = `${r.name}, the whole object.`;
+    ($("pr-g-obs") as HTMLButtonElement).disabled = true;
+    const next = $("pr-g-next");
+    next.textContent = game.i === 4 ? "Finish" : "Next round";
+    next.classList.remove("pr-hide");
+    sizeCanvases();
+  }
+
+  function nextGame() {
+    if (game.i === 4) {
+      game.done = true;
+      $("pr-g-body").classList.add("pr-hide");
+      $("pr-g-end").classList.remove("pr-hide");
+      $("pr-g-endstats").textContent =
+        `Five rounds. You asked the second observer ${game.asked} of 5 times.`;
+      const dots = $("pr-g-dots").children;
+      for (let i = 0; i < 5; i++) dots[i].className = "is-done";
+      return;
+    }
+    game.i += 1;
+    renderGameRound();
+    sizeCanvases();
+  }
+
+  // ---------- wiring ----------
+  function syncPlaneChips() {
+    const allowed = PLANES_FOR_D[shape().d];
+    document.querySelectorAll<HTMLButtonElement>(".pr-plane").forEach((b) => {
+      const id = b.dataset.plane!;
+      b.classList.toggle("pr-hide", !allowed.includes(id));
+      b.classList.toggle("is-on", id === state.planeId);
+      b.setAttribute("aria-pressed", String(id === state.planeId));
+    });
+  }
+
+  $("pr-shapes").addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-shape]");
+    if (!b) return;
+    state.shapeId = b.dataset.shape!;
+    const allowed = PLANES_FOR_D[shape().d];
+    if (!allowed.includes(state.planeId)) {
+      state.planeId = shape().d >= 4 ? "XW" : shape().d === 3 ? "XZ" : "XY";
+    }
+    document.querySelectorAll<HTMLButtonElement>("#pr-shapes .pr-chip").forEach((c) => {
+      c.classList.toggle("is-on", c === b);
+      c.setAttribute("aria-pressed", String(c === b));
+    });
+    syncPlaneChips();
+    updateLadderText();
+  });
+
+  $("pr-planes").addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-plane]");
+    if (!b) return;
+    state.planeId = b.dataset.plane!;
+    syncPlaneChips();
+    updateLadderText();
+  });
+
+  ($("pr-speed") as HTMLInputElement).addEventListener("input", (e) => {
+    state.omega = parseFloat((e.target as HTMLInputElement).value);
+    $("pr-speedval").textContent = `${state.omega.toFixed(2)} rev/s`;
+  });
+
+  function setShutter(mode: typeof state.shMode) {
+    state.shMode = mode;
+    // entering a sampled mode: seed the sample with the present so the room
+    // does not jump to a stale pose
+    state.sampClock = state.trueClock;
+    state.sampAngle = state.trueAngle;
+    state.lastSample = Math.floor(state.trueClock * shutterRate());
+    $("pr-sh-live").classList.toggle("is-on", mode === "live");
+    $("pr-sh-frozen").classList.toggle("is-on", mode === "frozen");
+    $("pr-sh-back").classList.toggle("is-on", mode === "back");
+  }
+  $("pr-sh-live").addEventListener("click", () => setShutter("live"));
+  $("pr-sh-frozen").addEventListener("click", () => setShutter("frozen"));
+  $("pr-sh-back").addEventListener("click", () => setShutter("back"));
+  ($("pr-sh-rate") as HTMLInputElement).addEventListener("input", (e) => {
+    state.shRate = parseFloat((e.target as HTMLInputElement).value);
+    setShutter("custom");
+  });
+
+  document.querySelectorAll<HTMLButtonElement>("[data-cmode]").forEach((b) =>
+    b.addEventListener("click", () => {
+      sliceState.cubeMode = b.dataset.cmode!;
+      document.querySelectorAll<HTMLButtonElement>("[data-cmode]").forEach((c) =>
+        c.classList.toggle("is-on", c === b),
+      );
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>("[data-tmode]").forEach((b) =>
+    b.addEventListener("click", () => {
+      sliceState.tessMode = b.dataset.tmode!;
+      document.querySelectorAll<HTMLButtonElement>("[data-tmode]").forEach((c) =>
+        c.classList.toggle("is-on", c === b),
+      );
+    }),
+  );
+  function loopToggle(btnId: string, key: "cubeAuto" | "tessAuto") {
+    $(btnId).addEventListener("click", () => {
+      sliceState[key] = !sliceState[key];
+      $(btnId).classList.toggle("is-on", sliceState[key]);
+      $(btnId).setAttribute("aria-pressed", String(sliceState[key]));
+    });
+  }
+  loopToggle("pr-sl-loop", "cubeAuto");
+  loopToggle("pr-t-loop", "tessAuto");
+  ($("pr-sl-range") as HTMLInputElement).addEventListener("input", (e) => {
+    sliceState.cubeAuto = false;
+    $("pr-sl-loop").classList.remove("is-on");
+    sliceState.cubeH = parseFloat((e.target as HTMLInputElement).value);
+  });
+  ($("pr-t-range") as HTMLInputElement).addEventListener("input", (e) => {
+    sliceState.tessAuto = false;
+    $("pr-t-loop").classList.remove("is-on");
+    sliceState.tessH = parseFloat((e.target as HTMLInputElement).value);
+  });
+
+  $("pr-g-opts").addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>(".pr-gopt");
+    if (!b) return;
+    answerGame(parseInt(b.dataset.opt!, 10));
+  });
+  $("pr-g-obs").addEventListener("click", () => {
+    if (game.askedThis || game.answered) return;
+    game.askedThis = true;
+    game.asked += 1;
+    $("pr-g-v2fig").classList.remove("pr-hide");
+    ($("pr-g-obs") as HTMLButtonElement).disabled = true;
+    sizeCanvases();
+  });
+  $("pr-g-next").addEventListener("click", nextGame);
+  $("pr-g-again").addEventListener("click", () => {
+    game.i = 0; game.asked = 0; game.done = false;
+    $("pr-g-end").classList.add("pr-hide");
+    $("pr-g-body").classList.remove("pr-hide");
+    renderGameRound();
+    sizeCanvases();
+  });
+
+  // ---------- the loop ----------
+  // rAF paints pixels only and some environments never fire it, so state
+  // lives in tick() and rAF is just the preferred scheduler. A watchdog
+  // keeps the clock alive at ~15fps if rAF stalls while the page is
+  // visible; hidden tabs stay quiet.
+  let lastT = 0;
+  let lastTickAt = 0;
+  function tick(now: number) {
+    lastTickAt = performance.now();
+    const dt = Math.min((now - lastT) / 1000 || 0, 0.1);
+    lastT = now;
+    state.trueClock += dt;
+    state.trueAngle += state.omega * dt;
+    const f = shutterRate();
+    const idx = Math.floor(state.trueClock * f);
+    if (idx !== state.lastSample) {
+      state.lastSample = idx;
+      state.sampClock = state.trueClock;
+      state.sampAngle = state.trueAngle;
+    }
+    drawLadder();
+    updateShutterText();
+    drawCubeSlice();
+    drawTessSlice();
+    if (!game.done) {
+      const r = ROUNDS[game.i];
+      drawGameView(gv1, r, "v1");
+      if (game.askedThis) drawGameView(gv2, r, "v2");
+      if (game.answered) drawGameReveal(r);
+    }
+  }
+  function frame(now: number) {
+    requestAnimationFrame(frame);
+    tick(now);
+  }
+
+  // Canvas backing stores follow their wrappers: late CSS, font swaps, and
+  // container changes all land here, not just window resizes.
+  let sizeDebounce = 0;
+  const ro = new ResizeObserver(() => {
+    clearTimeout(sizeDebounce);
+    sizeDebounce = window.setTimeout(() => {
+      sizeCanvases();
+      tick(performance.now());
+    }, 60) as unknown as number;
+  });
+  ro.observe(cA.el.parentElement!);
+  ro.observe(grev.el.parentElement!);
+  window.addEventListener("resize", sizeCanvases);
+
+  sizeCanvases();
+  syncPlaneChips();
+  updateLadderText();
+  renderGameRound();
+  setShutter("live");
+  tick(performance.now());
+  requestAnimationFrame((t) => { lastT = t; requestAnimationFrame(frame); });
+  // No visibility gate: browsers already throttle hidden-tab intervals to
+  // about one tick a second, and some embeds report hidden while showing.
+  window.setInterval(() => {
+    if (performance.now() - lastTickAt > 200) tick(performance.now());
+  }, 66);
+</script>

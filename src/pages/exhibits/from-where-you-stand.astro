@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PerspectiveRoom from "../../components/PerspectiveRoom.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "From Where You Stand";
+const description =
+  "An interactive room about perspective. One shape shown every way at once: real 4D rotations projected to the page, shadows, slices through the paper, a strobe shutter, and five objects to identify from a single angle. Every view is true. None is complete.";
+
+const jsonLd = [
+  {
+    "@type": "CreativeWork",
+    name: title,
+    description:
+      "An interactive demonstration that the same object reads differently from every viewpoint: dimension ladders, orthographic shadows, cross-sections, temporal aliasing, and a guessing game about silhouettes.",
+    creator: { "@id": "https://jakeherridge.com/#person" },
+    url: "https://jakeherridge.com/exhibits/from-where-you-stand/",
+  },
+  breadcrumb([
+    { name: "Jake Herridge", url: "https://jakeherridge.com/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/from-where-you-stand/" },
+  ]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header>
+      <h1 class="wonk text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+      <p class="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
+        Every view is true. None is complete.
+      </p>
+      <p class="mt-5 max-w-2xl leading-relaxed text-ink">
+        One room, one clock. Every panel below is computed live from the shape
+        itself: real rotations in up to five dimensions, real projections, real
+        shadows, real slices, and a shutter you control. Nothing is a
+        recording.
+      </p>
+    </header>
+
+    <div class="mt-12">
+      <PerspectiveRoom />
+    </div>
+
+    <footer class="mt-14 border-t border-faint pt-6">
+      <a href="/map/" class="text-accent underline underline-offset-4 hover:text-accent-strong">
+        The Map draws everything else here from one angle of its own &rarr;
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

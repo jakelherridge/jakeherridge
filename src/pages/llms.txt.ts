@@ -19,6 +19,7 @@ export const GET: APIRoute = async () => {
   txt += `- [The Boy and the Sword](${SITE}/exhibits/sword/): A short story, read at walking pace. The reading room tracks what the boy is carrying as you scroll.\n`;
   txt += `- [Synapse](${SITE}/exhibits/synapse/): Instantly connects all of your files for AI context. Synapse is a Claude Code plugin (https://github.com/jakelherridge/synapse-capture) that types, tags, and connects a folder of notes on its own, so an AI can pick up your full context from everything you fed it. The room shows Jake's whole vault as an anonymous turning 3D graph, replays how real nodes were captured, and answers questions about this site with citations from real nodes.\n`;
   txt += `- [Kitchen Happy Club](https://kitchenhappy.club/): Recipes and a journey. Jake's wife Haley's kitchen, on its own site.\n`;
+  txt += `- [From Where You Stand](${SITE}/exhibits/from-where-you-stand/): An interactive room about perspective. One shape computed live in every view at once: real 4D rotations projected to the page, orthographic shadows, cross-sections through the paper (a cube's corner-first middle slice is a regular hexagon, a tesseract's is a regular octahedron), a strobe shutter demonstrating the wagon-wheel effect honestly, and five objects to identify from a single angle. Every view is true. None is complete.\n`;
 
   txt += `\n## White papers\n`;
   for (const p of papers) {
