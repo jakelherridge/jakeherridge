@@ -1,9 +1,11 @@
 # Surfer Pete's Eye
 
-An iPhone camera that sees the world the way Surfer Pete does. Ninety years old,
-a few head wounds, lost his marbles, and everything is beautiful. The camera feed
-runs through one Metal shader (flow, vibrancy, neon edges, sun), Vision names what
-it sees in Pete's words, and your hands turn into crabs.
+An iPhone camera that sees the world the way Surfer Pete does. Once a jacked
+ladies-man surfer, now ninety, a few head wounds down, living in a shed on
+Eleuthera, spearing his own fish and hunting crabs by torchlight, and everything
+is beautiful. The camera feed runs through one Metal shader (flow, vibrancy, neon
+edges, sun), Vision names what it sees in Pete's words, and your hands turn into
+crabs.
 
 The plan and the reasoning live in
 `docs/plans/2026-09-21-003-feat-surfer-petes-eye-ios-app.md` at the repo root.

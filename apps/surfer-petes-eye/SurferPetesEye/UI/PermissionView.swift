@@ -20,7 +20,7 @@ struct PermissionView: View {
                 Text("Surfer Pete's Eye")
                     .font(.system(.largeTitle, design: .rounded).weight(.black))
                 Text(mode == .ask
-                     ? "Pete needs to borrow your eyes, brah. The camera never leaves the phone."
+                     ? "Pete needs to borrow your eyes, bey. The camera never leaves the phone. Nothing leaves the island."
                      : "Pete can't see without the camera. Flip it on in Settings and come back.")
                     .font(.system(.body, design: .rounded))
                 Button(mode == .ask ? "Let Pete look" : "Open Settings", action: action)

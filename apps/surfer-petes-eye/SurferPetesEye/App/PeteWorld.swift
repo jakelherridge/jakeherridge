@@ -46,9 +46,11 @@ final class PeteWorld {
             }
         }
 
-        if let special = newcomers.first(where: { $0.isHappyJuice || PeteLexicon.isTheStick($0.label) }),
-           let line = PeteSayings.onSighting(special) {
-            say(line)
+        for newcomer in newcomers {
+            if let line = PeteSayings.onSighting(newcomer) {
+                say(line)
+                break
+            }
         }
     }
 

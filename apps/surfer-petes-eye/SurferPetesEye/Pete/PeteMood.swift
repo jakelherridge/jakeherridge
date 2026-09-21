@@ -2,23 +2,25 @@ import SwiftUI
 import simd
 
 /// Pete's world has weather. Each mood is a palette for the shader, a
-/// strength for the sun, and how hard the world warps.
+/// strength for the sun, and how hard the world warps. Named for the
+/// island: the surf break at Gregory Town, the calm Bight side, the capital
+/// at golden hour, crab hunting after dark, and the reef that eats ships.
 enum PeteMood: String, CaseIterable, Identifiable {
     case dawnPatrol = "Dawn Patrol"
-    case glassy = "Glassy"
-    case goldenHour = "Golden Hour"
-    case nightSesh = "Night Sesh"
-    case wipeout = "Wipeout"
+    case glassy = "Glassy Bight"
+    case goldenHour = "Governor's Gold"
+    case nightSesh = "Crab Walk"
+    case wipeout = "Devil's Backbone"
 
     var id: String { rawValue }
 
     var tagline: String {
         switch self {
-        case .dawnPatrol: return "Dawn patrol. Nobody out. Perfect."
-        case .glassy: return "Glassy, brah. Look at it."
-        case .goldenHour: return "Golden hour. Every hour."
-        case .nightSesh: return "Night sesh. The colors come out."
-        case .wipeout: return "Wipeout. Head went thump. All good."
+        case .dawnPatrol: return "Dawn patrol at Surfer's. Nobody out. Perfect."
+        case .glassy: return "Bight side. Glassy, brah. Look at it."
+        case .goldenHour: return "Governor's Harbour gold. Every hour."
+        case .nightSesh: return "Crab walk. Torch on. The colors come out."
+        case .wipeout: return "Devil's Backbone. Head went thump. All good."
         }
     }
 
@@ -27,7 +29,7 @@ enum PeteMood: String, CaseIterable, Identifiable {
         case .dawnPatrol: return "sunrise.fill"
         case .glassy: return "water.waves"
         case .goldenHour: return "sun.max.fill"
-        case .nightSesh: return "moon.stars.fill"
+        case .nightSesh: return "flashlight.on.fill"
         case .wipeout: return "tornado"
         }
     }

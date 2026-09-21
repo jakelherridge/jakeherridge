@@ -17,14 +17,27 @@ wild camera overlay. A perspective art project, not a utility.
 
 Who he is decides every number in the shader and every word in the lexicon.
 
+The lore, from Jake: in the eighties Pete was a huge, jacked, ladies-man surfer.
+Steroids, waves, happy juice, a few bloody head wounds. He is ninety now and lives
+in a little shed on Eleuthera in the Bahamas. He spears his own fish with a
+Hawaiian sling, hunts land crabs at night with a torch after the rain, and enjoys
+life exactly as much as he did then. The island is in everything he says: Surfer's
+Beach at Gregory Town, the two blues at Glass Window, the pink sand over on Harbour
+Island, the Spanish Wells crawfish boats, the Friday fish fry at Governor's Harbour,
+the mail boat on Thursday, potcakes, Kalik, sky juice, rake 'n' scrape, Junkanoo,
+and the reef at Devil's Backbone that has eaten a hundred ships. The old jacked
+version of him is a running joke he tells on himself, never a brag.
+
 - He is never mean. Everything is beautiful, or funny, or both.
 - He names things. He does not explain them.
 - Short lines. He was never a talker. He was a surfer.
 - The sun is always up somewhere in the frame, even indoors, even at night.
 - Water everywhere. The world flows and sets roll through the frame.
 - Marbles lost: hue drifts slowly, tags tilt, the world sloshes when the phone moves.
-- Head wounds: the Wipeout mood. Kaleidoscope, red, extra warp. Still happy.
+- Head wounds: the Devil's Backbone mood. Kaleidoscope, red, extra warp. Still happy.
 - Ninety years old: warm vignette, a little grain, soft focus. Not a bug.
+- Bahamian in the mouth: bey, potcake, tingum, sip sip, well muddo. Not a caricature,
+  just forty years of living there.
 
 ## The experience
 
@@ -38,8 +51,8 @@ Who he is decides every number in the shader and every word in the lexicon.
    each.
 5. Pete talks. One line every seven seconds, or sooner when something worth a line
    shows up ("Happy juice! Cheers, brah.").
-6. Moods. Dawn Patrol, Glassy, Golden Hour, Night Sesh, Wipeout. Picked by the clock,
-   cycled by tapping the pill or the palette button.
+6. Moods. Dawn Patrol, Glassy Bight, Governor's Gold, Crab Walk, Devil's Backbone.
+   Picked by the clock, cycled by tapping the pill or the palette button.
 7. Keep it. The shutter renders the current frame through the eye, stamps the tags and
    creatures on top, and saves to Photos.
 
@@ -182,8 +195,8 @@ apps/surfer-petes-eye/
    sharper but AGPL. Does that matter for an art project you might put on the store?
 5. Does the lexicon need a second voice pass from you? The table is a starting
    draft in Pete's register. Any words Pete would never say?
-6. Any real-Pete lore worth baking in (a home break, a year, a board name, a dog)?
-   The sayings have placeholders like Trestles and 1983.
+6. The Eleuthera lore is in (see the bible above). Anything to add or cut: a
+   settlement he calls home, a board name, a potcake's name, a year he'd rather forget?
 7. Minimum device. iOS 17 covers iPhone XS and up, but the shader wants an A14 or
    better to hold 60 fps. Fine to say iPhone 12 and up?
 

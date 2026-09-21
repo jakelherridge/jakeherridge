@@ -1,18 +1,24 @@
 import Foundation
 
-/// What Pete calls things. The model speaks COCO; Pete speaks Pete.
+/// What Pete calls things. The model speaks COCO; Pete speaks Pete, with
+/// a good amount of Bahamian in it after a few decades on Eleuthera.
 ///
 /// Several names per thing so a room full of chairs is not a room full of
 /// "the throne". A sighting picks one name by its seed and keeps it.
 enum PeteLexicon {
 
+    /// A few things Pete reacts to out loud. See PeteSayings.onSighting.
+    enum Kind {
+        case potcake, fish, boat, other
+    }
+
     static let table: [String: [String]] = [
         // people and animals
-        "person": ["brah", "a fellow soul", "grom", "a legend"],
-        "bird": ["sky buddy", "a feathered grom"],
+        "person": ["brah", "bey", "a fellow soul", "grom"],
+        "bird": ["sky buddy", "a gull with opinions"],
         "cat": ["the boss", "a small landlord"],
-        "dog": ["land seal", "the good boy"],
-        "horse": ["a big dog"],
+        "dog": ["potcake", "the good potcake"],
+        "horse": ["a big potcake"],
         "sheep": ["a cloud with legs"],
         "cow": ["a moo boat"],
         "elephant": ["a gray mountain with a hose"],
@@ -25,12 +31,12 @@ enum PeteLexicon {
         "car": ["land boat", "a land boat"],
         "motorcycle": ["an angry land boat"],
         "motorbike": ["an angry land boat"],
-        "airplane": ["a sky whale"],
-        "aeroplane": ["a sky whale"],
-        "bus": ["the big land boat"],
+        "airplane": ["the Nassau bird"],
+        "aeroplane": ["the Nassau bird"],
+        "bus": ["the jitney"],
         "train": ["an iron snake"],
-        "truck": ["the hauler"],
-        "boat": ["the real deal", "a boat, respect"],
+        "truck": ["the island truck, most of one"],
+        "boat": ["the real deal", "a boat, respect", "the Spanish Wells express"],
 
         // street
         "traffic light": ["a disco light"],
@@ -41,7 +47,7 @@ enum PeteLexicon {
 
         // carry
         "backpack": ["a turtle shell"],
-        "umbrella": ["portable shade"],
+        "umbrella": ["portable shade", "a casuarina you can carry"],
         "handbag": ["a treasure sack"],
         "tie": ["a neck leash"],
         "suitcase": ["the escape box"],
@@ -56,13 +62,14 @@ enum PeteLexicon {
         "baseball glove": ["a catch hand"],
         "skateboard": ["a sidewalk surfboard"],
         "surfboard": ["THE STICK", "the magic plank", "my old friend"],
+        "fishing rod": ["the patient way"],
         "tennis racket": ["a fly swatter"],
 
         // happy juice and its vessels
         "bottle": ["happy juice"],
         "wine glass": ["fancy happy juice"],
         "wineglass": ["fancy happy juice"],
-        "cup": ["happy juice", "a mug of happy juice"],
+        "cup": ["happy juice", "a mug of happy juice", "sky juice, maybe"],
 
         // kitchen
         "fork": ["a tiny trident"],
@@ -73,6 +80,7 @@ enum PeteLexicon {
         "apple": ["a crunch ball"],
         "sandwich": ["the stack"],
         "orange": ["a sun ball"],
+        "pineapple": ["Gregory Town gold"],
         "broccoli": ["a tiny tree"],
         "carrot": ["an orange stick"],
         "hot dog": ["tube grub"],
@@ -86,7 +94,7 @@ enum PeteLexicon {
         "sofa": ["the big soft"],
         "potted plant": ["buddy", "a green friend"],
         "pottedplant": ["buddy", "a green friend"],
-        "bed": ["the raft"],
+        "bed": ["the hammock, basically"],
         "dining table": ["the flat rock"],
         "diningtable": ["the flat rock"],
         "toilet": ["the porcelain wave"],
@@ -101,9 +109,9 @@ enum PeteLexicon {
         "oven": ["the hot box"],
         "toaster": ["a bread tanner"],
         "sink": ["a tiny lagoon"],
-        "refrigerator": ["the happy juice cave"],
+        "refrigerator": ["the happy juice cave", "the cooler that hums"],
         "book": ["a paper brick"],
-        "clock": ["the tyrant"],
+        "clock": ["the tyrant", "the rooster's cousin"],
         "vase": ["a flower boat"],
         "scissors": ["the snippers"],
         "teddy bear": ["the soft one"],
@@ -117,32 +125,41 @@ enum PeteLexicon {
     /// whole word wins.
     static let wordRules: [(words: [String], names: [String])] = [
         (["beer", "wine", "cocktail", "coffee", "drink", "drinks", "beverage", "juice", "soda", "mug",
-          "glass", "bottle", "cup", "champagne", "liquor", "whiskey", "margarita", "latte", "espresso"],
-         ["happy juice"]),
-        (["ocean", "sea", "wave", "waves", "surf", "surfing", "beach", "coast", "shore", "tide"],
-         ["the big blue", "home", "the whole point"]),
-        (["sun", "sunset", "sunrise", "sky"], ["the big warm", "golden hour, always"]),
-        (["dog", "puppy"], ["land seal", "the good boy"]),
+          "glass", "bottle", "cup", "champagne", "liquor", "whiskey", "rum", "margarita", "latte", "espresso"],
+         ["happy juice", "happy juice", "a Kalik, probably"]),
+        (["coconut", "coconuts"], ["sky juice, almost"]),
+        (["ocean", "sea", "wave", "waves", "surf", "surfing", "beach", "coast", "shore", "tide", "reef", "lagoon"],
+         ["the big blue", "home", "the whole point", "the Bight, or the loud side"]),
+        (["sun", "sunset", "sunrise", "sky"], ["the big warm", "golden hour, always", "the Eleuthera light"]),
+        (["dog", "puppy"], ["potcake", "the good potcake"]),
         (["cat", "kitten"], ["the boss", "a small landlord"]),
-        (["bird", "seagull", "gull", "pelican"], ["sky buddy", "a feathered grom"]),
-        (["fish"], ["a swimmer", "a wet friend"]),
+        (["bird", "seagull", "gull", "pelican", "heron", "hummingbird"], ["sky buddy", "a gull with opinions"]),
+        (["chicken", "rooster", "hen"], ["the alarm clock"]),
+        (["goat"], ["the lawn mower"]),
+        (["lizard", "iguana", "gecko"], ["the landlord"]),
+        (["fish", "grouper", "snapper", "lobster", "crawfish", "conch"], ["a swimmer", "dinner, if he's slow"]),
         (["crab"], ["a crab, he knows things"]),
-        (["car", "vehicle", "truck", "van"], ["land boat"]),
+        (["pineapple"], ["Gregory Town gold"]),
+        (["car", "vehicle", "truck", "van", "cart"], ["land boat"]),
         (["surfboard", "board"], ["THE STICK", "the magic plank"]),
-        (["tree", "plant", "flower", "flowers", "garden", "forest", "palm"], ["a green friend", "buddy"]),
+        (["palm", "palms", "pine", "pines"], ["a buddy that whispers"]),
+        (["tree", "plant", "flower", "flowers", "garden", "forest"], ["a green friend", "buddy"]),
+        (["shed", "hut", "cabin", "shack", "cottage"], ["home, brah"]),
+        (["hammock"], ["the office"]),
         (["food", "meal", "snack", "pizza", "burger", "sandwich", "taco", "fries"], ["grindage", "fuel for the stoke"]),
         (["water", "pool", "lake", "river"], ["baby ocean", "practice water"]),
         (["phone", "screen", "computer", "laptop", "monitor"], ["the glow slab", "a pocket portal"]),
-        (["people", "crowd", "person", "man", "woman", "child", "kid", "face", "baby"], ["brah", "a fellow soul", "grom"]),
-        (["sand"], ["the good stuff"]),
+        (["people", "crowd", "person", "man", "woman", "child", "kid", "face", "baby"], ["brah", "bey", "a fellow soul", "grom"]),
+        (["sand"], ["the good stuff", "pink, if you squint"]),
         (["cloud", "clouds"], ["sky foam"]),
         (["mountain", "hill", "mountains"], ["a wave that forgot to break"]),
-        (["night", "dark"], ["the night sesh"]),
+        (["night", "dark"], ["crab walk hours"]),
+        (["rain", "storm"], ["crab weather"]),
         (["indoor", "room", "furniture", "wall", "kitchen", "bedroom"], ["the cave"]),
         (["outdoor", "nature", "landscape", "outdoors"], ["out there, brah"]),
     ]
 
-    static let unknownNames = ["a something", "one of those", "a whatsit", "a real one", "a good one, probably"]
+    static let unknownNames = ["a tingum", "one of them tingums", "a whatsit", "a real one", "a good one, probably"]
 
     static func normalize(_ label: String) -> String {
         label.lowercased()
@@ -175,5 +192,13 @@ enum PeteLexicon {
 
     static func isTheStick(_ label: String) -> Bool {
         names(for: label).contains { $0 == "THE STICK" }
+    }
+
+    static func kind(of label: String) -> Kind {
+        let options = names(for: label)
+        if options.contains(where: { $0.contains("potcake") }) { return .potcake }
+        if options.contains("a swimmer") { return .fish }
+        if options.contains("the real deal") { return .boat }
+        return .other
     }
 }
