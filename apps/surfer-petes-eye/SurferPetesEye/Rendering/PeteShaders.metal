@@ -1,9 +1,13 @@
-// Surfer Pete's eye, as a fragment shader.
+// Surfer Pete's eye, as two fragment passes.
 //
-// One fullscreen triangle samples the camera texture and runs it through
-// Pete's head: the world flows like water, colors go way past vibrant,
-// edges glow neon, the sun is always somewhere, and anything Pete has named
-// sparkles. `intensity` fades the whole thing back to a plain camera.
+// Pass 1 (peteFieldFragment) runs at postcard resolution and computes all
+// the noise that makes the world move: the flow field, the ripple phase and
+// the band phase. Pass 2 (peteFragment) runs at screen resolution, samples
+// that field once, and does the rest with texture reads and cheap math.
+// Splitting it this way is what keeps the phone cool: fractal noise is the
+// expensive part and it is far too smooth to need computing per pixel.
+//
+// `intensity` fades the whole thing back to a plain camera.
 
 #include <metal_stdlib>
 #include "ShaderTypes.h"
@@ -45,12 +49,12 @@ static float vnoise(float2 p) {
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
-// Fractal Brownian motion. Five octaves is enough for water at phone size.
+// Fractal Brownian motion. Four octaves is enough for water at postcard size.
 static float fbm(float2 p) {
     float v = 0.0;
     float amp = 0.5;
     const float2x2 rot = float2x2(float2(0.8, 0.6), float2(-0.6, 0.8));
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
         v += amp * vnoise(p);
         p = rot * p * 2.0 + 17.3;
         amp *= 0.5;
@@ -59,7 +63,7 @@ static float fbm(float2 p) {
 }
 
 // ---------------------------------------------------------------------------
-// Color helpers
+// Color and coordinate helpers
 // ---------------------------------------------------------------------------
 
 static float3 rgb2hsv(float3 c) {
@@ -81,16 +85,27 @@ static float luma(float3 c) {
     return dot(c, float3(0.299, 0.587, 0.114));
 }
 
-// Map a view uv (0..1 over the drawable) to a camera texture uv so the
-// texture covers the view, cropping the long side. FrameGeometry.swift does
-// the same math in reverse for the overlay.
-static float2 aspectFillUV(float2 viewUV, float2 res, float2 tex) {
+// Map a view uv (0..1 over the drawable) to an upright frame uv so the frame
+// covers the view, cropping the long side. FrameGeometry.swift does the same
+// math in reverse for the overlay.
+static float2 aspectFillUV(float2 viewUV, float2 res, float2 frame) {
     float viewAspect = res.x / res.y;
-    float texAspect = tex.x / tex.y;
-    float2 scale = (texAspect > viewAspect)
-        ? float2(viewAspect / texAspect, 1.0)
-        : float2(1.0, texAspect / viewAspect);
+    float frameAspect = frame.x / frame.y;
+    float2 scale = (frameAspect > viewAspect)
+        ? float2(viewAspect / frameAspect, 1.0)
+        : float2(1.0, frameAspect / viewAspect);
     return (viewUV - 0.5) * scale + 0.5;
+}
+
+// View uv to raw camera texture uv. The buffer is never rotated on the CPU;
+// this is where the quarter turn (and the selfie mirror) happens.
+static float2 cameraUV(float2 viewUV, constant PeteUniforms &u) {
+    float2 f = aspectFillUV(viewUV, u.resolution, u.frameSize);
+    switch (u.frameOrientation) {
+        case PETE_FRAME_BACK_PORTRAIT: return float2(f.y, 1.0 - f.x);
+        case PETE_FRAME_FRONT_PORTRAIT: return float2(f.y, f.x);
+        default: return f;
+    }
 }
 
 static float sobelEdge(texture2d<float, access::sample> cam, sampler s, float2 tuv, float2 texel) {
@@ -108,11 +123,36 @@ static float sobelEdge(texture2d<float, access::sample> cam, sampler s, float2 t
 }
 
 // ---------------------------------------------------------------------------
-// The eye
+// Pass 1: the field. Everything that flows is decided here, at low res.
+// ---------------------------------------------------------------------------
+
+fragment float4 peteFieldFragment(PeteVertexOut in [[stage_in]],
+                                  constant PeteUniforms &u [[buffer(0)]])
+{
+    const float t = u.time;
+    const float aspect = u.resolution.x / u.resolution.y;
+    float2 p = in.uv * float2(aspect, 1.0);
+
+    // Domain-warped flow, -1..1 on each axis.
+    float2 np = p * 3.0;
+    float2 flow = float2(fbm(np + float2(t * 0.17, -t * 0.11)),
+                         fbm(np + float2(7.1, 3.7) + float2(-t * 0.13, t * 0.15)));
+    flow = (flow - 0.5) * 2.0;
+
+    // Phases for the ripple wobble and the wave bands, 0..1.
+    float ripple = fbm(p * 5.0 + t * 0.2);
+    float bands = fbm(p * 4.0 + t * 0.25);
+
+    return float4(flow, ripple, bands);
+}
+
+// ---------------------------------------------------------------------------
+// Pass 2: the eye.
 // ---------------------------------------------------------------------------
 
 fragment float4 peteFragment(PeteVertexOut in [[stage_in]],
                              texture2d<float, access::sample> cam [[texture(0)]],
+                             texture2d<float, access::sample> field [[texture(1)]],
                              constant PeteUniforms &u [[buffer(0)]],
                              constant PeteHotspot *hotspots [[buffer(1)]])
 {
@@ -136,30 +176,28 @@ fragment float4 peteFragment(PeteVertexOut in [[stage_in]],
         uv = mix(uv, folded, u.kaleido);
     }
 
-    // 1. The world flows. Domain-warped noise pushes every pixel like water.
-    float2 np = uv * asp * 3.0;
-    float2 flow = float2(fbm(np + float2(t * 0.17, -t * 0.11)),
-                         fbm(np + float2(7.1, 3.7) + float2(-t * 0.13, t * 0.15)));
-    flow = (flow - 0.5) * 2.0;
+    // 1. The world flows. One read of the field replaces all the noise.
+    float4 f = field.sample(smp, uv);
+    float2 flow = f.xy;
     float swirlAmount = (0.035 + 0.06 * u.motion) * k * u.drift;
     float2 wuv = uv + flow * swirlAmount / asp;
 
     // 2. Sets rolling in: a horizontal wobble marching down the frame.
-    float ripple = sin(uv.y * 28.0 + fbm(uv * asp * 5.0 + t * 0.2) * 9.0 - t * 1.6);
+    float ripple = sin(uv.y * 28.0 + f.z * 9.0 - t * 1.6);
     wuv.x += ripple * 0.006 * k;
 
     // 3. Sample with a little chromatic split along the flow.
     float2 ca = flow * 0.004 * k / asp;
-    float2 tuv = aspectFillUV(wuv, u.resolution, u.textureSize);
+    float2 tuv = cameraUV(wuv, u);
     float3 col;
-    col.r = cam.sample(smp, aspectFillUV(wuv + ca, u.resolution, u.textureSize)).r;
+    col.r = cam.sample(smp, cameraUV(wuv + ca, u)).r;
     col.g = cam.sample(smp, tuv).g;
-    col.b = cam.sample(smp, aspectFillUV(wuv - ca, u.resolution, u.textureSize)).b;
-    float3 orig = cam.sample(smp, aspectFillUV(in.uv, u.resolution, u.textureSize)).rgb;
+    col.b = cam.sample(smp, cameraUV(wuv - ca, u)).b;
+    float3 orig = cam.sample(smp, cameraUV(in.uv, u)).rgb;
 
-    // 4. Vibrancy. Saturation way up, hue drifting slowly, shadows lifted.
+    // 4. Vibrancy. Saturation way up, hue drifting slowly with the flow, shadows lifted.
     float3 hsv = rgb2hsv(col);
-    float hueDrift = (fbm(uv * asp * 2.0 - t * 0.05) - 0.5) * 0.35 * k;
+    float hueDrift = flow.x * 0.18 * k;
     hsv.x = fract(hsv.x + hueDrift);
     hsv.y = clamp(hsv.y * (1.0 + 1.4 * k) + 0.08 * k, 0.0, 1.0);
     hsv.z = pow(hsv.z, 1.0 / (1.0 + 0.35 * k));
@@ -167,11 +205,11 @@ fragment float4 peteFragment(PeteVertexOut in [[stage_in]],
 
     // 5. Wave bands. Luminance becomes rolling bands of mood color.
     float lum = luma(col);
-    float bands = 0.5 + 0.5 * sin(lum * 14.0 + fbm(uv * asp * 4.0 + t * 0.25) * 7.0 - t * 1.2);
+    float bands = 0.5 + 0.5 * sin(lum * 14.0 + f.w * 7.0 - t * 1.2);
     float3 bandColor = mix(u.paletteA.rgb, u.paletteB.rgb, bands);
     col = mix(col, col * (0.75 + 0.5 * bands) + bandColor * 0.12, 0.6 * k);
 
-    // 6. Neon edges. Sobel on the original frame, colored by the mood and pulsing.
+    // 6. Neon edges. Sobel on the raw frame, colored by the mood and pulsing.
     float2 texel = 2.0 / max(u.textureSize, float2(1.0));
     float edge = smoothstep(0.15, 0.6, sobelEdge(cam, smp, tuv, texel));
     float3 edgeColor = mix(u.paletteC.rgb, u.paletteD.rgb, 0.5 + 0.5 * sin(t * 2.0 + uv.y * 10.0));

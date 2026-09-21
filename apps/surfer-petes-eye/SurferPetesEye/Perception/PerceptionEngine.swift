@@ -41,9 +41,11 @@ final class PerceptionEngine {
 
     /// Called on the camera queue for every frame. Cheap unless it decides
     /// to run something.
-    func process(_ pixelBuffer: CVPixelBuffer) {
+    func process(_ frame: CameraFrame) {
         let now = CACurrentMediaTime()
-        let frameSize = CGSize(width: CVPixelBufferGetWidth(pixelBuffer), height: CVPixelBufferGetHeight(pixelBuffer))
+        let pixelBuffer = frame.pixelBuffer
+        let orientation = frame.orientation.visionOrientation
+        let frameSize = frame.uprightSize
 
         stateLock.lock()
         let runObjects = !objectBusy && now - lastObjectTime >= objectInterval
@@ -54,7 +56,7 @@ final class PerceptionEngine {
 
         if runObjects {
             objectQueue.async { [self] in
-                let raw = (try? objectDetector.detect(in: pixelBuffer)) ?? []
+                let raw = (try? objectDetector.detect(in: pixelBuffer, orientation: orientation)) ?? []
                 let detections = raw.map(FrameDetection.init(raw:))
                 publish(frameSize: frameSize) { tracker, time in
                     _ = tracker.ingest(detections: detections, at: time)
@@ -65,7 +67,7 @@ final class PerceptionEngine {
 
         if runHands {
             handQueue.async { [self] in
-                let hands = handDetector.detect(in: pixelBuffer)
+                let hands = handDetector.detect(in: pixelBuffer, orientation: orientation)
                 publish(frameSize: frameSize) { tracker, time in
                     _ = tracker.ingest(hands: hands, at: time)
                 }

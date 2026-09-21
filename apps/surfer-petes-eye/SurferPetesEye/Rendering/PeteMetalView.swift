@@ -2,10 +2,10 @@ import SwiftUI
 import MetalKit
 
 /// MTKView that renders at a fraction of native resolution. Pete's world is
-/// soft anyway, and the shader does a lot of work per pixel.
+/// soft anyway, and the eye pass still does a dozen texture reads per pixel.
 final class PeteMTKView: MTKView {
     var renderScale: CGFloat = 0.75 {
-        didSet { setNeedsLayout() }
+        didSet { if renderScale != oldValue { setNeedsLayout() } }
     }
 
     override func layoutSubviews() {
@@ -22,13 +22,14 @@ final class PeteMTKView: MTKView {
 struct PeteMetalView: UIViewRepresentable {
     let renderer: PeteRenderer
     var renderScale: CGFloat = 0.75
+    var frameRate: Int = 60
 
     func makeUIView(context: Context) -> PeteMTKView {
         let view = PeteMTKView(frame: .zero, device: renderer.device)
         view.colorPixelFormat = .bgra8Unorm
         view.framebufferOnly = true
         view.autoResizeDrawable = false
-        view.preferredFramesPerSecond = 60
+        view.preferredFramesPerSecond = frameRate
         view.isPaused = false
         view.enableSetNeedsDisplay = false
         view.backgroundColor = .black
@@ -39,5 +40,8 @@ struct PeteMetalView: UIViewRepresentable {
 
     func updateUIView(_ uiView: PeteMTKView, context: Context) {
         uiView.renderScale = renderScale
+        if uiView.preferredFramesPerSecond != frameRate {
+            uiView.preferredFramesPerSecond = frameRate
+        }
     }
 }

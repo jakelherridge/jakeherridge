@@ -2,11 +2,19 @@ import AVFoundation
 import CoreVideo
 import Foundation
 
-/// Wraps AVCaptureSession and hands out BGRA pixel buffers, already rotated
-/// to portrait, on a dedicated queue. Nothing here knows about Pete.
+/// Wraps AVCaptureSession and hands out raw BGRA pixel buffers on a
+/// dedicated queue. Nothing here knows about Pete.
+///
+/// Tuned for a phone that stays cool: 720p, a locked 30 fps, no wide
+/// color, and no rotation or mirroring of the buffers (see CameraFrame).
 final class CameraManager: NSObject {
 
-    typealias FrameHandler = (CVPixelBuffer) -> Void
+    typealias FrameHandler = (CameraFrame) -> Void
+
+    /// 720p is plenty. Pete's eye blurs everything anyway, and the shader,
+    /// the Vision models and the memory bus all work half as hard as at 1080p.
+    static let preset: AVCaptureSession.Preset = .hd1280x720
+    static let frameRate: Int32 = 30
 
     let session = AVCaptureSession()
     var onFrame: FrameHandler?
@@ -84,6 +92,7 @@ final class CameraManager: NSObject {
                 self.session.addInput(newInput)
                 self.input = newInput
                 self.position = next
+                Self.lockFrameRate(device)
             } else if let old = self.input, self.session.canAddInput(old) {
                 self.session.addInput(old)
             }
@@ -101,13 +110,15 @@ final class CameraManager: NSObject {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
 
-        session.sessionPreset = session.canSetSessionPreset(.hd1920x1080) ? .hd1920x1080 : .hd1280x720
+        session.automaticallyConfiguresCaptureDeviceForWideColor = false
+        session.sessionPreset = session.canSetSessionPreset(Self.preset) ? Self.preset : .medium
 
         guard let device = Self.camera(at: position) else { throw CameraError.noCamera }
         let deviceInput = try AVCaptureDeviceInput(device: device)
         guard session.canAddInput(deviceInput) else { throw CameraError.cannotAddInput }
         session.addInput(deviceInput)
         input = deviceInput
+        Self.lockFrameRate(device)
 
         output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
         output.alwaysDiscardsLateVideoFrames = true
@@ -118,16 +129,28 @@ final class CameraManager: NSObject {
         configureConnection()
     }
 
-    /// Portrait buffers and a mirrored selfie camera, so Vision and the
-    /// shader can both treat the frame as "up is up".
+    /// A steady 30 fps. Some 720p formats offer 60, which would double the
+    /// work of everything downstream for no visible gain through Pete's eye.
+    private static func lockFrameRate(_ device: AVCaptureDevice) {
+        let duration = CMTime(value: 1, timescale: frameRate)
+        let supported = device.activeFormat.videoSupportedFrameRateRanges.contains {
+            $0.minFrameRate <= Double(frameRate) && Double(frameRate) <= $0.maxFrameRate
+        }
+        guard supported, (try? device.lockForConfiguration()) != nil else { return }
+        device.activeVideoMinFrameDuration = duration
+        device.activeVideoMaxFrameDuration = duration
+        device.unlockForConfiguration()
+    }
+
+    /// Raw buffers, please. The shader handles orientation and mirroring.
     private func configureConnection() {
         guard let connection = output.connection(with: .video) else { return }
-        if connection.isVideoRotationAngleSupported(90) {
-            connection.videoRotationAngle = 90
+        if connection.isVideoRotationAngleSupported(0) {
+            connection.videoRotationAngle = 0
         }
         if connection.isVideoMirroringSupported {
             connection.automaticallyAdjustsVideoMirroring = false
-            connection.isVideoMirrored = (position == .front)
+            connection.isVideoMirrored = false
         }
     }
 }
@@ -137,6 +160,6 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                        didOutput sampleBuffer: CMSampleBuffer,
                        from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        onFrame?(pixelBuffer)
+        onFrame?(CameraFrame(pixelBuffer: pixelBuffer, orientation: FrameOrientation.forCamera(position: position)))
     }
 }

@@ -1,6 +1,7 @@
 import CoreGraphics
 import CoreVideo
 import Foundation
+import ImageIO
 import Vision
 
 /// The 21 hand joints Vision reports, kept free of Vision types so the
@@ -133,8 +134,8 @@ final class HandGestureDetector {
     }()
     private let minimumJointConfidence: Float = 0.3
 
-    func poses(in pixelBuffer: CVPixelBuffer) -> [HandPose] {
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
+    func poses(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) -> [HandPose] {
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: orientation, options: [:])
         guard (try? handler.perform([request])) != nil, let observations = request.results else { return [] }
         return observations.compactMap { observation in
             guard let points = try? observation.recognizedPoints(.all) else { return nil }
@@ -155,8 +156,8 @@ final class HandGestureDetector {
         }
     }
 
-    func detect(in pixelBuffer: CVPixelBuffer) -> [FrameHand] {
-        poses(in: pixelBuffer).compactMap { pose in
+    func detect(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) -> [FrameHand] {
+        poses(in: pixelBuffer, orientation: orientation).compactMap { pose in
             guard let bounds = pose.bounds else { return nil }
             let pinch = HandGestureClassifier.pinchPoint(pose) ?? CGPoint(x: bounds.midX, y: bounds.midY)
             return FrameHand(side: pose.side,

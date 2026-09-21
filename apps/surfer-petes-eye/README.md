@@ -38,10 +38,20 @@ whole-frame tags ("the big blue", "happy juice") instead of boxes.
 | `SurferPetesEye/App/PeteSession.swift` | Wires camera, renderer, perception and motion together. |
 | `SurferPetesEye/Camera/FrameGeometry.swift` | Coordinate math between Vision, the frame, and the screen. |
 
+## Staying snappy and cool
+
+The camera runs at 720p and a locked 30 fps, with no wide color and no CPU
+rotation (the shader turns the frame). The heavy noise math runs once per frame
+in a 160 px wide pass; the full-res pass mostly reads textures. A governor
+watches the phone's thermal state and Low Power Mode and steps render scale,
+frame rate and detection cadence down before iOS has to throttle. You will see
+"easing off" or "cooling down" next to the eyes label when it kicks in.
+
 ## Tuning Pete
 
 - More or less Pete: the slider, or `PeteWorld.intensity` default.
-- Sharper or softer picture: `renderScale` in `PeteMetalView` (0.75 by default).
+- Sharper or softer picture: `PerformanceGovernor.Tier.renderScale` (0.75 at full).
+- Camera feed: `CameraManager.preset` and `frameRate`.
 - How fast the world flows: `swirlAmount` and the `t *` factors in the shader.
 - How long tags linger: `SightingTracker.timeToLive`.
 - How sure the model must be: `CoreMLObjectDetector(minimumConfidence:)`.

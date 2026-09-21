@@ -14,6 +14,7 @@ final class PeteSession {
     }
 
     let world = PeteWorld()
+    let governor = PerformanceGovernor()
     let renderer: PeteRenderer?
     var permission: Permission
     var setupError: String?
@@ -43,9 +44,9 @@ final class PeteSession {
         let perception = self.perception
         let world = self.world
 
-        camera.onFrame = { pixelBuffer in
-            renderer?.enqueue(pixelBuffer)
-            perception.process(pixelBuffer)
+        camera.onFrame = { frame in
+            renderer?.enqueue(frame)
+            perception.process(frame)
         }
 
         perception.onUpdate = { update in
@@ -55,11 +56,20 @@ final class PeteSession {
         }
 
         // MTKView draws on the main thread, so this is safe to assume.
-        renderer?.inputs = { drawableSize, textureSize, time in
+        renderer?.inputs = { drawableSize, frameSize, time in
             MainActor.assumeIsolated {
-                world.frameInputs(drawableSize: drawableSize, textureSize: textureSize, time: time)
+                world.frameInputs(drawableSize: drawableSize, frameSize: frameSize, time: time)
             }
         }
+
+        // The governor steps detection down when the phone runs warm. The
+        // Metal view reads render scale and frame rate from it directly.
+        let applyTier: (PerformanceGovernor.Tier) -> Void = { tier in
+            perception.objectInterval = tier.objectInterval
+            perception.handInterval = tier.handInterval
+        }
+        governor.onChange = applyTier
+        applyTier(governor.tier)
 
         motion.onEnergy = { energy in
             MainActor.assumeIsolated {

@@ -10,10 +10,10 @@ enum PeteRendererError: Error {
 }
 
 /// Owns the Metal pipeline. Camera frames come in as CVPixelBuffers, get
-/// wrapped as Metal textures with zero copies, and go out through
-/// `peteFragment` in PeteShaders.metal. Draws on the main thread as the
-/// MTKView delegate; frames arrive on the camera queue and are handed over
-/// under a lock.
+/// wrapped as Metal textures with zero copies, and go out through two
+/// passes in PeteShaders.metal: a postcard-sized noise field, then the eye
+/// at screen resolution. Draws on the main thread as the MTKView delegate;
+/// frames arrive on the camera queue and are handed over under a lock.
 final class PeteRenderer: NSObject, MTKViewDelegate {
 
     struct FrameInputs {
@@ -21,38 +21,54 @@ final class PeteRenderer: NSObject, MTKViewDelegate {
         var hotspots: [PeteHotspot]
     }
 
+    /// Width of the noise field in pixels. Height follows the drawable's
+    /// aspect. Noise this smooth does not need more.
+    static let fieldWidth = 160
+
     let device: MTLDevice
     private let commandQueue: MTLCommandQueue
-    private let pipeline: MTLRenderPipelineState
+    private let eyePipeline: MTLRenderPipelineState
+    private let fieldPipeline: MTLRenderPipelineState
     private var textureCache: CVMetalTextureCache?
+    private var fieldTexture: MTLTexture?
 
     private let lock = NSLock()
-    private var pendingPixelBuffer: CVPixelBuffer?
+    private var pendingFrame: CameraFrame?
     private var cameraTexture: MTLTexture?
     private var cameraTextureRef: CVMetalTexture? // keeps the texture memory alive
+    private var cameraOrientation: FrameOrientation = .upright
     private let epoch = CACurrentMediaTime()
 
     /// Called every frame on the main thread to fetch the current mood,
-    /// intensity, motion and hotspots. Resolution, texture size and time are
+    /// intensity, motion and hotspots. `frameSize` is the upright camera
+    /// frame in pixels. Resolution, texture size, orientation and time are
     /// filled in by the renderer.
-    var inputs: ((_ drawableSize: CGSize, _ textureSize: CGSize, _ time: Float) -> FrameInputs)?
+    var inputs: ((_ drawableSize: CGSize, _ frameSize: CGSize, _ time: Float) -> FrameInputs)?
 
     init(device: MTLDevice) throws {
         guard let queue = device.makeCommandQueue(),
               let library = device.makeDefaultLibrary(),
               let vertex = library.makeFunction(name: "peteVertex"),
-              let fragment = library.makeFunction(name: "peteFragment")
+              let eye = library.makeFunction(name: "peteFragment"),
+              let field = library.makeFunction(name: "peteFieldFragment")
         else { throw PeteRendererError.shaderMissing }
 
-        let descriptor = MTLRenderPipelineDescriptor()
-        descriptor.label = "Pete"
-        descriptor.vertexFunction = vertex
-        descriptor.fragmentFunction = fragment
-        descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+        let eyeDescriptor = MTLRenderPipelineDescriptor()
+        eyeDescriptor.label = "Pete's eye"
+        eyeDescriptor.vertexFunction = vertex
+        eyeDescriptor.fragmentFunction = eye
+        eyeDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+
+        let fieldDescriptor = MTLRenderPipelineDescriptor()
+        fieldDescriptor.label = "Pete's field"
+        fieldDescriptor.vertexFunction = vertex
+        fieldDescriptor.fragmentFunction = field
+        fieldDescriptor.colorAttachments[0].pixelFormat = .rgba16Float
 
         self.device = device
         commandQueue = queue
-        pipeline = try device.makeRenderPipelineState(descriptor: descriptor)
+        eyePipeline = try device.makeRenderPipelineState(descriptor: eyeDescriptor)
+        fieldPipeline = try device.makeRenderPipelineState(descriptor: fieldDescriptor)
         super.init()
         CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, device, nil, &textureCache)
     }
@@ -65,17 +81,18 @@ final class PeteRenderer: NSObject, MTKViewDelegate {
     // MARK: Input
 
     /// Called from the camera queue. Only the newest frame is kept.
-    func enqueue(_ pixelBuffer: CVPixelBuffer) {
+    func enqueue(_ frame: CameraFrame) {
         lock.lock()
-        pendingPixelBuffer = pixelBuffer
+        pendingFrame = frame
         lock.unlock()
     }
 
     var elapsed: Float { Float(CACurrentMediaTime() - epoch) }
 
-    var textureSize: CGSize {
+    /// Upright frame size in pixels, or zero before the first frame.
+    var frameSize: CGSize {
         guard let texture = cameraTexture else { return .zero }
-        return CGSize(width: texture.width, height: texture.height)
+        return cameraOrientation.uprightSize(forBufferSize: CGSize(width: texture.width, height: texture.height))
     }
 
     // MARK: MTKViewDelegate
@@ -149,11 +166,12 @@ final class PeteRenderer: NSObject, MTKViewDelegate {
 
     private func refreshCameraTexture() {
         lock.lock()
-        let pixelBuffer = pendingPixelBuffer
-        pendingPixelBuffer = nil
+        let frame = pendingFrame
+        pendingFrame = nil
         lock.unlock()
 
-        guard let pixelBuffer, let cache = textureCache else { return }
+        guard let frame, let cache = textureCache else { return }
+        let pixelBuffer = frame.pixelBuffer
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
         var ref: CVMetalTexture?
@@ -162,18 +180,42 @@ final class PeteRenderer: NSObject, MTKViewDelegate {
         guard status == kCVReturnSuccess, let ref, let texture = CVMetalTextureGetTexture(ref) else { return }
         cameraTextureRef = ref
         cameraTexture = texture
+        cameraOrientation = frame.orientation
+    }
+
+    private func ensureFieldTexture(for drawableSize: CGSize) -> MTLTexture? {
+        let width = Self.fieldWidth
+        let aspect = drawableSize.width > 0 ? drawableSize.height / drawableSize.width : 2
+        let height = max(1, Int((CGFloat(width) * aspect).rounded()))
+        if let existing = fieldTexture, existing.width == width, existing.height == height {
+            return existing
+        }
+        let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba16Float,
+                                                                  width: width,
+                                                                  height: height,
+                                                                  mipmapped: false)
+        descriptor.usage = [.renderTarget, .shaderRead]
+        descriptor.storageMode = .private
+        let texture = device.makeTexture(descriptor: descriptor)
+        texture?.label = "Pete's field"
+        fieldTexture = texture
+        return texture
     }
 
     private func encode(into pass: MTLRenderPassDescriptor,
                         commandBuffer: MTLCommandBuffer,
                         camera: MTLTexture,
                         drawableSize: CGSize) {
-        let cameraSize = CGSize(width: camera.width, height: camera.height)
+        let textureSize = CGSize(width: camera.width, height: camera.height)
+        let orientation = cameraOrientation
+        let frameSize = orientation.uprightSize(forBufferSize: textureSize)
         let time = elapsed
-        var frame = inputs?(drawableSize, cameraSize, time) ?? FrameInputs(uniforms: PeteUniforms(), hotspots: [])
+        var frame = inputs?(drawableSize, frameSize, time) ?? FrameInputs(uniforms: PeteUniforms(), hotspots: [])
 
         frame.uniforms.resolution = SIMD2<Float>(Float(drawableSize.width), Float(drawableSize.height))
-        frame.uniforms.textureSize = SIMD2<Float>(Float(cameraSize.width), Float(cameraSize.height))
+        frame.uniforms.textureSize = SIMD2<Float>(Float(textureSize.width), Float(textureSize.height))
+        frame.uniforms.frameSize = SIMD2<Float>(Float(frameSize.width), Float(frameSize.height))
+        frame.uniforms.frameOrientation = orientation.rawValue
         frame.uniforms.time = time
 
         // Metal wants a non-empty buffer even when there is nothing to light up.
@@ -181,10 +223,27 @@ final class PeteRenderer: NSObject, MTKViewDelegate {
         frame.uniforms.hotspotCount = Int32(hotspots.count)
         if hotspots.isEmpty { hotspots = [PeteHotspot()] }
 
+        // Pass 1: the field, at postcard size.
+        if let field = ensureFieldTexture(for: drawableSize) {
+            let fieldPass = MTLRenderPassDescriptor()
+            fieldPass.colorAttachments[0].texture = field
+            fieldPass.colorAttachments[0].loadAction = .dontCare
+            fieldPass.colorAttachments[0].storeAction = .store
+            if let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: fieldPass) {
+                encoder.label = "Pete's field"
+                encoder.setRenderPipelineState(fieldPipeline)
+                encoder.setFragmentBytes(&frame.uniforms, length: MemoryLayout<PeteUniforms>.stride, index: 0)
+                encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+                encoder.endEncoding()
+            }
+        }
+
+        // Pass 2: the eye.
         guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else { return }
         encoder.label = "Pete's eye"
-        encoder.setRenderPipelineState(pipeline)
+        encoder.setRenderPipelineState(eyePipeline)
         encoder.setFragmentTexture(camera, index: 0)
+        encoder.setFragmentTexture(fieldTexture, index: 1)
         encoder.setFragmentBytes(&frame.uniforms, length: MemoryLayout<PeteUniforms>.stride, index: 0)
         hotspots.withUnsafeBytes { raw in
             encoder.setFragmentBytes(raw.baseAddress!, length: raw.count, index: 1)

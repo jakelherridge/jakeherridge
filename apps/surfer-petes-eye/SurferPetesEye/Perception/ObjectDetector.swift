@@ -1,6 +1,7 @@
 import CoreML
 import CoreVideo
 import Foundation
+import ImageIO
 import Vision
 
 /// One thing the model saw. `visionRect` is nil for whole-frame labels.
@@ -12,7 +13,9 @@ struct RawDetection: Equatable {
 
 protocol ObjectDetector: AnyObject {
     var name: String { get }
-    func detect(in pixelBuffer: CVPixelBuffer) throws -> [RawDetection]
+    /// `orientation` tells Vision which way is up in the raw buffer. Results
+    /// come back normalized to the upright frame.
+    func detect(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) throws -> [RawDetection]
 }
 
 /// Runs whatever Core ML object detector is bundled (see Resources/Models).
@@ -40,8 +43,8 @@ final class CoreMLObjectDetector: ObjectDetector {
         name = url.deletingPathExtension().lastPathComponent
     }
 
-    func detect(in pixelBuffer: CVPixelBuffer) throws -> [RawDetection] {
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
+    func detect(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) throws -> [RawDetection] {
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: orientation, options: [:])
         try handler.perform([request])
         let observations = (request.results as? [VNRecognizedObjectObservation]) ?? []
         return observations.compactMap { observation in
@@ -64,8 +67,8 @@ final class SceneClassifierDetector: ObjectDetector {
         self.maximumLabels = maximumLabels
     }
 
-    func detect(in pixelBuffer: CVPixelBuffer) throws -> [RawDetection] {
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .up, options: [:])
+    func detect(in pixelBuffer: CVPixelBuffer, orientation: CGImagePropertyOrientation) throws -> [RawDetection] {
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: orientation, options: [:])
         try handler.perform([request])
         let observations = request.results ?? []
         return observations

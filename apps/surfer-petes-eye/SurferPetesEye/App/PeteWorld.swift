@@ -73,9 +73,10 @@ final class PeteWorld {
 
     // MARK: Renderer out
 
-    /// Builds the per-frame shader inputs. Resolution, texture size and time
-    /// are filled in by the renderer.
-    func frameInputs(drawableSize: CGSize, textureSize: CGSize, time: Float) -> PeteRenderer.FrameInputs {
+    /// Builds the per-frame shader inputs. `frameSize` is the upright camera
+    /// frame. Resolution, texture size, orientation and time are filled in
+    /// by the renderer.
+    func frameInputs(drawableSize: CGSize, frameSize: CGSize, time: Float) -> PeteRenderer.FrameInputs {
         var uniforms = PeteUniforms()
         uniforms.intensity = Float(intensity)
         uniforms.motion = Float(motionEnergy)
@@ -93,7 +94,7 @@ final class PeteWorld {
         uniforms.paletteC = palette.2
         uniforms.paletteD = palette.3
 
-        let geometry = FrameGeometry(textureSize: textureSize, viewSize: drawableSize)
+        let geometry = FrameGeometry(textureSize: frameSize, viewSize: drawableSize)
         var hotspots: [PeteHotspot] = []
         for sighting in sightings where !sighting.isAmbient {
             if hotspots.count >= Int(PETE_MAX_HOTSPOTS) { break }

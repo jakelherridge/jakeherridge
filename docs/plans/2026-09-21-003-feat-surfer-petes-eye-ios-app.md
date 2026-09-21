@@ -65,11 +65,13 @@ Who he is decides every number in the shader and every word in the lexicon.
 ## Architecture
 
 ```
-AVCaptureSession (1080p BGRA, rotated to portrait, mirrored for selfie)
+AVCaptureSession (720p BGRA at a locked 30 fps, raw buffers, never rotated on the CPU)
    |
-   +--> PeteRenderer (Metal, 60 fps, main thread)
-   |      CVPixelBuffer -> MTLTexture (zero copy) -> peteFragment -> drawable
-   |      uniforms: intensity, motion, mood palette, sun, hotspot rects
+   +--> PeteRenderer (Metal, up to 60 fps, main thread)
+   |      CVPixelBuffer -> MTLTexture (zero copy)
+   |      pass 1: peteFieldFragment, 160 px wide, all the noise
+   |      pass 2: peteFragment at screen res, turns the frame, samples the field
+   |      uniforms: intensity, motion, mood palette, sun, hotspot rects, orientation
    |
    +--> PerceptionEngine (Vision, background queues, throttled)
           objects ~8 Hz  -> SightingTracker -> PeteWorld.sightings
@@ -79,10 +81,22 @@ SwiftUI <-----------------------------------------------+
    PeteMetalView + PeteOverlayView (tags, crab, bursts) + TopStrip + ControlsBar
 ```
 
-**Why Metal, not Core Image.** The eye is one fragment shader with domain warping,
+**Why Metal, not Core Image.** The eye is a fragment shader with domain warping,
 HSV work, Sobel edges, a sun with rays, hotspot sparkle, vignette and grain. Core
 Image would be a chain of a dozen kernels and intermediate textures. One shader is
 faster, and every number lives in one file you can tune by eye.
+
+**Why two passes.** Fractal noise is the expensive part and it is far too smooth to
+need computing per pixel. Pass 1 computes the flow field and the ripple and band
+phases into a 160 px wide texture. Pass 2 reads it once per pixel. The full-res
+pass is then mostly texture reads, which is what keeps the phone cool.
+
+**Why the buffers are never rotated.** Asking AVFoundation for portrait buffers
+costs a full-frame copy thirty times a second. Instead the camera hands over raw
+landscape buffers, the shader does the quarter turn (and the selfie mirror) when
+it samples, and Vision is told which way is up. `FrameOrientation` is the one
+place that knows the mapping, and the tests pin it. Same pattern as Apple's
+AVCamFilter sample.
 
 **Why Vision.** Hand pose (21 joints, two hands) and the scene classifier are built
 in and free. Object boxes come from any Core ML detector with NMS baked in; Vision
@@ -98,6 +112,12 @@ cover both directions.
 newest buffer under a lock and draws on the main thread. Perception drops frames
 unless a detector is idle and its interval has passed, so a slow model never makes
 the crab late. Results hop to the main actor into `PeteWorld`.
+
+**Staying cool.** `PerformanceGovernor` watches iOS's thermal state and Low Power
+Mode. At "serious" it drops render scale to 0.6, frame rate to 30 and halves
+detection cadence. At "critical" it goes to 0.5 and a third. It steps back up when
+the phone cools. The top strip shows "easing off" or "cooling down" while it is
+active so you can see it happen.
 
 **Stability.** `SightingTracker` matches detections to existing sightings by label
 and overlap, smooths boxes, keeps a sighting alive 0.7 s after the model loses it,
@@ -123,11 +143,14 @@ and never renames a thing once Pete has named it. Gestures must hold for two fra
 
 | Thing | Target | Lever |
 | --- | --- | --- |
-| Render | 60 fps on iPhone 12 and up | `renderScale` 0.75 in `PeteMetalView`; fbm octaves in the shader |
-| Object detection | 8 Hz, under 40 ms on the Neural Engine | model choice; `objectInterval` |
-| Hand pose | 15 Hz, under 20 ms | `handInterval`; `maximumHandCount` |
-| Memory | one live camera buffer plus one Metal texture | renderer keeps only the newest frame |
-| Battery | a beach afternoon | 1080p not 4K; detection throttled; no work when backgrounded |
+| Camera | 720p at 30 fps, no wide color, no CPU rotation | `CameraManager.preset`, `frameRate` |
+| Render | 60 fps on iPhone 12 and up, cool to the touch | render scale 0.75 (governor steps it down); field pass at 160 px; fbm octaves |
+| Eye pass cost | about 13 texture reads and no noise per pixel | keep all noise in the field pass |
+| Object detection | 8 Hz, under 40 ms on the Neural Engine | model choice; `objectInterval` (governor) |
+| Hand pose | 15 Hz, under 20 ms | `handInterval` (governor); `maximumHandCount` |
+| Memory | one live camera buffer, one camera texture, one small field texture | renderer keeps only the newest frame |
+| Thermal | never hit the system throttle | `PerformanceGovernor` tiers |
+| Battery | a beach afternoon | everything above; no work when backgrounded |
 
 ## Repo layout
 
@@ -169,6 +192,9 @@ apps/surfer-petes-eye/
 - Written without a Mac in the loop. Expect a handful of compiler nits on the first
   build; the structure and the math were checked by hand and the pure parts have
   tests.
+- One thing to confirm on the first device run: with `.right` / `.leftMirrored`
+  passed to Vision, boxes and hand joints should come back in the upright frame.
+  If tags land sideways, the fix is one line in `FrameGeometry.frameRect(fromVision:)`.
 - The Apple model download URLs in `Scripts/fetch_model.sh` could not be verified
   from the sandbox (its proxy blocks that host). If they have moved, the models page
   on developer.apple.com has the same files.

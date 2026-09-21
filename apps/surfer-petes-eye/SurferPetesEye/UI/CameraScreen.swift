@@ -9,7 +9,9 @@ struct CameraScreen: View {
         GeometryReader { geo in
             ZStack {
                 if let renderer = session.renderer {
-                    PeteMetalView(renderer: renderer)
+                    PeteMetalView(renderer: renderer,
+                                  renderScale: session.governor.renderScale,
+                                  frameRate: session.governor.frameRate)
                 } else {
                     NoEyeView(message: "No Metal on this device. Pete can't see without it.")
                 }
@@ -17,7 +19,9 @@ struct CameraScreen: View {
                 PeteOverlayView(world: session.world)
 
                 VStack(spacing: 0) {
-                    TopStrip(world: session.world, onMoodTap: { session.cycleMood() })
+                    TopStrip(world: session.world,
+                             status: session.governor.tier == .full ? "" : session.governor.tier.label,
+                             onMoodTap: { session.cycleMood() })
                         .padding(.top, geo.safeAreaInsets.top + 8)
                     Spacer()
                     ControlsBar(session: session, viewSize: geo.size)
@@ -43,6 +47,7 @@ struct CameraScreen: View {
 /// whatever Pete just said underneath.
 struct TopStrip: View {
     let world: PeteWorld
+    var status: String = ""
     let onMoodTap: () -> Void
 
     var body: some View {
@@ -60,7 +65,7 @@ struct TopStrip: View {
                 Spacer()
 
                 if !world.detectorName.isEmpty {
-                    Text("eyes: \(world.detectorName)")
+                    Text(status.isEmpty ? "eyes: \(world.detectorName)" : "eyes: \(world.detectorName) · \(status)")
                         .font(.caption2.monospaced())
                         .opacity(0.6)
                 }
