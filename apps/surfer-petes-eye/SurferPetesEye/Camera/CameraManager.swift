@@ -80,23 +80,30 @@ final class CameraManager: NSObject {
     func flip() {
         sessionQueue.async {
             let next: AVCaptureDevice.Position = (self.position == .back) ? .front : .back
-            self.session.beginConfiguration()
-            defer { self.session.commitConfiguration() }
             guard let device = Self.camera(at: next),
                   let newInput = try? AVCaptureDeviceInput(device: device)
             else { return }
+
+            self.session.beginConfiguration()
             if let old = self.input {
                 self.session.removeInput(old)
             }
+            var switched = false
             if self.session.canAddInput(newInput) {
                 self.session.addInput(newInput)
                 self.input = newInput
                 self.position = next
-                Self.lockFrameRate(device)
+                switched = true
             } else if let old = self.input, self.session.canAddInput(old) {
                 self.session.addInput(old)
             }
             self.configureConnection()
+            self.session.commitConfiguration()
+
+            // After the commit: the format is settled and the lock sticks.
+            if switched {
+                Self.lockFrameRate(device)
+            }
         }
     }
 
@@ -107,30 +114,40 @@ final class CameraManager: NSObject {
     }
 
     private func configure() throws {
-        session.beginConfiguration()
-        defer { session.commitConfiguration() }
+        guard let device = Self.camera(at: position) else { throw CameraError.noCamera }
+        let deviceInput = try AVCaptureDeviceInput(device: device)
 
+        session.beginConfiguration()
         session.automaticallyConfiguresCaptureDeviceForWideColor = false
         session.sessionPreset = session.canSetSessionPreset(Self.preset) ? Self.preset : .medium
 
-        guard let device = Self.camera(at: position) else { throw CameraError.noCamera }
-        let deviceInput = try AVCaptureDeviceInput(device: device)
-        guard session.canAddInput(deviceInput) else { throw CameraError.cannotAddInput }
+        guard session.canAddInput(deviceInput) else {
+            session.commitConfiguration()
+            throw CameraError.cannotAddInput
+        }
         session.addInput(deviceInput)
         input = deviceInput
-        Self.lockFrameRate(device)
 
         output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
         output.alwaysDiscardsLateVideoFrames = true
         output.setSampleBufferDelegate(self, queue: videoQueue)
-        guard session.canAddOutput(output) else { throw CameraError.cannotAddOutput }
+        guard session.canAddOutput(output) else {
+            session.commitConfiguration()
+            throw CameraError.cannotAddOutput
+        }
         session.addOutput(output)
 
         configureConnection()
+        session.commitConfiguration()
+
+        // After the commit: the preset has picked the format, so the frame
+        // duration we set now is not reset by a format change.
+        Self.lockFrameRate(device)
     }
 
     /// A steady 30 fps. Some 720p formats offer 60, which would double the
     /// work of everything downstream for no visible gain through Pete's eye.
+    /// Call this after the session commit that picks the format.
     private static func lockFrameRate(_ device: AVCaptureDevice) {
         let duration = CMTime(value: 1, timescale: frameRate)
         let supported = device.activeFormat.videoSupportedFrameRateRanges.contains {

@@ -52,6 +52,9 @@ final class FrameGeometryTests: XCTestCase {
         let empty = FrameGeometry(textureSize: .zero, viewSize: CGSize(width: 390, height: 844))
         XCTAssertEqual(empty.fillScale, CGSize(width: 1, height: 1))
         let rect = empty.viewRect(frameRect: CGRect(x: 0.1, y: 0.2, width: 0.3, height: 0.4))
-        XCTAssertEqual(rect, CGRect(x: 0.1, y: 0.2, width: 0.3, height: 0.4))
+        XCTAssertEqual(rect.minX, 0.1, accuracy: 1e-9)
+        XCTAssertEqual(rect.minY, 0.2, accuracy: 1e-9)
+        XCTAssertEqual(rect.width, 0.3, accuracy: 1e-9)
+        XCTAssertEqual(rect.height, 0.4, accuracy: 1e-9)
     }
 }

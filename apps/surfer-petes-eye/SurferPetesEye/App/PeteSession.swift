@@ -136,14 +136,19 @@ final class PeteSession {
     // MARK: Capture
 
     /// Renders the current frame through Pete's eye, stamps the overlay on
-    /// top, and saves the result to Photos.
-    func takeSnapshot(viewSize: CGSize) async {
+    /// top, and saves the result to Photos. `displayScale` comes from the
+    /// SwiftUI environment; it is the one reliable source outside UIKit
+    /// layout callbacks.
+    func takeSnapshot(viewSize: CGSize, displayScale: CGFloat) async {
         guard let renderer, !isSaving else { return }
         isSaving = true
         defer { isSaving = false }
 
+        // Let the flash actually reach the screen before the blocking render.
         withAnimation(.easeOut(duration: 0.08)) { isFlashing = true }
-        let scale = UITraitCollection.current.displayScale
+        try? await Task.sleep(for: .milliseconds(90))
+
+        let scale = displayScale > 0 ? displayScale : 3
         let pixelSize = CGSize(width: viewSize.width * scale, height: viewSize.height * scale)
         let base = renderer.snapshot(size: pixelSize)
         withAnimation(.easeIn(duration: 0.25)) { isFlashing = false }

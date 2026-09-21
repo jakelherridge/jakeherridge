@@ -205,9 +205,13 @@ apps/surfer-petes-eye/
 - Written without a Mac in the loop. Expect a handful of compiler nits on the first
   build; the structure and the math were checked by hand and the pure parts have
   tests.
-- One thing to confirm on the first device run: with `.right` / `.leftMirrored`
-  passed to Vision, boxes and hand joints should come back in the upright frame.
-  If tags land sideways, the fix is one line in `FrameGeometry.frameRect(fromVision:)`.
+- Two things to confirm on the first device run. First, with `.right` and
+  `.leftMirrored` passed to Vision, boxes and hand joints should come back in the
+  upright frame; if tags land sideways, the fix is one line in
+  `FrameGeometry.frameRect(fromVision:)`. Second, the selfie camera should be
+  upright and mirrored; if it comes out upside down, change `.frontPortrait` to
+  `.rightMirrored` in `CameraFrame.swift` and the matching shader case in
+  `cameraUV` to `float2(1.0 - f.y, 1.0 - f.x)`, together.
 - The Apple model download URLs in `Scripts/fetch_model.sh` could not be verified
   from the sandbox (its proxy blocks that host). If they have moved, the models page
   on developer.apple.com has the same files.

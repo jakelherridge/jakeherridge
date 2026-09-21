@@ -4,6 +4,7 @@ import SwiftUI
 struct ControlsBar: View {
     let session: PeteSession
     let viewSize: CGSize
+    @Environment(\.displayScale) private var displayScale
 
     var body: some View {
         VStack(spacing: 16) {
@@ -15,7 +16,7 @@ struct ControlsBar: View {
                 }
                 Spacer()
                 ShutterButton(isBusy: session.isSaving) {
-                    Task { await session.takeSnapshot(viewSize: viewSize) }
+                    Task { await session.takeSnapshot(viewSize: viewSize, displayScale: displayScale) }
                 }
                 Spacer()
                 RoundButton(systemImage: "paintpalette.fill") {

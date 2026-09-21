@@ -107,8 +107,19 @@ final class PeteRenderer: NSObject, MTKViewDelegate {
               let commandBuffer = commandQueue.makeCommandBuffer()
         else { return }
         encode(into: passDescriptor, commandBuffer: commandBuffer, camera: texture, drawableSize: view.drawableSize)
+        retainCameraFrame(until: commandBuffer)
         commandBuffer.present(drawable)
         commandBuffer.commit()
+    }
+
+    /// The CVMetalTexture owns the pixel buffer's pool slot. Hold it until
+    /// the GPU has finished reading, or the camera can recycle the buffer
+    /// mid-draw and tear the frame.
+    private func retainCameraFrame(until commandBuffer: MTLCommandBuffer) {
+        let keep = cameraTextureRef
+        commandBuffer.addCompletedHandler { _ in
+            _ = keep
+        }
     }
 
     // MARK: Snapshot
