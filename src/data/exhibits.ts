@@ -81,11 +81,10 @@ export const exhibits: Exhibit[] = [
     alt: "Sticker of a green horned frog with heavy-lidded eyes and pink cheeks, sitting in a small puddle",
   },
   {
-    // The kids' clothing brand's preview site (Jake, 2026-11-11). Monster Club
-    // is a working name; update the title and href when the brand name and
-    // domain are locked.
+    // The kids' clothing brand's preview site (Jake, 2026-11-11; title is
+    // Jake's wording). Update the href when the brand's domain is locked.
     href: "https://spontaneous-liger-19b92c.netlify.app/",
-    title: "Monster Club",
+    title: "Monster shirts for kids",
     line: "Hand-drawn monster shirts for kids. In progress.",
     sticker: monsterclubSticker,
     alt: "Sticker of a washed-black kids' tee printed with a red, hand-drawn dinosaur monster",
