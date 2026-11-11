@@ -61,6 +61,14 @@ export const nodes: GraphNode[] = [
     href: "/exhibits/pocketwild/",
   },
   {
+    id: "old-pond",
+    label: "Old Pond",
+    kind: "build",
+    status: "growing",
+    summary: "An iPhone app for one haiku a day. In progress.",
+    href: "/exhibits/old-pond/",
+  },
+  {
     id: "synapse",
     label: "Synapse",
     kind: "build",
@@ -307,6 +315,8 @@ export const nodes: GraphNode[] = [
 export const edges: GraphEdge[] = [
   // Made and wrote
   { from: "jake", to: "pocketwild", rel: "made" },
+  { from: "jake", to: "old-pond", rel: "made" },
+  { from: "pocketwild", to: "old-pond", rel: "led_to" },
   { from: "jake", to: "synapse", rel: "made" },
   { from: "jake", to: "synapse-capture", rel: "made" },
   { from: "jake", to: "apd", rel: "made" },

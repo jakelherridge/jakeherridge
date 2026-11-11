@@ -1,0 +1,618 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { breadcrumb } from "../../lib/schema";
+
+const title = "Old Pond";
+const description =
+  "Old Pond is an iPhone app for one haiku a day, in English and Japanese. In progress. This page shows the frog, a 5-7-5 counter to try, and dated notes from the build.";
+
+const jsonLd = [
+  {
+    "@type": "SoftwareApplication",
+    name: "Old Pond",
+    applicationCategory: "LifestyleApplication",
+    operatingSystem: "iOS",
+    author: { "@id": "https://jakeherridge.com/#person" },
+    description:
+      "An iPhone app for writing one haiku a day. Pebbles count 5, 7 and 5 as you type or talk. Nothing leaves the phone. Not yet released.",
+  },
+  breadcrumb([
+    { name: "Jake Herridge", url: "https://jakeherridge.com/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/old-pond/" },
+  ]),
+];
+
+// The frog's drawings, in the order each small animation plays them.
+const sitting = ["open", "open", "open", "blink-a", "blink", "blink-a"];
+const loops = [
+  { name: "Croak", frames: ["open", "croak-a", "croak-b", "croak", "croak", "croak-b", "croak-a", "open"] },
+  { name: "Side eye", frames: ["open", "look-a", "look", "look", "look", "look-a", "open", "open"] },
+  { name: "Asleep", frames: ["blink"] },
+];
+
+const facts = [
+  "One haiku a day. Today's can be changed until it is sealed.",
+  "Pebbles count 5, 7 and 5. Japanese is counted in morae. The count is a guide and never blocks a haiku.",
+  "Type it, or talk it out. Speech is turned into words on the phone.",
+  "The pond follows the season and the time of day. At night the frog sleeps.",
+  "A year of haiku in one list. Any haiku can wear a star or a heart.",
+  "A home screen widget: the frog on his lily pad.",
+  "No account, no server, no analytics, no ads. Nothing leaves the phone.",
+  "Free, with a one-time unlock for extras.",
+];
+
+// Dated notes, newest first. Add a line when something changes.
+const notes = [
+  {
+    date: "2026-11-10",
+    items: [
+      "Stickers: a star or a heart on any haiku.",
+      "A test build is being prepared for TestFlight.",
+    ],
+  },
+  {
+    date: "2026-11-09",
+    items: [
+      "Named Old Pond, after Bashō's frog haiku.",
+      "The look changed from glass to hand-drawn: one marker line, grid paper, paper cards, tape buttons.",
+      "Putting the haiku away leaves the pond and the frog. A finger held on the screen makes a small wind.",
+      "First build ran on a phone.",
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <div class="op-room">
+    <!-- The pond, drawn the way the app draws it: flat marker color, one pen line. -->
+    <div class="op-scene">
+      <svg viewBox="0 0 1000 460" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A pond in a meadow under a sleepy sun. A frog sits on a lily pad.">
+        <defs>
+          <filter id="op-wob" x="-2%" y="-2%" width="104%" height="104%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="7" />
+            <feDisplacementMap in="SourceGraphic" scale="5" />
+          </filter>
+        </defs>
+        <rect width="1000" height="460" fill="#A9C7F5" />
+        <g filter="url(#op-wob)" class="op-ink">
+          <!-- clouds: outline every lump, then fill every lump, so the line runs round the outside only -->
+          <g class="op-cloud">
+            <g class="op-edge"><circle cx="150" cy="96" r="30" /><circle cx="196" cy="80" r="42" /><circle cx="246" cy="98" r="32" /><circle cx="198" cy="108" r="30" /></g>
+            <g class="op-fill"><circle cx="150" cy="96" r="30" /><circle cx="196" cy="80" r="42" /><circle cx="246" cy="98" r="32" /><circle cx="198" cy="108" r="30" /></g>
+          </g>
+          <g class="op-cloud">
+            <g class="op-edge"><circle cx="560" cy="70" r="24" /><circle cx="596" cy="58" r="33" /><circle cx="636" cy="72" r="25" /><circle cx="598" cy="80" r="24" /></g>
+            <g class="op-fill"><circle cx="560" cy="70" r="24" /><circle cx="596" cy="58" r="33" /><circle cx="636" cy="72" r="25" /><circle cx="598" cy="80" r="24" /></g>
+          </g>
+          <!-- the sun: rays are fat yellow strokes with the pen line around them -->
+          <g class="op-rays-edge">
+            <path d="M820 38v-22M873 60l16-16M896 112h22M873 164l16 16M820 186v22M767 164l-16 16M744 112h-22M767 60l-16-16" />
+          </g>
+          <g class="op-rays">
+            <path d="M820 38v-22M873 60l16-16M896 112h22M873 164l16 16M820 186v22M767 164l-16 16M744 112h-22M767 60l-16-16" />
+          </g>
+          <circle cx="820" cy="112" r="52" fill="#FFD95A" />
+          <path d="M790 106q10 10 20 0M830 106q10 10 20 0M811 134h18" fill="none" />
+          <ellipse cx="786" cy="126" rx="7" ry="5" fill="#FF8FA3" stroke="none" />
+          <ellipse cx="854" cy="126" rx="7" ry="5" fill="#FF8FA3" stroke="none" />
+          <!-- hills, grass -->
+          <path d="M-20 330Q160 170 420 300T1020 240V480H-20Z" fill="#7CBF8A" />
+          <path d="M-20 350Q260 230 560 320T1020 300V480H-20Z" fill="#8FC96A" />
+          <path d="M-20 338Q500 318 1020 338V480H-20Z" fill="#B9DC6E" />
+          <!-- small trees on the right -->
+          <path d="M870 338v-52M930 338v-38" fill="none" />
+          <g class="op-edge"><circle cx="856" cy="280" r="20" /><circle cx="884" cy="278" r="20" /><circle cx="870" cy="262" r="23" /><circle cx="922" cy="296" r="15" /><circle cx="940" cy="294" r="15" /><circle cx="931" cy="282" r="17" /></g>
+          <g class="op-leaf"><circle cx="856" cy="280" r="20" /><circle cx="884" cy="278" r="20" /><circle cx="870" cy="262" r="23" /><circle cx="922" cy="296" r="15" /><circle cx="940" cy="294" r="15" /><circle cx="931" cy="282" r="17" /></g>
+          <!-- the pond, pads, reeds -->
+          <ellipse cx="500" cy="404" rx="330" ry="52" fill="#6ECFC6" />
+          <path d="M300 396q26-10 52 0M610 424q30-10 60 0M420 438q22-8 44 0" class="op-foam" />
+          <ellipse cx="290" cy="412" rx="36" ry="11" fill="#58B45C" />
+          <ellipse cx="712" cy="398" rx="30" ry="9" fill="#58B45C" />
+          <circle cx="722" cy="392" r="7" fill="#FF9DB5" />
+          <ellipse cx="500" cy="424" rx="92" ry="19" fill="#58B45C" />
+          <g class="op-reed-edge"><path d="M792 418q4-50-6-86M808 420q0-40 8-70" /></g>
+          <g class="op-reed"><path d="M792 418q4-50-6-86M808 420q0-40 8-70" /></g>
+          <rect x="780" y="318" width="11" height="26" rx="5.5" fill="#8A5A3C" />
+          <!-- grass tufts -->
+          <path d="M120 400v-12M127 400v-16M134 400v-11M900 430v-12M907 430v-16M60 440v-12M67 440v-15" fill="none" />
+        </g>
+        <image href="/oldpond/tree.png" x="70" y="150" width="172" height="200" />
+        <ellipse cx="500" cy="420" rx="52" ry="8" fill="#2B2420" />
+        <image id="op-aldo" data-frames={sitting.join(",")} href="/oldpond/aldo-open.png" x="432" y="248" width="136" height="176" />
+      </svg>
+      <div class="op-title">
+        <p class="op-tag op-tag-small">iOS app · in progress</p>
+        <h1 class="op-tag op-tag-big">{title}</h1>
+      </div>
+    </div>
+
+    <article class="op-page">
+      <section class="op-card op-tilt-l op-pinned">
+        <p class="op-lead">A haiku a day.</p>
+        <p>Old Pond is an iPhone app for writing one haiku a day.</p>
+        <p class="op-chips">
+          <span>one haiku a day</span><span>5, 7, 5</span><span>English and Japanese</span>
+        </p>
+      </section>
+
+      <section aria-labelledby="aldo">
+        <h2 id="aldo" class="op-tag op-heading">The frog</h2>
+        <div class="op-card op-tilt-r">
+          <div class="op-frogs">
+            {
+              loops.map((loop) => (
+                <figure>
+                  <div class="op-loop" data-frames={loop.frames.join(",")}>
+                    <img
+                      src={`/oldpond/aldo-${loop.frames[0]}.png`}
+                      alt={`The frog: ${loop.name.toLowerCase()}`}
+                      width="400"
+                      height="517"
+                      loading="lazy"
+                    />
+                  </div>
+                </figure>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="count">
+        <h2 id="count" class="op-tag op-heading">Try it out</h2>
+        <div class="op-slips" id="op-haiku">
+          {
+            [5, 7, 5].map((target, i) => (
+              <label class={`op-card op-slip ${i % 2 === 0 ? "op-tilt-l" : "op-tilt-r"}`}>
+                <span class="sr-only">Line {i + 1}, {target} syllables</span>
+                <input
+                  type="text"
+                  class="op-line"
+                  data-target={target}
+                  placeholder={["five", "seven", "five"][i]}
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <span class="op-pebbles" aria-hidden="true">
+                  {Array.from({ length: target }).map(() => <i class="op-pebble" />)}
+                  <b class="op-over" />
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </section>
+
+      <section aria-labelledby="facts">
+        <h2 id="facts" class="op-tag op-heading">What is in it</h2>
+        <ul class="op-card op-tilt-r op-list">
+          {facts.map((fact) => <li>{fact}</li>)}
+        </ul>
+      </section>
+
+      <section aria-labelledby="notes">
+        <h2 id="notes" class="op-tag op-heading">Build notes</h2>
+        <dl class="op-notes">
+          {
+            notes.map((note, i) => (
+              <div class={`op-card ${i % 2 === 0 ? "op-tilt-l" : "op-tilt-r"}`}>
+                <dt class="op-tape">
+                  <time datetime={note.date}>{note.date}</time>
+                </dt>
+                <dd>
+                  <ul class="op-list">
+                    {note.items.map((item) => <li>{item}</li>)}
+                  </ul>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+
+      <p class="op-next">
+        <a href="/exhibits/pocketwild/" class="op-button">The frog's first job was PocketWild &rarr;</a>
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  /* The app's look, carried to the page: Darumadrop One, flat marker color,
+     one 3px pen line on everything, grid paper, cream cards, tape. */
+  @font-face {
+    font-family: "Darumadrop One";
+    src: url("/oldpond/DarumadropOne-Regular.ttf") format("truetype");
+    font-display: swap;
+  }
+  .op-room {
+    --ink: #2b2420;
+    --sheet: #fbf3dc;
+    --tape: #ff8a5b;
+    --sun: #ffd95a;
+    --grass: #b9dc6e;
+    --line: 3px;
+    --grid: linear-gradient(rgba(43, 36, 32, 0.07) 1px, transparent 1px) 0 0 / 16px 16px,
+      linear-gradient(90deg, rgba(43, 36, 32, 0.07) 1px, transparent 1px) 0 0 / 16px 16px;
+    background: var(--grid), var(--grass);
+    color: var(--ink);
+    font-family: "Darumadrop One", ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+    font-size: 1.12rem;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  /* --- the scene --- */
+  .op-scene {
+    position: relative;
+    height: clamp(300px, 46vw, 470px);
+    border-bottom: 0;
+  }
+  .op-scene svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .op-scene :global(.op-ink) {
+    stroke: var(--ink);
+    stroke-width: 3px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .op-scene :global(.op-ink *) {
+    vector-effect: non-scaling-stroke;
+  }
+  .op-scene :global(.op-edge) {
+    fill: var(--ink);
+    stroke-width: 6px;
+  }
+  .op-scene :global(.op-fill) {
+    fill: #fff;
+    stroke: none;
+  }
+  .op-scene :global(.op-leaf) {
+    fill: #4fa85a;
+    stroke: none;
+  }
+  .op-scene :global(.op-rays-edge) {
+    fill: none;
+    stroke-width: 12px;
+  }
+  .op-scene :global(.op-rays) {
+    fill: none;
+    stroke: var(--sun);
+    stroke-width: 6px;
+  }
+  .op-scene :global(.op-foam) {
+    fill: none;
+    stroke: #fff;
+  }
+  .op-scene :global(.op-reed-edge) {
+    fill: none;
+    stroke-width: 10px;
+  }
+  .op-scene :global(.op-reed) {
+    fill: none;
+    stroke: #3f9a55;
+    stroke-width: 4px;
+  }
+  .op-title {
+    position: absolute;
+    left: max(1.25rem, calc((100% - 62rem) / 2));
+    top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  /* --- paper --- */
+  .op-tag {
+    display: inline-block;
+    margin: 0;
+    background: var(--sheet);
+    border: var(--line) solid var(--ink);
+    border-radius: 5px 9px 6px 10px / 8px 5px 10px 6px;
+    box-shadow: 3px 4px 0 rgba(43, 36, 32, 0.25);
+    padding: 0.2rem 0.75rem;
+    font-weight: 400;
+    line-height: 1.25;
+  }
+  .op-tag-small {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transform: rotate(-1.5deg);
+  }
+  .op-tag-big {
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    padding: 0.1rem 1.1rem 0.25rem;
+    transform: rotate(-1deg);
+  }
+  .op-heading {
+    background: var(--sun);
+    font-size: 1.35rem;
+    transform: rotate(-1.2deg);
+    margin: 0 0 1rem 0.25rem;
+  }
+  .op-page {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.25rem 1.25rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  .op-card {
+    position: relative;
+    display: block;
+    margin: 0;
+    background: var(--grid), var(--sheet);
+    border: var(--line) solid var(--ink);
+    border-radius: 7px 12px 8px 13px / 11px 7px 13px 8px;
+    box-shadow: 4px 5px 0 rgba(43, 36, 32, 0.25);
+    padding: 1.4rem 1.5rem;
+  }
+  .op-card p {
+    margin: 0 0 0.8rem;
+  }
+  .op-card p:last-child {
+    margin-bottom: 0;
+  }
+  .op-tilt-l {
+    transform: rotate(-0.5deg);
+  }
+  .op-tilt-r {
+    transform: rotate(0.45deg);
+  }
+  /* the pin that holds the first card up */
+  .op-pinned::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -11px;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    background: #8e7cc3;
+    border: var(--line) solid var(--ink);
+    border-radius: 999px;
+  }
+  .op-lead {
+    font-size: 1.9rem;
+    line-height: 1.2;
+  }
+  .op-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem !important;
+  }
+  .op-chips span {
+    background: #fff;
+    border: var(--line) solid var(--ink);
+    border-radius: 999px;
+    padding: 0.05rem 0.7rem;
+    font-size: 0.9rem;
+  }
+  .op-small {
+    font-family: ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+  /* words that sit straight on the grass */
+  .op-onpond {
+    margin: 0 0.25rem 1rem;
+  }
+  .op-slips + .op-onpond {
+    margin-top: 1rem;
+  }
+
+  /* --- the frog --- */
+  .op-frogs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .op-frogs figure {
+    margin: 0;
+    text-align: center;
+  }
+  .op-frogs img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .op-frogs figcaption {
+    margin-top: 0.3rem;
+    font-size: 1rem;
+  }
+
+  /* --- the count --- */
+  .op-slips {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .op-slip {
+    padding: 0.9rem 1.2rem 1rem;
+    cursor: text;
+  }
+  .op-slip:has(.op-pebbles.done) {
+    background: var(--grid), #fff0a8;
+  }
+  .op-line {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.3rem;
+  }
+  .op-line::placeholder {
+    color: rgba(43, 36, 32, 0.35);
+  }
+  .op-pebbles {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+  .op-pebble {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: var(--line) solid var(--ink);
+    border-radius: 999px;
+  }
+  .op-pebble.on {
+    background: var(--ink);
+  }
+  .op-pebbles.done .op-pebble.on {
+    background: var(--tape);
+  }
+  .op-over {
+    margin-left: 0.3rem;
+    font-weight: 400;
+    color: #d2382e;
+  }
+
+  /* --- lists and notes --- */
+  .op-list {
+    margin: 0;
+    padding-left: 1.4rem;
+    list-style: none;
+  }
+  ul.op-card.op-list {
+    padding-left: 2.6rem;
+  }
+  .op-list li {
+    position: relative;
+    margin: 0 0 0.45rem;
+  }
+  .op-list li:last-child {
+    margin-bottom: 0;
+  }
+  /* a pebble for a bullet */
+  .op-list li::before {
+    content: "";
+    position: absolute;
+    left: -1.35rem;
+    top: 0.52em;
+    width: 0.6rem;
+    height: 0.6rem;
+    background: var(--ink);
+    border-radius: 999px;
+  }
+  .op-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    margin: 0;
+  }
+  .op-notes dd {
+    margin: 0;
+  }
+  /* the date is a strip of tape across the top of its card */
+  .op-tape {
+    display: inline-block;
+    margin: -2.1rem 0 0.8rem -0.4rem;
+    background: var(--tape);
+    border: var(--line) solid var(--ink);
+    padding: 0.05rem 1rem;
+    transform: rotate(-2deg);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 25%, 100% 50%, calc(100% - 7px) 75%, 100% 100%, 0 100%, 7px 75%, 0 50%, 7px 25%);
+  }
+  .op-next {
+    margin: 0;
+    text-align: center;
+  }
+  .op-button {
+    display: inline-block;
+    background: var(--tape);
+    color: var(--ink);
+    border: var(--line) solid var(--ink);
+    border-radius: 6px 10px 7px 11px / 9px 6px 11px 7px;
+    box-shadow: 4px 5px 0 rgba(43, 36, 32, 0.25);
+    padding: 0.5rem 1.3rem;
+    text-decoration: none;
+    transform: rotate(-0.8deg);
+  }
+  .op-button:hover {
+    box-shadow: 1px 2px 0 rgba(43, 36, 32, 0.25);
+    translate: 3px 3px;
+  }
+  @media (max-width: 34rem) {
+    .op-room {
+      font-size: 1.02rem;
+    }
+    .op-card {
+      padding: 1.1rem 1.1rem;
+    }
+    .op-frogs {
+      gap: 0.4rem;
+    }
+  }
+</style>
+
+<script>
+  // The frog's small animations: swap whole drawings, a few a second. Stills if
+  // the reader asks for less motion.
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const src = (f: string) => `/oldpond/aldo-${f}.png`;
+  function play(frames: string[], show: (url: string) => void, n: number) {
+    if (frames.length < 2 || still) return;
+    frames.forEach((f) => {
+      new Image().src = src(f);
+    });
+    let i = 0;
+    const step = () => {
+      i = (i + 1) % frames.length;
+      show(src(frames[i]));
+      // Hold the first drawing longer, so each loop rests between goes.
+      window.setTimeout(step, i === 0 ? 2400 + n * 600 : 220);
+    };
+    window.setTimeout(step, 1400 + n * 800);
+  }
+  document.querySelectorAll<HTMLElement>(".op-loop").forEach((box, n) => {
+    const img = box.querySelector("img");
+    if (img) play((box.dataset.frames ?? "").split(","), (url) => (img.src = url), n);
+  });
+  const aldo = document.getElementById("op-aldo");
+  if (aldo) play((aldo.dataset.frames ?? "").split(","), (url) => aldo.setAttribute("href", url), 2);
+
+  // English syllables by rule: groups of vowels, less a silent final e.
+  function syllables(text: string): number {
+    const words = text.toLowerCase().match(/[a-z']+/g) ?? [];
+    let total = 0;
+    for (let word of words) {
+      word = word.replace(/'/g, "");
+      if (!word) continue;
+      if (word.length <= 3) {
+        total += 1;
+        continue;
+      }
+      const trimmed = word.replace(/(?:[^laeiouy]es|[^aeiouy]ed|[^laeiouy]e)$/, "").replace(/^y/, "");
+      const groups = trimmed.match(/[aeiouy]{1,2}/g);
+      total += Math.max(1, groups ? groups.length : 0);
+    }
+    return total;
+  }
+
+  document.querySelectorAll<HTMLInputElement>(".op-line").forEach((input) => {
+    const target = Number(input.dataset.target);
+    const row = input.parentElement?.querySelector(".op-pebbles");
+    const over = row?.querySelector(".op-over");
+    const pebbles = row ? Array.from(row.querySelectorAll(".op-pebble")) : [];
+    const draw = () => {
+      const beats = syllables(input.value);
+      pebbles.forEach((p, i) => p.classList.toggle("on", i < beats));
+      row?.classList.toggle("done", beats === target);
+      if (over) over.textContent = beats > target ? `+${beats - target}` : "";
+    };
+    input.addEventListener("input", draw);
+    draw();
+  });
+</script>
