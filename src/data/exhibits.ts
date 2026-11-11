@@ -9,6 +9,7 @@ import synapseSticker from "../assets/stickers/synapse.png";
 import kitchenSticker from "../assets/stickers/kitchen.png";
 import perspectiveSticker from "../assets/stickers/perspective.png";
 import oldpondSticker from "../assets/stickers/oldpond.png";
+import monsterclubSticker from "../assets/stickers/monsterclub.png";
 
 export interface Exhibit {
   href: string;
@@ -78,5 +79,16 @@ export const exhibits: Exhibit[] = [
     line: "A haiku a day.",
     sticker: oldpondSticker,
     alt: "Sticker of a green horned frog with heavy-lidded eyes and pink cheeks, sitting in a small puddle",
+  },
+  {
+    // The kids' clothing brand's preview site (Jake, 2026-11-11). Monster Club
+    // is a working name; update the title and href when the brand name and
+    // domain are locked.
+    href: "https://spontaneous-liger-19b92c.netlify.app/",
+    title: "Monster Club",
+    line: "Hand-drawn monster shirts for kids. In progress.",
+    sticker: monsterclubSticker,
+    alt: "Sticker of a washed-black kids' tee printed with a red, hand-drawn dinosaur monster",
+    external: true,
   },
 ];
