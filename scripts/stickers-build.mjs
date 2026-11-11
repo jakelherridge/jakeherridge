@@ -5,9 +5,9 @@
 //
 //   node scripts/stickers-build.mjs
 //
-// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond}.png
+// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond,monsterclub}.png
 //
-//   ONLY=oldpond node scripts/stickers-build.mjs   builds just that one, without
+//   ONLY=oldpond (or ONLY=monsterclub) node scripts/stickers-build.mjs builds just that one, without
 //   needing the other stickers' sources (some live in ~/Downloads).
 //
 // Photo cutouts (Haley, and the monster if Vision recognizes it) run through
@@ -38,6 +38,9 @@ const SRC = {
   perspective: "/Users/jake/Downloads/Gemini_Generated_Image_ns2cwhns2cwhns2c.jpeg",
   // Old Pond: the app's own frog, eyes open, already cut out (2026-11-10).
   oldpond: "/Users/jake/Documents/OldPond/App/Assets.xcassets/AldoOpen.imageset/aldo.png",
+  // Monster Club: the Snaptooth tee mockup from the kids' clothing brand
+  // (KidsBrand repo, gitignored master), Vision-lifted off its backdrop (2026-11-11).
+  monsterclub: "/Users/jake/Documents/KidsBrand/tools/mockups/masters/snaptooth-tee.png",
 };
 
 const exists = (p) => access(p).then(() => true, () => false);
@@ -230,9 +233,31 @@ async function iphoneSticker() {
 // ---- build them all ----
 const jobs = [];
 
+// Monster Club: the brand's Snaptooth tee, lifted off the mockup's backdrop
+// and tilted a touch so it reads as a shirt sticker, not a product photo.
+{
+  const cut = await lift(SRC.monsterclub, "monsterclub-cut.png");
+  const art = await sharp(cut).trim({ threshold: 8 }).png().toBuffer();
+  const cov = await coverage(art);
+  if (cov < 0.2 || cov > 0.95) throw new Error(`monsterclub lift coverage ${cov.toFixed(3)} looks wrong`);
+  if (process.env.ONLY === "monsterclub") {
+    const sticker = await sharp(await dieCut(art))
+      .rotate(-4, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+    await writeFile(path.join(OUT, "monsterclub.png"), sticker);
+    const m = await sharp(sticker).metadata();
+    console.log(`  monsterclub.png  ${m.width}x${m.height}  ${(sticker.length / 1024).toFixed(0)}kB`);
+    process.exit(0);
+  }
+  jobs.push(["monsterclub", art, { tilt: -4 }]);
+}
+
 // Old Pond: the app's frog sitting in a little puddle. His drawing already
 // has a clean alpha. The puddle is drawn here the way the app draws water:
-// flat teal, the same ink line as the frog, a few white ripple marks.
+// flat teal, the same ink line as the frog, a few white ripple marks. His
+// shadow is tall enough to fill the gaps between his legs, so no water
+// shows through under him.
 {
   const frog = await sharp(SRC.oldpond).trim({ threshold: 8 }).png().toBuffer();
   const fm = await sharp(frog).metadata();
@@ -257,7 +282,7 @@ const jobs = [];
       <path d="M${cx + rx * 0.52} ${cy + ry * 0.38}q${rx * 0.12} ${-ry * 0.3} ${rx * 0.24} 0"/>
       <path d="M${cx - rx * 0.5} ${cy + ry * 0.55}q${rx * 0.09} ${-ry * 0.26} ${rx * 0.18} 0"/>
     </g>
-    <ellipse cx="${cx}" cy="${cy + ry * 0.12}" rx="${fm.width * 0.4}" ry="${ry * 0.34}" fill="#2B2420"/>
+    <ellipse cx="${cx}" cy="${cy + ry * 0.02}" rx="${fm.width * 0.4}" ry="${ry * 0.5}" fill="#2B2420"/>
   </svg>`;
   const art = await sharp({
     create: { width: W, height: H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
@@ -519,7 +544,13 @@ jobs.push(["sword", await sharp(SRC.sword).toBuffer()]);
 for (const [name, art, opts] of jobs) {
   // raw skips the die cut: the kitchen card is a photo with stickers ON it,
   // not a sticker itself.
-  const sticker = opts?.raw ? art : await dieCut(art);
+  let sticker = opts?.raw ? art : await dieCut(art);
+  if (opts?.tilt) {
+    sticker = await sharp(sticker)
+      .rotate(opts.tilt, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+  }
   const file = path.join(OUT, `${name}.png`);
   await writeFile(file, sticker);
   const m = await sharp(sticker).metadata();
