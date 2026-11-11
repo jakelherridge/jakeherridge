@@ -5,7 +5,10 @@
 //
 //   node scripts/stickers-build.mjs
 //
-// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen}.png
+// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond}.png
+//
+//   ONLY=oldpond node scripts/stickers-build.mjs   builds just that one, without
+//   needing the other stickers' sources (some live in ~/Downloads).
 //
 // Photo cutouts (Haley, and the monster if Vision recognizes it) run through
 // scripts/subject-lift.swift, Apple's on-device segmentation. Nothing leaves
@@ -33,6 +36,8 @@ const SRC = {
   // From Where You Stand: Jake's Gemini ink render, one cylinder casting a
   // circle shadow on the floor and a square shadow on the wall (2026-08-15).
   perspective: "/Users/jake/Downloads/Gemini_Generated_Image_ns2cwhns2cwhns2c.jpeg",
+  // Old Pond: the app's own frog, eyes open, already cut out (2026-11-10).
+  oldpond: "/Users/jake/Documents/OldPond/App/Assets.xcassets/AldoOpen.imageset/aldo.png",
 };
 
 const exists = (p) => access(p).then(() => true, () => false);
@@ -224,6 +229,20 @@ async function iphoneSticker() {
 
 // ---- build them all ----
 const jobs = [];
+
+// Old Pond: the frog as he sits in the app. His drawing already has a clean
+// alpha, so the die cut is all it needs.
+{
+  const art = await sharp(SRC.oldpond).trim({ threshold: 8 }).png().toBuffer();
+  if (process.env.ONLY === "oldpond") {
+    const sticker = await dieCut(art);
+    await writeFile(path.join(OUT, "oldpond.png"), sticker);
+    const m = await sharp(sticker).metadata();
+    console.log(`  oldpond.png  ${m.width}x${m.height}  ${(sticker.length / 1024).toFixed(0)}kB`);
+    process.exit(0);
+  }
+  jobs.push(["oldpond", art]);
+}
 
 // Gator: already keyed to transparency by the header pipeline.
 jobs.push(["gators", await sharp(SRC.gator).toBuffer()]);

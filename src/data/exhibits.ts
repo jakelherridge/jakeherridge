@@ -8,6 +8,7 @@ import swordSticker from "../assets/stickers/sword.png";
 import synapseSticker from "../assets/stickers/synapse.png";
 import kitchenSticker from "../assets/stickers/kitchen.png";
 import perspectiveSticker from "../assets/stickers/perspective.png";
+import oldpondSticker from "../assets/stickers/oldpond.png";
 
 export interface Exhibit {
   href: string;
@@ -70,5 +71,12 @@ export const exhibits: Exhibit[] = [
     line: "Every view is true. None is complete.",
     sticker: perspectiveSticker,
     alt: "Sticker of an ink cylinder casting a circle shadow on the floor and a square shadow on the wall",
+  },
+  {
+    href: "/exhibits/old-pond/",
+    title: "Old Pond",
+    line: "A haiku a day.",
+    sticker: oldpondSticker,
+    alt: "Sticker of a green horned frog with heavy-lidded eyes and pink cheeks",
   },
 ];
