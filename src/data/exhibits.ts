@@ -77,6 +77,6 @@ export const exhibits: Exhibit[] = [
     title: "Old Pond",
     line: "A haiku a day.",
     sticker: oldpondSticker,
-    alt: "Sticker of a green horned frog with heavy-lidded eyes and pink cheeks",
+    alt: "Sticker of a green horned frog with heavy-lidded eyes and pink cheeks, sitting in a small puddle",
   },
 ];

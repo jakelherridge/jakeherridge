@@ -230,10 +230,44 @@ async function iphoneSticker() {
 // ---- build them all ----
 const jobs = [];
 
-// Old Pond: the frog as he sits in the app. His drawing already has a clean
-// alpha, so the die cut is all it needs.
+// Old Pond: the app's frog sitting in a little puddle. His drawing already
+// has a clean alpha. The puddle is drawn here the way the app draws water:
+// flat teal, the same ink line as the frog, a few white ripple marks.
 {
-  const art = await sharp(SRC.oldpond).trim({ threshold: 8 }).png().toBuffer();
+  const frog = await sharp(SRC.oldpond).trim({ threshold: 8 }).png().toBuffer();
+  const fm = await sharp(frog).metadata();
+  const W = Math.round(fm.width * 1.5);
+  const puddleH = Math.round(fm.height * 0.3);
+  const H = fm.height + Math.round(puddleH * 0.42);
+  const cx = W / 2;
+  const cy = H - puddleH / 2 - 6;
+  const rx = W / 2 - 16;
+  const ry = puddleH / 2 - 8;
+  const line = 18; // the frog's outline is about this heavy at this size
+  // A slightly lumpy oval, so it reads as drawn and not as a perfect ellipse.
+  const blob = `M${cx - rx} ${cy + 4}
+    C${cx - rx} ${cy - ry * 0.9} ${cx - rx * 0.45} ${cy - ry * 1.08} ${cx - rx * 0.05} ${cy - ry}
+    S${cx + rx * 1.02} ${cy - ry * 0.95} ${cx + rx} ${cy - 2}
+    S${cx + rx * 0.5} ${cy + ry * 1.06} ${cx + rx * 0.02} ${cy + ry}
+    S${cx - rx} ${cy + ry * 0.9} ${cx - rx} ${cy + 4}Z`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+    <path d="${blob}" fill="#6ECFC6" stroke="#2B2420" stroke-width="${line}" stroke-linejoin="round"/>
+    <g fill="none" stroke="#ffffff" stroke-width="${line * 0.7}" stroke-linecap="round">
+      <path d="M${cx - rx * 0.78} ${cy - ry * 0.1}q${rx * 0.11} ${-ry * 0.3} ${rx * 0.22} 0"/>
+      <path d="M${cx + rx * 0.52} ${cy + ry * 0.38}q${rx * 0.12} ${-ry * 0.3} ${rx * 0.24} 0"/>
+      <path d="M${cx - rx * 0.5} ${cy + ry * 0.55}q${rx * 0.09} ${-ry * 0.26} ${rx * 0.18} 0"/>
+    </g>
+    <ellipse cx="${cx}" cy="${cy + ry * 0.12}" rx="${fm.width * 0.4}" ry="${ry * 0.34}" fill="#2B2420"/>
+  </svg>`;
+  const art = await sharp({
+    create: { width: W, height: H, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+  })
+    .composite([
+      { input: Buffer.from(svg), left: 0, top: 0 },
+      { input: frog, left: Math.round(cx - fm.width / 2), top: Math.round(cy + ry * 0.22 - fm.height) },
+    ])
+    .png()
+    .toBuffer();
   if (process.env.ONLY === "oldpond") {
     const sticker = await dieCut(art);
     await writeFile(path.join(OUT, "oldpond.png"), sticker);
