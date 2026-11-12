@@ -1,0 +1,94 @@
+{
+  "monsters": [
+    {
+      "id": "01",
+      "title": "Monster 01",
+      "src": "/terrarium/monster_01.png",
+      "w": 73,
+      "h": 96
+    },
+    {
+      "id": "04",
+      "title": "Monster 04",
+      "src": "/terrarium/monster_04.png",
+      "w": 64,
+      "h": 96
+    },
+    {
+      "id": "05",
+      "title": "Monster 05",
+      "src": "/terrarium/monster_05.png",
+      "w": 70,
+      "h": 96
+    },
+    {
+      "id": "06",
+      "title": "Monster 06",
+      "src": "/terrarium/monster_06.png",
+      "w": 70,
+      "h": 96
+    },
+    {
+      "id": "12",
+      "title": "Monster 12",
+      "src": "/terrarium/monster_12.png",
+      "w": 71,
+      "h": 96
+    },
+    {
+      "id": "14",
+      "title": "Monster 14",
+      "src": "/terrarium/monster_14.png",
+      "w": 74,
+      "h": 96
+    },
+    {
+      "id": "16",
+      "title": "Monster 16",
+      "src": "/terrarium/monster_16.png",
+      "w": 70,
+      "h": 96
+    },
+    {
+      "id": "17",
+      "title": "Monster 17",
+      "src": "/terrarium/monster_17.png",
+      "w": 63,
+      "h": 87
+    },
+    {
+      "id": "20",
+      "title": "Monster 20",
+      "src": "/terrarium/monster_20.png",
+      "w": 61,
+      "h": 90
+    },
+    {
+      "id": "23",
+      "title": "Monster 23",
+      "src": "/terrarium/monster_23.png",
+      "w": 66,
+      "h": 96
+    },
+    {
+      "id": "29",
+      "title": "Monster 29",
+      "src": "/terrarium/monster_29.png",
+      "w": 96,
+      "h": 65
+    },
+    {
+      "id": "31",
+      "title": "Monster 31",
+      "src": "/terrarium/monster_31.png",
+      "w": 68,
+      "h": 96
+    }
+  ],
+  "example": {
+    "id": "17",
+    "page": "/terrarium/page-17.webp",
+    "w": 446,
+    "h": 640
+  }
+}

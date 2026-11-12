@@ -5,9 +5,9 @@
 //
 //   node scripts/stickers-build.mjs
 //
-// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond,monsterclub}.png
+// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond,monsterclub,terrarium}.png
 //
-//   ONLY=oldpond (or ONLY=monsterclub) node scripts/stickers-build.mjs builds just that one, without
+//   ONLY=oldpond (or monsterclub, or terrarium) node scripts/stickers-build.mjs builds just that one, without
 //   needing the other stickers' sources (some live in ~/Downloads).
 //
 // Photo cutouts (Haley, and the monster if Vision recognizes it) run through
@@ -41,6 +41,10 @@ const SRC = {
   // Monster Club: the Snaptooth tee mockup from the kids' clothing brand
   // (KidsBrand repo, gitignored master), Vision-lifted off its backdrop (2026-11-11).
   monsterclub: "/Users/jake/Documents/KidsBrand/tools/mockups/masters/snaptooth-tee.png",
+  // Monster Terrarium: a monster-shaped pocket pet with a flat green screen,
+  // rendered by OpenRouter (google/gemini-3.1-flash-image) on 2026-11-11 and
+  // kept in the game's project folder. The tank gets painted into the screen.
+  terrarium: "/Users/jake/Documents/TwelveEpicMonths/projects/09-monster-terrarium/work/sticker/device-1.png",
 };
 
 const exists = (p) => access(p).then(() => true, () => false);
@@ -251,6 +255,151 @@ const jobs = [];
     process.exit(0);
   }
   jobs.push(["monsterclub", art, { tilt: -4 }]);
+}
+
+// Monster Terrarium: a new-age monster pocket pet (Jake's ask, 2026-11-11)
+// whose screen is the tank. The toy is an OpenRouter image render with a flat
+// green screen, kept in the game's project folder (work/sticker/device-1.png,
+// made by make_device.mjs there). Vision lifts it off its white backdrop, and
+// the screen gets the real tank: the game's colors and two of its own 96 px
+// sprites (from public/terrarium, via terrarium-build.mjs), drawn at pixel
+// scale and blown up 2x with hard edges, so the monsters on it are exact.
+{
+  const cut = await lift(SRC.terrarium, "terrarium-device-cut.png");
+  // Find the screen in the original render: Vision sometimes counts part of a
+  // flat green screen as background, so the lifted copy can't be trusted there.
+  const dev = await sharp(SRC.terrarium).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const DW = dev.info.width;
+  const DH = dev.info.height;
+  const cm = await sharp(cut).metadata();
+  if (cm.width !== DW || cm.height !== DH) throw new Error("terrarium lift changed the render's size");
+  const d = dev.data;
+  // The screen is the strongly green part of the toy.
+  let screen = new Uint8Array(DW * DH);
+  let sx0 = DW, sy0 = DH, sx1 = -1, sy1 = -1;
+  for (let p = 0; p < DW * DH; p++) {
+    const [r, g, b] = [d[p * 3], d[p * 3 + 1], d[p * 3 + 2]];
+    if (g > 140 && g - Math.max(r, b) > 60) {
+      screen[p] = 1;
+      const x = p % DW, y = (p / DW) | 0;
+      sx0 = Math.min(sx0, x); sx1 = Math.max(sx1, x); sy0 = Math.min(sy0, y); sy1 = Math.max(sy1, y);
+    }
+  }
+  if (sx1 < 0) throw new Error("no green screen found in the terrarium device render");
+  // The screen's rounded corners fade from green into the cream frame. Grow
+  // from the solid green through anything still greenish, staying near the
+  // screen, so the fringe gets covered without reaching the green body.
+  {
+    const stack = [];
+    for (let p = 0; p < DW * DH; p++) if (screen[p]) stack.push(p);
+    while (stack.length) {
+      const p = stack.pop();
+      const x = p % DW, y = (p / DW) | 0;
+      for (const q of [x > 0 ? p - 1 : -1, x < DW - 1 ? p + 1 : -1, y > 0 ? p - DW : -1, y < DH - 1 ? p + DW : -1]) {
+        if (q < 0 || screen[q]) continue;
+        const qx = q % DW, qy = (q / DW) | 0;
+        if (qx < sx0 - 10 || qx > sx1 + 10 || qy < sy0 - 10 || qy > sy1 + 10) continue;
+        if (d[q * 3 + 1] - Math.max(d[q * 3], d[q * 3 + 2]) > 14) {
+          screen[q] = 1;
+          stack.push(q);
+          sx0 = Math.min(sx0, qx); sx1 = Math.max(sx1, qx); sy0 = Math.min(sy0, qy); sy1 = Math.max(sy1, qy);
+        }
+      }
+    }
+  }
+  // Then 2 px more, for the last antialiased edge.
+  for (let pass = 0; pass < 2; pass++) {
+    const grown = screen.slice();
+    for (let p = 0; p < DW * DH; p++) {
+      if (screen[p]) continue;
+      const x = p % DW;
+      if ((x > 0 && screen[p - 1]) || (x < DW - 1 && screen[p + 1]) || screen[p - DW] || screen[p + DW]) grown[p] = 1;
+    }
+    screen = grown;
+  }
+  sx0 -= 2; sy0 -= 2; sx1 += 2; sy1 += 2;
+  const SW = sx1 - sx0 + 1;
+  const SH = sy1 - sy0 + 1;
+
+  // The tank at pixel scale, sized so 2x fills the screen.
+  const K = 2;
+  const PW = Math.floor(SW / K);
+  const PH = Math.floor(SH / K);
+  const px = Buffer.alloc(PW * PH * 4);
+  const rect = (x, y, w, h, color) => {
+    const c = [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16));
+    for (let yy = Math.max(0, y); yy < Math.min(PH, y + h); yy++)
+      for (let xx = Math.max(0, x); xx < Math.min(PW, x + w); xx++) {
+        const i = (yy * PW + xx) * 4;
+        [px[i], px[i + 1], px[i + 2], px[i + 3]] = [...c, 255];
+      }
+  };
+  const soilTop = PH - 34;
+  rect(0, 0, PW, PH, "#c4d6ba");
+  rect(0, soilTop, PW, PH - soilTop, "#684e3a");
+  rect(0, soilTop, PW, 3, "#62844f");
+  let seed = 9;
+  const seeded = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  for (let i = 0; i < 26; i++) rect(Math.floor(seeded() * (PW - 3)), soilTop + 6 + Math.floor(seeded() * 24), 3, 2, "#533e2e");
+  for (const [x, h, c] of [[4, 34, "#577747"], [8, 50, "#6e9a57"], [12, 28, "#577747"], [PW - 9, 30, "#6e9a57"], [PW - 5, 42, "#577747"]]) {
+    for (let y = 0; y < h; y++) rect(x + Math.round(Math.sin(y / 8)), soilTop + 2 - y, 2, 1, c);
+  }
+  // Two of the tank's monsters, facing each other: the dog in the box, and
+  // the chunky gator lying on his side.
+  const dir = path.join(ROOT, "public/terrarium");
+  const cast = [
+    ["17", 0.3, soilTop + 20, false],
+    ["29", 0.72, soilTop + 25, true],
+  ];
+  const layers = [];
+  for (const [id, fx, feet, flip] of cast) {
+    let img = sharp(path.join(dir, `monster_${id}.png`));
+    if (flip) img = img.flop();
+    const buf = await img.png().toBuffer();
+    const m = await sharp(buf).metadata();
+    layers.push({ input: buf, left: Math.round(PW * fx - m.width / 2), top: feet - m.height });
+  }
+  const tankSmall = await sharp(px, { raw: { width: PW, height: PH, channels: 4 } }).composite(layers).png().toBuffer();
+  // A faint sheen across the glass, the way a little LCD catches light.
+  const sheen = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="0.35" stop-color="#fff" stop-opacity="0.06"/>
+      <stop offset="0.36" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+    <rect width="${SW}" height="${SH}" fill="url(#g)"/></svg>`);
+  // Separate steps on purpose: sharp runs one pipeline's operations in its own
+  // order, and removeAlpha before the composite would leave 4 channels.
+  const tankBig = await sharp(tankSmall)
+    .resize(PW * K, PH * K, { kernel: "nearest" })
+    .extend({ right: SW - PW * K, bottom: SH - PH * K, extendWith: "copy" })
+    .png()
+    .toBuffer();
+  const tankLit = await sharp(tankBig).composite([{ input: sheen }]).png().toBuffer();
+  const tankRGB = await sharp(tankLit).removeAlpha().raw().toBuffer();
+  const mask = Buffer.alloc(SW * SH);
+  for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) mask[y * SW + x] = screen[(y + sy0) * DW + (x + sx0)] ? 255 : 0;
+  const screenImg = await sharp(tankRGB, { raw: { width: SW, height: SH, channels: 3 } })
+    // extractChannel keeps the softened mask one channel wide; without it the
+    // blur hands back three and the rows slide out of line.
+    .joinChannel(await sharp(mask, { raw: { width: SW, height: SH, channels: 1 } }).blur(0.6).extractChannel(0).raw().toBuffer(), {
+      raw: { width: SW, height: SH, channels: 1 },
+    })
+    .png()
+    .toBuffer();
+  const lit = await sharp(cut).composite([{ input: screenImg, left: sx0, top: sy0 }]).png().toBuffer();
+  const art = await sharp(lit).trim({ threshold: 8 }).png().toBuffer();
+  const cov = await coverage(art);
+  if (cov < 0.3 || cov > 0.97) throw new Error(`terrarium lift coverage ${cov.toFixed(3)} looks wrong`);
+  if (process.env.ONLY === "terrarium") {
+    const sticker = await sharp(await dieCut(art))
+      .rotate(-3, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+    await writeFile(path.join(OUT, "terrarium.png"), sticker);
+    const m = await sharp(sticker).metadata();
+    console.log(`  terrarium.png  ${m.width}x${m.height}  ${(sticker.length / 1024).toFixed(0)}kB`);
+    process.exit(0);
+  }
+  jobs.push(["terrarium", art, { tilt: -3 }]);
 }
 
 // Old Pond: the app's frog sitting in a little puddle. His drawing already

@@ -1,0 +1,374 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { breadcrumb } from "../../lib/schema";
+import terrarium from "../../data/terrarium.json";
+
+const title = "Monster Terrarium";
+const description =
+  "Monster Terrarium is a pixel tank where hand-drawn monsters wander. In progress. A copy of the tank runs live on this page, with every sprite, one drawing shown before and after, and dated build notes.";
+
+const { monsters, example } = terrarium;
+const exampleSprite = monsters.find((m) => m.id === example.id)!;
+
+const jsonLd = [
+  {
+    "@type": "SoftwareApplication",
+    name: title,
+    applicationCategory: "GameApplication",
+    operatingSystem: "Linux, macOS",
+    author: { "@id": "https://jakeherridge.com/#person" },
+    description:
+      "A pixel tank where hand-drawn monsters wander. At home it runs on its own screen, and a phone on the same Wi-Fi can send in a photo of a drawing. Built in Godot 4. Not yet released.",
+  },
+  breadcrumb([
+    { name: "Jake Herridge", url: "https://jakeherridge.com/" },
+    { name: title, url: "https://jakeherridge.com/exhibits/monster-terrarium/" },
+  ]),
+];
+
+const facts = [
+  "A tank 960 by 540 pixels. It doubles evenly onto a 1080p screen, so the pixels stay square.",
+  "Each monster is 96 pixels tall, made by a script from a hand-drawn, colored-in page. There are ten colors, all taken from those pages.",
+  "Monsters wander, rest, bob as they walk, and turn to face where they are going.",
+  "At home it runs on its own screen. A phone on the same Wi-Fi opens the tank's address and sends a photo of a drawing. About a second later a new monster walks in.",
+  "The photos stay in the house. No account, no server.",
+  "Built in Godot 4. A free version is planned for itch.io.",
+];
+
+// Dated notes, newest first. Add a line when the tank changes.
+const notes = [
+  {
+    date: "2026-11-11",
+    items: [
+      "This page, with a live copy of the tank.",
+      "Monster 29, the chunky gator, now lies on his side. His page is drawn snout up.",
+    ],
+  },
+  {
+    date: "2026-11-05",
+    items: [
+      "Sprites went from 48 to 96 pixels tall.",
+      "A cleanup pass after the shrink: faint specks go, stray pixels take the color around them, lines that land two pixels wide get thinned.",
+      "All 12 colored monsters are in the tank.",
+    ],
+  },
+  {
+    date: "2026-11-03",
+    items: [
+      "Started in Godot 4. One monster wandering a plain tank.",
+      "A phone on the same Wi-Fi can send a photo, and it walks in as a new monster.",
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <article class="mx-auto max-w-5xl px-5 py-14">
+    <header>
+      <p class="font-mono text-[0.65rem] uppercase tracking-widest text-rust">
+        Exhibit · Game · in progress
+      </p>
+      <h1 class="wonk mt-2 text-4xl font-semibold tracking-tight md:text-6xl">{title}</h1>
+      <p class="mt-4 font-mono text-xs tracking-wide text-muted">
+        {monsters.length} monsters · 96 pixels tall · Godot 4
+      </p>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+        A pixel tank where hand-drawn monsters wander. At home it runs on its own
+        screen. A photo of a drawing, sent from a phone, becomes a new monster.
+      </p>
+    </header>
+
+    <!-- The tank itself, live. Same sprites, same wander rules as the game. -->
+    <figure class="mt-10">
+      <canvas
+        id="tank"
+        width="960"
+        height="540"
+        class="tank block w-full"
+        role="img"
+        aria-label={`A pixel tank with a soil floor. ${monsters.length} hand-drawn monsters wander across it, rest, and turn around.`}
+        data-monsters={JSON.stringify(monsters.map(({ src, w, h }) => ({ src, w, h })))}
+      ></canvas>
+      <figcaption class="mt-3 font-mono text-xs tracking-wide text-muted">
+        Live. The game's sprites and its wander rules, running in this browser.
+      </figcaption>
+    </figure>
+
+    <section class="mt-20" aria-labelledby="monsters">
+      <h2 id="monsters" class="wonk text-2xl font-semibold tracking-tight md:text-3xl">
+        The monsters
+      </h2>
+      <ul class="mt-8 grid grid-cols-3 gap-x-6 gap-y-10 sm:grid-cols-4 md:grid-cols-6">
+        {
+          monsters.map((m) => (
+            <li class="flex flex-col items-center">
+              <div class="flex h-[192px] items-end">
+                <img
+                  src={m.src}
+                  alt={`${m.title} as a sprite`}
+                  width={m.w * 2}
+                  height={m.h * 2}
+                  class="pixel max-w-full"
+                  loading="lazy"
+                />
+              </div>
+              <p class="mt-3 font-mono text-xs tracking-wide text-muted">{m.title}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="mt-20" aria-labelledby="pixels">
+      <h2 id="pixels" class="wonk text-2xl font-semibold tracking-tight md:text-3xl">
+        From page to pixels
+      </h2>
+      <div class="mt-8 grid items-end gap-10 sm:grid-cols-2">
+        <figure class="mx-auto w-full max-w-[300px]">
+          <img
+            src={example.page}
+            alt={`Monster ${example.id} as a colored page: an orange dog-like monster with big round eyes, sitting in a brown box with little legs`}
+            width={example.w}
+            height={example.h}
+            class="w-full -rotate-1 rounded-md border border-faint shadow-sm"
+            loading="lazy"
+          />
+          <figcaption class="mt-3 font-mono text-xs tracking-wide text-muted">
+            The page. Drawn in ink, colored in.
+          </figcaption>
+        </figure>
+        <figure class="mx-auto w-full max-w-[300px]">
+          <img
+            src={exampleSprite.src}
+            alt={`Monster ${example.id} as a 96 pixel sprite`}
+            width={exampleSprite.w * 3}
+            height={exampleSprite.h * 3}
+            class="pixel mx-auto"
+            loading="lazy"
+          />
+          <figcaption class="mt-3 font-mono text-xs tracking-wide text-muted">
+            The sprite. 96 pixels tall, ten colors, shown at three times size.
+          </figcaption>
+        </figure>
+      </div>
+      <p class="mt-8 max-w-2xl text-muted">
+        A script finds the paper and lifts the drawing off it. Every pixel snaps to
+        the nearest of the ten colors. The drawing shrinks block by block: a block
+        with enough ink turns into outline, a block that is mostly paper turns
+        clear, and the rest take their most common color. Faint specks are dropped,
+        lines that land two pixels wide are thinned, and the outline is closed. The
+        game runs the same steps on a phone photo, with extra work to even out
+        shadows and find the edge of the sheet.
+      </p>
+    </section>
+
+    <section class="mt-20" aria-labelledby="facts">
+      <h2 id="facts" class="wonk text-2xl font-semibold tracking-tight md:text-3xl">
+        What is in it
+      </h2>
+      <ul class="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-muted marker:text-rust">
+        {facts.map((fact) => <li>{fact}</li>)}
+      </ul>
+    </section>
+
+    <section class="mt-20" aria-labelledby="notes">
+      <h2 id="notes" class="wonk text-2xl font-semibold tracking-tight md:text-3xl">
+        Build notes
+      </h2>
+      <dl class="mt-6 max-w-2xl space-y-6">
+        {
+          notes.map((note) => (
+            <div class="grid gap-1 sm:grid-cols-[7.5rem_1fr] sm:gap-6">
+              <dt class="font-mono text-xs leading-7 tracking-wide text-rust">
+                <time datetime={note.date}>{note.date}</time>
+              </dt>
+              <dd class="m-0">
+                <ul class="space-y-1 text-muted">
+                  {note.items.map((item) => <li>{item}</li>)}
+                </ul>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <p class="mt-20">
+      <a href="/exhibits/monsters/" class="font-medium">
+        The same monsters are coloring sheets &rarr;
+      </a>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .pixel {
+    image-rendering: pixelated;
+  }
+  .tank {
+    aspect-ratio: 16 / 9;
+    height: auto;
+    background: #c4d6ba;
+    border-radius: 6px;
+  }
+  /* Shrunk below one canvas pixel per screen pixel, smooth beats pixelated
+     (pixelated would drop whole rows). The script sets data-sharp. */
+  .tank[data-sharp] {
+    image-rendering: pixelated;
+  }
+</style>
+
+<script>
+  // The tank, ported from the game (work/godot/scripts/terrarium.gd and
+  // monster.gd): a 960x540 tank, a soil floor 96 pixels deep, and monsters
+  // that pick a spot, walk there, rest, and pick again.
+  const W = 960;
+  const H = 540;
+  const FLOOR = H - 96;
+  const BAND = [FLOOR + 14, H - 8]; // where feet can stand
+  const SPEED = [21, 8]; // pixels a second, sideways and up/down
+  const BOB = 2;
+  const BOB_RATE = 6;
+  const BACK = "#c4d6ba";
+  const SOIL = "#684e3a";
+  const MOSS = "#62844f";
+  const PEBBLE = "#533e2e";
+
+  type Spec = { src: string; w: number; h: number };
+  type Monster = Spec & {
+    img: HTMLImageElement;
+    x: number;
+    y: number;
+    tx: number;
+    ty: number;
+    rest: number;
+    walk: number;
+    flip: boolean;
+  };
+
+  const canvas = document.getElementById("tank") as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext("2d");
+  if (canvas && ctx) {
+    const specs: Spec[] = JSON.parse(canvas.dataset.monsters ?? "[]");
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
+    // The floor never changes, so draw it once. Pebbles use a fixed seed.
+    const floor = document.createElement("canvas");
+    floor.width = W;
+    floor.height = H;
+    const f = floor.getContext("2d")!;
+    f.fillStyle = BACK;
+    f.fillRect(0, 0, W, H);
+    f.fillStyle = SOIL;
+    f.fillRect(0, FLOOR, W, H - FLOOR);
+    f.fillStyle = MOSS;
+    f.fillRect(0, FLOOR, W, 3);
+    let seed = 9;
+    const seeded = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    f.fillStyle = PEBBLE;
+    for (let i = 0; i < 90; i++) {
+      f.fillRect(Math.floor(seeded() * (W - 3)), Math.floor(BAND[0] + seeded() * (H - 3 - BAND[0])), 3, 2);
+    }
+
+    // Start spread across the tank, each with its own short rest, so they
+    // don't all set off at once.
+    const order = specs.map((_, i) => i).sort(() => Math.random() - 0.5);
+    const monsters: Monster[] = specs.map((s, i) => {
+      const img = new Image();
+      img.src = s.src;
+      const slot = order[i];
+      const x = Math.min(W - s.w, Math.max(s.w, ((slot + 0.5) * W) / specs.length + rand(-20, 20)));
+      const y = rand(BAND[0], BAND[1]);
+      return { ...s, img, x, y, tx: x, ty: y, rest: rand(0, 4), walk: 0, flip: Math.random() < 0.5 };
+    });
+
+    const pickTarget = (m: Monster) => {
+      m.tx = Math.min(W - m.w, Math.max(m.w, m.x + rand(-240, 240)));
+      m.ty = rand(BAND[0], BAND[1]);
+    };
+
+    const step = (dt: number) => {
+      for (const m of monsters) {
+        if (m.rest > 0) {
+          m.rest -= dt;
+          continue;
+        }
+        const dx = m.tx - m.x;
+        const dy = m.ty - m.y;
+        if (Math.hypot(dx, dy) < 1) {
+          m.rest = rand(1.5, 6);
+          pickTarget(m);
+          continue;
+        }
+        m.x += Math.sign(dx) * Math.min(Math.abs(dx), SPEED[0] * dt);
+        m.y += Math.sign(dy) * Math.min(Math.abs(dy), SPEED[1] * dt);
+        if (Math.abs(dx) > 0.5) m.flip = dx < 0;
+        m.walk += dt;
+      }
+    };
+
+    const draw = () => {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(floor, 0, 0);
+      // Lower on screen draws in front, like the game's y-sort.
+      for (const m of [...monsters].sort((a, b) => a.y - b.y)) {
+        if (!m.img.complete || m.img.naturalWidth === 0) continue;
+        const bob = m.rest > 0 ? 0 : -Math.round(Math.abs(Math.sin(m.walk * BOB_RATE)) * BOB);
+        const left = Math.round(m.x - m.w / 2);
+        const top = Math.round(m.y - m.h) + bob;
+        if (m.flip) {
+          ctx.save();
+          ctx.translate(left + m.w, top);
+          ctx.scale(-1, 1);
+          ctx.drawImage(m.img, 0, 0);
+          ctx.restore();
+        } else {
+          ctx.drawImage(m.img, left, top);
+        }
+      }
+    };
+
+    // Square pixels when the tank is shown at full size or bigger.
+    const sharpen = () => {
+      const scale = (canvas.clientWidth * window.devicePixelRatio) / W;
+      canvas.toggleAttribute("data-sharp", scale >= 1);
+    };
+    sharpen();
+    window.addEventListener("resize", sharpen);
+
+    // First paint right away, then again as each sprite arrives.
+    draw();
+    monsters.forEach((m) => m.img.addEventListener("load", draw));
+
+    if (!still) {
+      let visible = true;
+      let last = performance.now();
+      const tick = () => {
+        const now = performance.now();
+        const dt = Math.min(0.1, (now - last) / 1000);
+        last = now;
+        if (visible && !document.hidden) {
+          step(dt);
+          draw();
+        }
+      };
+      const loop = () => {
+        tick();
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+      // A watchdog in case animation frames stop (hidden panes, some embeds).
+      window.setInterval(() => {
+        if (performance.now() - last > 250) tick();
+      }, 100);
+      new IntersectionObserver(([e]) => {
+        visible = e.isIntersecting;
+        last = performance.now();
+      }).observe(canvas);
+    }
+  }
+</script>

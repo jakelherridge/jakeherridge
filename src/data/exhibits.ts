@@ -10,6 +10,7 @@ import kitchenSticker from "../assets/stickers/kitchen.png";
 import perspectiveSticker from "../assets/stickers/perspective.png";
 import oldpondSticker from "../assets/stickers/oldpond.png";
 import monsterclubSticker from "../assets/stickers/monsterclub.png";
+import terrariumSticker from "../assets/stickers/terrarium.png";
 
 export interface Exhibit {
   href: string;
@@ -90,5 +91,14 @@ export const exhibits: Exhibit[] = [
     sticker: monsterclubSticker,
     alt: "Sticker of a washed-black kids' tee printed with a red, hand-drawn dinosaur monster",
     external: true,
+  },
+  {
+    // Project #9 of Jake's 2027 year (Jake, 2026-11-11). Line drafted by
+    // Claude; Jake can change it.
+    href: "/exhibits/monster-terrarium/",
+    title: "Monster Terrarium",
+    line: "Hand-drawn monsters in a pixel tank. In progress.",
+    sticker: terrariumSticker,
+    alt: "Sticker of an egg-shaped pocket pet toy with little horns and feet, its screen showing the pixel tank: a dog in a box and a chunky gator on a soil floor",
   },
 ];

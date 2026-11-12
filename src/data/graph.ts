@@ -69,6 +69,14 @@ export const nodes: GraphNode[] = [
     href: "/exhibits/old-pond/",
   },
   {
+    id: "monster-terrarium",
+    label: "Monster Terrarium",
+    kind: "build",
+    status: "growing",
+    summary: "A pixel tank where hand-drawn monsters wander. In progress.",
+    href: "/exhibits/monster-terrarium/",
+  },
+  {
     id: "synapse",
     label: "Synapse",
     kind: "build",
@@ -317,6 +325,7 @@ export const edges: GraphEdge[] = [
   { from: "jake", to: "pocketwild", rel: "made" },
   { from: "jake", to: "old-pond", rel: "made" },
   { from: "pocketwild", to: "old-pond", rel: "led_to" },
+  { from: "jake", to: "monster-terrarium", rel: "made" },
   { from: "jake", to: "synapse", rel: "made" },
   { from: "jake", to: "synapse-capture", rel: "made" },
   { from: "jake", to: "apd", rel: "made" },
