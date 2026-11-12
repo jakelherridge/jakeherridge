@@ -11,6 +11,7 @@ import perspectiveSticker from "../assets/stickers/perspective.png";
 import oldpondSticker from "../assets/stickers/oldpond.png";
 import monsterclubSticker from "../assets/stickers/monsterclub.png";
 import terrariumSticker from "../assets/stickers/terrarium.png";
+import claybornSticker from "../assets/stickers/clayborn.png";
 
 export interface Exhibit {
   href: string;
@@ -100,5 +101,16 @@ export const exhibits: Exhibit[] = [
     line: "Hand-drawn monsters in a pixel tank. In progress.",
     sticker: terrariumSticker,
     alt: "Sticker of an egg-shaped pocket pet toy with little horns and feet, its screen showing the pixel tank: a dog in a box and a chunky gator on a soil floor",
+  },
+  {
+    // Project #4 of Jake's 2027 year, live as a no-account web game since
+    // 2026-11-11 (Jake's ask: a sticker on the home page linking to it). Line
+    // drafted by Claude; Jake can change it.
+    href: "https://clayborn-game.netlify.app/",
+    title: "Clayborn",
+    line: "Build a clay creature and take it for a walk.",
+    sticker: claybornSticker,
+    alt: "Sticker of a green clay creature with orange spots, curled horns and googly eyes, standing on a little disc of clay grass",
+    external: true,
   },
 ];

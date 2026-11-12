@@ -5,9 +5,9 @@
 //
 //   node scripts/stickers-build.mjs
 //
-// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond,monsterclub,terrarium}.png
+// out: src/assets/stickers/{gators,monsters,sword,pocketwild,kitchen,oldpond,monsterclub,terrarium,clayborn}.png
 //
-//   ONLY=oldpond (or monsterclub, or terrarium) node scripts/stickers-build.mjs builds just that one, without
+//   ONLY=oldpond (or monsterclub, terrarium, clayborn) node scripts/stickers-build.mjs builds just that one, without
 //   needing the other stickers' sources (some live in ~/Downloads).
 //
 // Photo cutouts (Haley, and the monster if Vision recognizes it) run through
@@ -45,6 +45,11 @@ const SRC = {
   // rendered by OpenRouter (google/gemini-3.1-flash-image) on 2026-11-11 and
   // kept in the game's project folder. The tank gets painted into the screen.
   terrarium: "/Users/jake/Documents/TwelveEpicMonths/projects/09-monster-terrarium/work/sticker/device-1.png",
+  // Clayborn: the game's landing-page creature as a handmade clay figurine on
+  // a disc of clay grass. OpenRouter (google/gemini-3.1-flash-image) made it
+  // from a real in-game render on 2026-11-11; master and script (make_sticker.mjs)
+  // live in the game's project folder.
+  clayborn: "/Users/jake/Documents/TwelveEpicMonths/projects/04-clayborn/work/sticker/base-1.png",
 };
 
 const exists = (p) => access(p).then(() => true, () => false);
@@ -400,6 +405,27 @@ const jobs = [];
     process.exit(0);
   }
   jobs.push(["terrarium", art, { tilt: -3 }]);
+}
+
+// Clayborn: the clay creature on its grass disc, lifted off the render's white
+// backdrop (Vision drops the floor shadow) and tilted the other way from its
+// neighbors. The gap under the belly fills white like a real sticker backing.
+{
+  const cut = await lift(SRC.clayborn, "clayborn-cut.png");
+  const art = await sharp(await keepMajor(await sharp(cut).toBuffer())).trim({ threshold: 8 }).png().toBuffer();
+  const cov = await coverage(art);
+  if (cov < 0.2 || cov > 0.95) throw new Error(`clayborn lift coverage ${cov.toFixed(3)} looks wrong`);
+  if (process.env.ONLY === "clayborn") {
+    const sticker = await sharp(await dieCut(art))
+      .rotate(3, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+    await writeFile(path.join(OUT, "clayborn.png"), sticker);
+    const m = await sharp(sticker).metadata();
+    console.log(`  clayborn.png  ${m.width}x${m.height}  ${(sticker.length / 1024).toFixed(0)}kB`);
+    process.exit(0);
+  }
+  jobs.push(["clayborn", art, { tilt: 3 }]);
 }
 
 // Old Pond: the app's frog sitting in a little puddle. His drawing already
